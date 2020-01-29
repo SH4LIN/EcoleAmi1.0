@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
               icon: new Icon(Icons.settings),
-              title: Text("Profile")
+              title: Text("Settings")
           ),
         ],
         type: BottomNavigationBarType.fixed,

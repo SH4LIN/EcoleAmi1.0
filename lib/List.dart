@@ -97,14 +97,6 @@ class _ListState extends State<List> {
                       onPressed: ()=>{Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => new Home()))},
                       splashColor: Colors.red,
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 7.0)),
-                    new GestureDetector(
-                      child: new Text(
-                        "Not Registered? Sign up Here",
-                        style: new TextStyle(color: Colors.black,fontSize: 11.0),
-                      ),
-                      onTap: ()=>{},
-                    ),
                     new Padding(padding: const EdgeInsets.only(bottom: 10.0)),
                     new Align(
                       alignment: Alignment.bottomRight,

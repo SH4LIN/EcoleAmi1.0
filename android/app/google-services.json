@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "673655284458",
+    "firebase_url": "https://ecoleami-1-0.firebaseio.com",
+    "project_id": "ecoleami-1-0",
+    "storage_bucket": "ecoleami-1-0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673655284458:android:ed03c2fd45d23f55d2ed93",
+        "android_client_info": {
+          "package_name": "example.com.ecoleami1_0"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673655284458-ht8mbjl6na1r2io3dl365o6f4oklqtou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkEOBmWDcouwmvbvigeJrUa2EIxeJxaAI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673655284458-ht8mbjl6na1r2io3dl365o6f4oklqtou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
