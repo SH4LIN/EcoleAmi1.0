@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:673655284458:android:ed03c2fd45d23f55d2ed93",
+        "mobilesdk_app_id": "1:673655284458:android:31074a31384c16acd2ed93",
         "android_client_info": {
           "package_name": "example.com.ecoleami1_0"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "673655284458-a0hqb6klvja2nfoi980rjjp7hfstlaat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "example.com.ecoleami1_0",
+            "certificate_hash": "638829c82fce7585fe3f3128b9ede76d22dd479c"
+          }
+        },
         {
           "client_id": "673655284458-ht8mbjl6na1r2io3dl365o6f4oklqtou.apps.googleusercontent.com",
           "client_type": 3
