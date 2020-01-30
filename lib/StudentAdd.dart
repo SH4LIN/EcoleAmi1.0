@@ -1,5 +1,9 @@
+import 'package:ecoleami1_0/ManageStudent.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+
 class StudentAdd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -15,6 +19,9 @@ class AddDetails extends StatefulWidget {
 }
 
 class _AddDetailsState extends State<AddDetails> {
+
+
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -34,6 +41,18 @@ class Add extends StatefulWidget {
 
 class _AddState extends State<Add> {
   bool _obscureText = true;
+
+    final databaseReference = Firestore.instance;
+
+//    TextEditingController _enr;
+    TextEditingController _fName = new TextEditingController();
+    TextEditingController _mName = new TextEditingController();
+    TextEditingController _lName = new TextEditingController();
+    TextEditingController _eMail = new TextEditingController();
+    TextEditingController _phone = new TextEditingController();
+    TextEditingController _sem = new TextEditingController();
+
+
   @override
   Widget build(BuildContext context) {
     return new ListView(
@@ -58,6 +77,8 @@ class _AddState extends State<Add> {
                 child: new Column(
                   children: <Widget>[
                     new TextField(
+//                      controller: _enr,
+                      enabled: false,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -78,6 +99,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _fName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -98,6 +120,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _mName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -118,6 +141,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _lName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -138,6 +162,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _eMail,
                       keyboardType: TextInputType.emailAddress,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -158,6 +183,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _phone,
                       keyboardType: TextInputType.phone,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -178,6 +204,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _sem,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -198,6 +225,7 @@ class _AddState extends State<Add> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+//                      controller: _pass,
                       keyboardType: TextInputType.text,
                       obscureText: _obscureText,
                       enabled: false,
@@ -242,7 +270,7 @@ class _AddState extends State<Add> {
                             fontSize: 15.0
                         ),
                       ),
-                      //onPressed: ()=>{Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => new Home()))},
+                      onPressed: _onClick,
                       splashColor: Colors.red,
                     ),
                   ],
@@ -253,6 +281,37 @@ class _AddState extends State<Add> {
         ),
       ],
     );
+  }
+
+  void _onClick() async {
+
+//    if (_fName.text.isEmpty )
+
+    await databaseReference.collection("Student")
+        .document("1")
+        .setData({
+      'first_name': _fName.text,
+      'middle_name': _mName.text,
+      'last_name': _lName.text,
+      'email': _eMail.text,
+      'phone_num': _phone.text,
+      'sem': _sem.text,
+    });
+//
+//   DocumentReference ref = await databaseReference.collection("Student")
+//        .add({
+//      'first_name': _fName.text,
+//      'middle_name': _mName.text,
+//      'last_name': _lName.text,
+//      'email': _eMail.text,
+//      'phone_num': _phone.text,
+//      'sem': _sem.text,
+//    });
+    Fluttertoast.showToast(msg: "Recoed Added",gravity: ToastGravity.BOTTOM);
+    Navigator.of(context).push(
+        new MaterialPageRoute(builder: (BuildContext context)=>new ManageStudent())
+    );
+    //print(ref.documentID);
   }
 }
 
