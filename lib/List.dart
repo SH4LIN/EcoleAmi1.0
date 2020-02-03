@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'Home.dart';
 
 class List extends StatefulWidget {
@@ -8,7 +8,12 @@ class List extends StatefulWidget {
 }
 
 class _ListState extends State<List> {
+
+  TextEditingController _userName = new TextEditingController();
+  TextEditingController _pass = new TextEditingController();
+
   bool _obscureText = true;
+
   @override
   Widget build(BuildContext context) {
     return new ListView(
@@ -19,7 +24,7 @@ class _ListState extends State<List> {
           height: 160.0,
         ),
         new Container(
-          padding: const EdgeInsets.only(left: 30.0,right: 30.0),
+          padding: const EdgeInsets.only(left: 30.0, right: 30.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,
@@ -34,6 +39,7 @@ class _ListState extends State<List> {
                         padding: const EdgeInsets.only(bottom: 20.0)
                     ),
                     new TextField(
+                      controller: _userName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
@@ -54,6 +60,7 @@ class _ListState extends State<List> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      controller: _pass,
                       keyboardType: TextInputType.text,
                       obscureText: _obscureText,
                       cursorColor: Colors.purple,
@@ -67,8 +74,10 @@ class _ListState extends State<List> {
                           ),
                           prefixIcon: new Icon(Icons.lock),
                           suffixIcon: new IconButton(
-                            icon: new Icon(_obscureText?Icons.visibility_off : Icons.visibility),
-                            onPressed: (){
+                            icon: new Icon(_obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
                               setState(() {
                                 _obscureText = !_obscureText;
                               });
@@ -94,14 +103,14 @@ class _ListState extends State<List> {
                             fontSize: 15.0
                         ),
                       ),
-                      onPressed: ()=>{Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => new Home()))},
+                      onPressed: () => {_onClick()},
                       splashColor: Colors.red,
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 10.0)),
                     new Align(
                       alignment: Alignment.bottomRight,
                       child: new OutlineButton(
-                        onPressed: ()=>{},
+                        onPressed: () => {},
                         splashColor: Colors.greenAccent,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50.0)
@@ -124,5 +133,17 @@ class _ListState extends State<List> {
         ),
       ],
     );
+  }
+
+  void _onClick() {
+    String user = "Admin";
+    String pass = "Admin";
+    if (_userName.text.compareTo(user) == 0 && _pass.text.compareTo(pass)== 0) {
+      Navigator.of(context).pushReplacement(
+          new MaterialPageRoute(builder: (BuildContext context) => new Home()));
+    }
+    else{
+      Fluttertoast.showToast(msg: "Wrong Username Or Password",gravity: ToastGravity.BOTTOM,toastLength: Toast.LENGTH_SHORT,);
+    }
   }
 }

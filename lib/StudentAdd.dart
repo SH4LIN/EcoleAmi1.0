@@ -188,6 +188,7 @@ class _AddState extends State<Add> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      maxLength: 10,
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
                           hintStyle: new TextStyle(
@@ -260,6 +261,7 @@ class _AddState extends State<Add> {
                     ),
                     new RaisedButton(
                       color: Colors.redAccent,
+
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0)
                       ),
@@ -285,19 +287,21 @@ class _AddState extends State<Add> {
 
   void _onClick() async {
 
-//    if (_fName.text.isEmpty )
+    if (_fName.text.isEmpty || _mName.text.isEmpty || _lName.text.isEmpty || _eMail.text.isEmpty || _phone.text.isEmpty || _sem.text.isEmpty) {
+      Fluttertoast.showToast(msg: "All field are required",gravity: ToastGravity.BOTTOM);
+    }else {
 
-    await databaseReference.collection("Student")
-        .document("1")
-        .setData({
-      'first_name': _fName.text,
-      'middle_name': _mName.text,
-      'last_name': _lName.text,
-      'email': _eMail.text,
-      'phone_num': _phone.text,
-      'sem': _sem.text,
-    });
-//
+      await databaseReference.collection("Student")
+          .document("1")
+          .setData({
+        'first_name': _fName.text,
+        'middle_name': _mName.text,
+        'last_name': _lName.text,
+        'email': _eMail.text,
+        'phone_num': _phone.text,
+        'sem': _sem.text,
+      });
+
 //   DocumentReference ref = await databaseReference.collection("Student")
 //        .add({
 //      'first_name': _fName.text,
@@ -307,10 +311,17 @@ class _AddState extends State<Add> {
 //      'phone_num': _phone.text,
 //      'sem': _sem.text,
 //    });
-    Fluttertoast.showToast(msg: "Recoed Added",gravity: ToastGravity.BOTTOM);
-    Navigator.of(context).push(
-        new MaterialPageRoute(builder: (BuildContext context)=>new ManageStudent())
-    );
+
+      Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
+      Navigator.of(context).push(
+          new MaterialPageRoute(builder: (BuildContext context)=>new ManageStudent())
+      );
+    }
+
+
+
+
+
     //print(ref.documentID);
   }
 }
