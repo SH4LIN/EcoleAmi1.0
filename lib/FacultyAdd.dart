@@ -38,11 +38,25 @@ class _AddState extends State<Add> {
 
   final databaseReference = Firestore.instance;
 
+
 //    TextEditingController _enr;
   TextEditingController _fName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
+
+  bool _fValidate = false;
+  bool _lValidate = false;
+  bool _emailValidate = false;
+  bool _phoneValidate = false;
+
+  void dispose() {
+    super.dispose();
+    _fName.dispose();
+    _lName.dispose();
+    _eMail.dispose();
+    _phone.dispose();
+  }
 
   bool _obscureText = true;
   @override
@@ -73,12 +87,14 @@ class _AddState extends State<Add> {
                     ),
                     new TextField(
                       controller: _fName,
+                      autofocus: true,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "First Name",
+                          errorText: _fValidate ? 'Please enter First Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -100,6 +116,7 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Last Name",
+                          errorText: _lValidate ? 'Please enter Last Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -121,6 +138,7 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Email Address",
+                          errorText: _emailValidate ? 'Please enter Email Address' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -143,6 +161,7 @@ class _AddState extends State<Add> {
                       maxLength: 10,
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
+                          errorText: _phoneValidate ? 'Please enter Phone Number' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -201,7 +220,15 @@ class _AddState extends State<Add> {
                             fontSize: 15.0
                         ),
                       ),
-                      onPressed: ()=>{_onClick()},
+                      onPressed: () {
+                        setState(() {
+                          if (_fName.text.isEmpty) { _fValidate = true; } else { _fValidate = false; }
+                          if (_lName.text.isEmpty) { _lValidate = true; } else { _lValidate = false; }
+                          if (_eMail.text.isEmpty) { _emailValidate = true; } else { _emailValidate = false; }
+                          if (_phone.text.isEmpty) { _phoneValidate = true; } else { _phoneValidate = false; }
+                          if (_fName.text.isNotEmpty && _lName.text.isNotEmpty && _eMail.text.isNotEmpty && _phone.text.isNotEmpty ) { _onClick(); }
+                        });
+                      },
                       splashColor: Colors.red,
                     ),
                   ],
@@ -213,37 +240,31 @@ class _AddState extends State<Add> {
       ],
     );
   }
-  void _onClick()  async {
+  void _onClick() {
+    databaseReference.collection("Faculty")
+        .document("1")
+        .setData({
+      'first_name': _fName.text,
+      'last_name': _lName.text,
+      'email': _eMail.text,
+      'phone_num': _phone.text,
+    });
 
-    if (_fName.text.isEmpty || _lName.text.isEmpty || _eMail.text.isEmpty || _phone.text.isEmpty ) {
-      Fluttertoast.showToast(msg: "All fields are compulsory",gravity: ToastGravity.BOTTOM);
-    }else {
+/*   DocumentReference ref = await databaseReference.collection("Student")
+        .add({
+      'first_name': _fName.text,
+      'middle_name': _mName.text,
+      'last_name': _lName.text,
+      'email': _eMail.text,
+      'phone_num': _phone.text,
+      'sem': _sem.text,
+    });*/
 
-      await databaseReference.collection("Faculty")
-          .document("1")
-          .setData({
-        'first_name': _fName.text,
-        'last_name': _lName.text,
-        'email': _eMail.text,
-        'phone_num': _phone.text,
-      });
-
-//   DocumentReference ref = await databaseReference.collection("Student")
-//        .add({
-//      'first_name': _fName.text,
-//      'middle_name': _mName.text,
-//      'last_name': _lName.text,
-//      'email': _eMail.text,
-//      'phone_num': _phone.text,
-//      'sem': _sem.text,
-//    });
-
-      Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
-      Navigator.of(context).push(
-          new MaterialPageRoute(builder: (BuildContext context)=>new ManageFaculty())
-      );
-    }
-
-    //print(ref.documentID);
+    Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
+    Navigator.of(context).push(
+        new MaterialPageRoute(builder: (BuildContext context)=>new ManageFaculty())
+    );
   }
+
+//print(ref.documentID);
 }
