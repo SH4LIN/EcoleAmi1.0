@@ -58,7 +58,7 @@ class _ManageInformationState extends State<ManageInformation> {
                                   "Name : "+names[index],
                                   style: new TextStyle(
                                       fontSize: 10.0,
-                                    fontWeight: FontWeight.bold
+                                      fontWeight: FontWeight.bold
                                   ),
                                 ),
                                 new Padding(
@@ -114,7 +114,7 @@ class _ManageInformationState extends State<ManageInformation> {
                     onPressed: (){
                       Navigator.of(context).push(
                           new MaterialPageRoute(
-                            builder: (BuildContext context) => new StudentAdd()
+                              builder: (BuildContext context) => new StudentAdd()
                           )
                       );
                     },
@@ -127,4 +127,3 @@ class _ManageInformationState extends State<ManageInformation> {
     );
   }
 }
-

@@ -21,6 +21,7 @@ class _ManageInfoState extends State<ManageInfo> {
   List<String> enrollment = ["176170307109","176170307035","166170307501","176170307114","176170307059"];
   List<String> semester = ["6th","6th","6th","6th","6th"];
   List<String> division = ["B","A","A","B","A"];
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -127,4 +128,3 @@ class _ManageInfoState extends State<ManageInfo> {
     );;
   }
 }
-

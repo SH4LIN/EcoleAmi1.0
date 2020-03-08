@@ -1,10 +1,11 @@
 import 'package:ecoleami1_0/ManageStudent.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'ManageFaculty.dart';
 
 class ManageVerification extends StatelessWidget {
   String txt;
+  TextEditingController _pass = new TextEditingController();
   ManageVerification(String txt){
     this.txt = txt;
   }
@@ -27,7 +28,15 @@ class Verification extends StatefulWidget {
 
 class _VerificationState extends State<Verification> {
 
+  TextEditingController _pass = new TextEditingController();
   String txt;
+  bool _validate = false;
+
+  void dispose() {
+    _pass.dispose();
+    super.dispose();
+  }
+
   _VerificationState(String txt){
     this.txt = txt;
   }
@@ -56,6 +65,8 @@ class _VerificationState extends State<Verification> {
                       padding: const EdgeInsets.only(bottom: 20.0)
                   ),
                   new TextField(
+                    controller: _pass,
+                    autofocus: true,
                     keyboardType: TextInputType.text,
                     obscureText: _obscureText,
                     cursorColor: Colors.purple,
@@ -63,6 +74,7 @@ class _VerificationState extends State<Verification> {
                     cursorWidth: 3.0,
                     decoration: new InputDecoration(
                         hintText: "Password",
+                        errorText: _validate ? 'Please enter Password' : null,
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.grey,
@@ -96,7 +108,16 @@ class _VerificationState extends State<Verification> {
                           fontSize: 15.0
                       ),
                     ),
-                    onPressed: ()=>{Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => txt.startsWith("S")?new ManageStudent() : new ManageFaculty()))},
+                    onPressed: () {
+                      setState(() {
+                        if (_pass.text.isEmpty) {
+                          _validate = true;
+                        } else {
+                          _validate = false;
+                          _onClick();
+                        }
+                      });
+                    },
                     splashColor: Colors.red,
                   ),
                   new Padding(padding: const EdgeInsets.only(bottom: 10.0)),
@@ -126,5 +147,13 @@ class _VerificationState extends State<Verification> {
       ),
     );
   }
-}
+  void _onClick(){
+    String pass = "123";
+    if (_pass.text.compareTo(pass) == 1) {
+      Fluttertoast.showToast(msg: "Incorect Password",gravity: ToastGravity.BOTTOM,toastLength: Toast.LENGTH_SHORT,);
+    } else if (_pass.text.compareTo(pass) == 0){
+      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => txt.startsWith("S")?new ManageStudent() : new ManageFaculty()));
+    }
+  }
 
+}
