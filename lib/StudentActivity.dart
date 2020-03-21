@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'ManageVerification.dart';
 
-class Home extends StatelessWidget {
+class StudentActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: new HomePage(),
+      home: new StudentActivityPage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
+class StudentActivityPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _StudentActivityPageState createState() => _StudentActivityPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _StudentActivityPageState extends State<StudentActivityPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -25,8 +25,8 @@ class _HomePageState extends State<HomePage> {
         title: new Text("Ecoleami"),
       ),
       drawer: new Drawer(
-      elevation: 100.0,
-      child: new ListView(
+        elevation: 100.0,
+        child: new ListView(
           padding: EdgeInsets.only(top: 25.0),
           children: <Widget>[
             new UserAccountsDrawerHeader(
@@ -76,12 +76,12 @@ class _HomePageState extends State<HomePage> {
               onTap: _onItemTapped1,
             ),
             new ListTile(
-              title: new Text("Logout",style: Theme.of(context).textTheme.subhead,),
-              trailing: new Icon(Icons.arrow_back),
-              onTap: (){
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context)=>new MyApp()));
-              }
+                title: new Text("Logout",style: Theme.of(context).textTheme.subhead,),
+                trailing: new Icon(Icons.arrow_back),
+                onTap: (){
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context)=>new MyApp()));
+                }
             )
           ],
         ),
@@ -93,8 +93,8 @@ class _HomePageState extends State<HomePage> {
               title: new Text("Home")
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.account_circle),
-            title: Text("Profile")
+              icon: new Icon(Icons.account_circle),
+              title: Text("Profile")
           ),
           BottomNavigationBarItem(
               icon: new Icon(Icons.chat),
@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
         title: Text("Under Construction!"),
         elevation: 20.0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0)
+            borderRadius: BorderRadius.circular(20.0)
         ),
         content: new Text("This Part of Application is Still under Construction"),
         actions: <Widget>[

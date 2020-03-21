@@ -2,6 +2,7 @@ import 'package:ecoleami1_0/ManageStudent.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 
 class StudentAdd extends StatelessWidget {
@@ -318,21 +319,45 @@ class _AddState extends State<Add> {
   }
 
   void _onClick() async {
-
-    await databaseReference.collection("student_details")
-        .document(_phone.text.toString())
-        .setData({
-      'first_name': _fName.text,
-      'middle_name': _mName.text,
-      'last_name': _lName.text,
-      'email': _eMail.text,
-      'phone_number': _phone.text,
-      'semester': _sem.text,
-    });
-    Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
-    Navigator.of(context).push(
-        new MaterialPageRoute(builder: (BuildContext context)=>new ManageStudent())
-    );
+      ProgressDialog pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+      pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        )
+      );
+      await pr.show();
+    final snapShot = await Firestore.instance.collection("student_details").document(_phone.text).get();
+    if(snapShot == null || !snapShot.exists){
+      await databaseReference.collection("student_details")
+          .document(_phone.text.toString())
+          .setData({
+        'first_name': _fName.text,
+        'middle_name': _mName.text,
+        'last_name': _lName.text,
+        'email': _eMail.text,
+        'phone_number': _phone.text,
+        'semester': _sem.text,
+      });
+      await databaseReference.collection("login_details").document(_phone.text).setData({
+        'password': null,
+        'role': "student"
+      });
+      Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
+      Navigator.of(context).push(
+          new MaterialPageRoute(builder: (BuildContext context)=>new ManageStudent())
+      );
+    }
+    else{
+      Fluttertoast.showToast(msg: "Record Exist",gravity: ToastGravity.BOTTOM,backgroundColor: Colors.black);
+      pr.hide();
+    }
 //   DocumentReference ref = await databaseReference.collection("Student")
 //        .add({
 //      'first_name': _fName.text,
