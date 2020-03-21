@@ -1,5 +1,4 @@
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ecoleami1_0/Register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,21 +15,63 @@ class List extends StatefulWidget {
 }
 
 class _ListState extends State<List> {
-
   TextEditingController _userName = new TextEditingController();
   TextEditingController _pass = new TextEditingController();
+  SharedPreferences prf;
   bool _userValidate = false;
   bool _passValidate = false;
-
+  bool _obscureText = true;
+  var role;
+  var _password;
+  ProgressDialog pr;
 
   void dispose() {
     _userName.dispose();
     _pass.dispose();
     super.dispose();
   }
+  void saveState() async{
+    prf = await SharedPreferences.getInstance();
+    prf.setBool("isLoggedIn", true);
+    prf.setString("Username", _userName.text);
+    prf.setString("Password", _pass.text);
+    prf.setString("Role", role);
+  }
+  void checkState() async{
+    prf = await SharedPreferences.getInstance();
+    if(prf != null){
+      if(prf.getBool("isLoggedIn")){
+        switch(prf.get("Role")){
+          case "student":
+            Navigator.of(context).push(
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new StudentActivity()
+                )
+            );
+            break;
+          case "admin":
+            Navigator.of(context).pushReplacement(
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new Home()
+                )
+            );
+            break;
+          case "faculty":
+            break;
+          case "parent":
+            break;
+        }
+      }
+      else{
 
-  bool _obscureText = true;
-
+      }
+    }
+  }
+  @override
+  void initState(){
+    super.initState();
+    checkState();
+  }
   @override
   Widget build(BuildContext context) {
     return new ListView(
@@ -205,6 +246,7 @@ class _ListState extends State<List> {
   }
 
   void _onClick() {
+    showProgressbar();
     Firestore.instance.collection("login_details").document(_userName.text.trim()).get().then((document){
       if(!document.exists){
         Fluttertoast.showToast(
@@ -212,12 +254,13 @@ class _ListState extends State<List> {
             gravity: ToastGravity.BOTTOM,
             toastLength: Toast.LENGTH_LONG
         );
+        pr.hide();
       }
       else{
-        var role = document['role'];
-        var password = document['password'];
-        if(_pass.text.compareTo(password) == 0){
-          showProgressbar(context);
+        role = document['role'];
+        _password = document['password'];
+        if(_pass.text.compareTo(_password) == 0){
+          saveState();
           switch(role){
             case "student":
               Fluttertoast.showToast(
@@ -264,6 +307,7 @@ class _ListState extends State<List> {
           }
         }
         else{
+          pr.hide();
           Fluttertoast.showToast(
             msg: "Invalid Password",
             gravity: ToastGravity.BOTTOM,
@@ -272,21 +316,20 @@ class _ListState extends State<List> {
       }
     });
   }
-}
-ProgressDialog pr;
-Future<void> showProgressbar(BuildContext context) async {
-  pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
-  pr.style(
-      borderRadius: 20.0,
-      elevation: 20.0,
-      message: "Please Wait...",
-      insetAnimCurve: Curves.easeIn,
-      backgroundColor: Colors.black,
-      messageTextStyle: TextStyle(
-        color: Colors.white,
-        fontSize: 19.0,
-        wordSpacing: 2.0,
-      )
-  );
-  await pr.show();
+  void showProgressbar() async {
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        )
+    );
+    await pr.show();
+  }
 }

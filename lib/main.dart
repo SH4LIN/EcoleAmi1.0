@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'List.dart';
 
-void main() => runApp(new MyApp());
+void main(){
+  runApp(new MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -21,7 +23,7 @@ class _LoginPage extends StatefulWidget {
   __LoginPageState createState() => __LoginPageState();
 }
 
-class __LoginPageState extends State<_LoginPage> with TickerProviderStateMixin {
+class __LoginPageState extends State<_LoginPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(

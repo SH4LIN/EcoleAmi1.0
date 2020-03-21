@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'ManageVerification.dart';
 
@@ -78,7 +79,9 @@ class _HomePageState extends State<HomePage> {
             new ListTile(
               title: new Text("Logout",style: Theme.of(context).textTheme.subhead,),
               trailing: new Icon(Icons.arrow_back),
-              onTap: (){
+              onTap: () async {
+                SharedPreferences prf = await SharedPreferences.getInstance();
+                prf.setBool("isLoggedIn", false);
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context)=>new MyApp()));
               }
