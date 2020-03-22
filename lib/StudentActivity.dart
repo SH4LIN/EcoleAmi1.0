@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'ManageVerification.dart';
 
@@ -18,6 +20,19 @@ class StudentActivityPage extends StatefulWidget {
 }
 
 class _StudentActivityPageState extends State<StudentActivityPage> {
+  SharedPreferences prf;
+  String _username;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setUser();
+  }
+  void setUser() async{
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+    //Fluttertoast.showToast(msg: prf.get("Username"));
+  }
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -79,6 +94,7 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
                 title: new Text("Logout",style: Theme.of(context).textTheme.subhead,),
                 trailing: new Icon(Icons.arrow_back),
                 onTap: (){
+                  prf.setBool("isLoggedIn", false);
                   Navigator.of(context).pop();
                   Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context)=>new MyApp()));
                 }

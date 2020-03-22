@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  SharedPreferences prf;
+  String _username;
+  Future _details;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setUser();
+  }
+  void setUser() async{
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+    _details = setDetails();
+    //Fluttertoast.showToast(msg: prf.get("Username"));
+  }
+  Future setDetails() async{
+    return await Firestore.instance.collection("admin_details").document(_username).get();
+  }
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -31,8 +49,51 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(top: 25.0),
           children: <Widget>[
             new UserAccountsDrawerHeader(
-              accountName: Text("Admin"),
-              accountEmail: Text("sahilshh723@gmail.com"),
+              margin: EdgeInsets.only(bottom: 20.0),
+              accountName: FutureBuilder(
+                future: _details,
+                builder: (context,snap){
+                  switch(snap.connectionState){
+                    case ConnectionState.none:
+                      return Text("None");
+                      break;
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                      break;
+                    case ConnectionState.active:
+                      return CircularProgressIndicator();
+                      break;
+                    case ConnectionState.done:
+                      return Text("Done");
+                      break;
+                    default:
+                      return CircularProgressIndicator();
+                      break;
+                  }
+                },
+              ),
+              accountEmail: FutureBuilder(
+                future: _details,
+                builder: (context,snap){
+                  switch(snap.connectionState){
+                    case ConnectionState.none:
+                      return Text("None");
+                      break;
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                      break;
+                    case ConnectionState.active:
+                      return CircularProgressIndicator();
+                      break;
+                    case ConnectionState.done:
+                      return Text("Done");
+                      break;
+                    default:
+                      return CircularProgressIndicator();
+                      break;
+                  }
+                },
+              ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor:
                 Theme.of(context).platform == TargetPlatform.iOS

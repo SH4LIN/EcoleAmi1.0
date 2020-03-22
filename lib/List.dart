@@ -98,7 +98,6 @@ class _ListState extends State<List> {
                     ),
                     new TextField(
                       controller: _userName,
-                      autofocus: true,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
