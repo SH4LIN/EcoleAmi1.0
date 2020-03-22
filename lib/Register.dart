@@ -81,6 +81,7 @@ class __RegisterPageState extends State<_RegisterPage> {
                               ),
                             ),
                             splashColor: Colors.red,
+                            onPressed: null,
                           ),
                         ],
                       ),
