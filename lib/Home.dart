@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'List.dart';
 import 'ManageVerification.dart';
 
 class Home extends StatelessWidget {
@@ -22,24 +23,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   SharedPreferences prf;
   String _username;
-  Future _details;
   void initState() {
     super.initState();
-    setUser();
-    _details = setDetails();
+    user != null?_username = user : setUser();
   }
 
   void setUser() async {
     prf = await SharedPreferences.getInstance();
     _username = prf.get("Username");
     //Fluttertoast.showToast(msg: prf.get("Username"));
-  }
-
-  Future setDetails() async {
-    return await Firestore.instance
-        .collection("admin_details")
-        .document(_username)
-        .get();
   }
 
   @override
@@ -55,23 +47,29 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             new UserAccountsDrawerHeader(
               margin: EdgeInsets.only(bottom: 20.0),
-              accountName: FutureBuilder(
-                future: _details,
-                builder: (context, snap) {
-                  if (snap.hasData) {
-                    return Text("Hello");
-                  } else {
-                    return Text("Nothing");
+              accountName: StreamBuilder(
+                stream: Firestore.instance
+                    .collection("admin_details")
+                    .document(_username)
+                    .snapshots(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var username = snapshot.data;
+                    return Text(username['first_name']);
                   }
                 },
               ),
-              accountEmail: FutureBuilder(
-                future: _details,
-                builder: (context, snap) {
-                  if (snap.hasData) {
-                    return Text("Hello");
-                  } else {
-                    return Text("Nothing");
+              accountEmail: StreamBuilder(
+                stream: Firestore.instance
+                    .collection("admin_details")
+                    .document(_username)
+                    .snapshots(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var username = snapshot.data;
+                    return Text(username['email']);
                   }
                 },
               ),
