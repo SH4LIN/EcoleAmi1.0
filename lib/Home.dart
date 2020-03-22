@@ -24,7 +24,6 @@ class _HomePageState extends State<HomePage> {
   String _username;
   Future _details;
   void initState() {
-    // TODO: implement initState
     super.initState();
     setUser();
   }
