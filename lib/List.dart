@@ -8,7 +8,7 @@ import 'Home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'StudentActivity.dart';
-
+var user;
 class List extends StatefulWidget {
   @override
   _ListState createState() => _ListState();
@@ -36,6 +36,7 @@ class _ListState extends State<List> {
     prf.setString("Username", _userName.text);
     prf.setString("Password", _pass.text);
     prf.setString("Role", role);
+    user = _userName.text;
   }
   void checkState() async{
     prf = await SharedPreferences.getInstance();
@@ -43,7 +44,7 @@ class _ListState extends State<List> {
       if(prf.getBool("isLoggedIn")){
         switch(prf.get("Role")){
           case "student":
-            Navigator.of(context).push(
+            Navigator.of(context).pushReplacement(
                 new MaterialPageRoute(
                     builder: (BuildContext context) => new StudentActivity()
                 )
@@ -268,7 +269,7 @@ class _ListState extends State<List> {
                 toastLength: Toast.LENGTH_SHORT,
               );
               pr.hide();
-              Navigator.of(context).push(
+              Navigator.of(context).pushReplacement(
                 new MaterialPageRoute(
                     builder: (BuildContext context) => new StudentActivity()
                 )

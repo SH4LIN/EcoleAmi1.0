@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'List.dart';
 import 'ManageVerification.dart';
 
 class StudentActivity extends StatelessWidget {
@@ -24,11 +25,11 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
   String _username;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    setUser();
+    user != null?_username = user : setUser();
   }
-  void setUser() async{
+
+  void setUser() async {
     prf = await SharedPreferences.getInstance();
     _username = prf.get("Username");
     //Fluttertoast.showToast(msg: prf.get("Username"));
@@ -45,81 +46,121 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
           padding: EdgeInsets.only(top: 25.0),
           children: <Widget>[
             new UserAccountsDrawerHeader(
-              accountName: Text("Admin"),
-              accountEmail: Text("sahilshh723@gmail.com"),
+              margin: EdgeInsets.only(bottom: 20.0),
+              accountName: StreamBuilder(
+                stream: Firestore.instance
+                    .collection("student_details")
+                    .document(_username)
+                    .snapshots(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var username = snapshot.data;
+                    return Text(username['first_name']);
+                  }
+                },
+              ),
+          accountEmail: StreamBuilder(
+            stream: Firestore.instance
+                .collection("student_details")
+                .document(_username)
+                .snapshots(),
+            // ignore: missing_return
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var username = snapshot.data;
+                return Text(username['email']);
+              }
+            },
+          ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor:
                 Theme.of(context).platform == TargetPlatform.iOS
                     ? Colors.blue
                     : Colors.white,
                 child: Text(
-                  "A",
+                  "S",
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),
               arrowColor: Colors.red,
             ),
             new ListTile(
-              title: new Text("Manage Student",style: Theme.of(context).textTheme.subhead,),
+              title: new Text(
+                "Manage Student",
+                style: Theme.of(context).textTheme.subhead,
+              ),
               trailing: new Icon(Icons.account_circle),
-              onTap: (){
+              onTap: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new ManageVerification("Student")));
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                    new ManageVerification("Student")));
               },
             ),
             new ListTile(
-              title: new Text("Manage Faculty",style: Theme.of(context).textTheme.subhead,),
+              title: new Text(
+                "Manage Faculty",
+                style: Theme.of(context).textTheme.subhead,
+              ),
               trailing: new Icon(Icons.account_circle),
-              onTap: (){
+              onTap: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new ManageVerification("Faculty")));
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                    new ManageVerification("Faculty")));
               },
             ),
             new ListTile(
-              title: new Text("Dummy 1",style: Theme.of(context).textTheme.subhead,),
+              title: new Text(
+                "Dummy 1",
+                style: Theme.of(context).textTheme.subhead,
+              ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
             new ListTile(
-              title: new Text("Dummy 2",style: Theme.of(context).textTheme.subhead,),
+              title: new Text(
+                "Dummy 2",
+                style: Theme.of(context).textTheme.subhead,
+              ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
             new ListTile(
-              title: new Text("Dummy 3",style: Theme.of(context).textTheme.subhead,),
+              title: new Text(
+                "Dummy 3",
+                style: Theme.of(context).textTheme.subhead,
+              ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
             new ListTile(
-                title: new Text("Logout",style: Theme.of(context).textTheme.subhead,),
+                title: new Text(
+                  "Logout",
+                  style: Theme.of(context).textTheme.subhead,
+                ),
                 trailing: new Icon(Icons.arrow_back),
-                onTap: (){
+                onTap: () async {
+                  SharedPreferences prf = await SharedPreferences.getInstance();
                   prf.setBool("isLoggedIn", false);
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context)=>new MyApp()));
-                }
-            )
+                  Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                      builder: (BuildContext context) => new MyApp()));
+                })
           ],
         ),
       ),
       bottomNavigationBar: new BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: new Icon(Icons.home),
-              title: new Text("Home")
-          ),
+              icon: new Icon(Icons.home), title: new Text("Home")),
           BottomNavigationBarItem(
-              icon: new Icon(Icons.account_circle),
-              title: Text("Profile")
-          ),
+              icon: new Icon(Icons.account_circle), title: Text("Profile")),
           BottomNavigationBarItem(
-              icon: new Icon(Icons.chat),
-              title: Text("QnA")
-          ),
+              icon: new Icon(Icons.chat), title: Text("QnA")),
           BottomNavigationBarItem(
-              icon: new Icon(Icons.settings),
-              title: Text("Settings")
-          ),
+              icon: new Icon(Icons.settings), title: Text("Settings")),
         ],
         type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
