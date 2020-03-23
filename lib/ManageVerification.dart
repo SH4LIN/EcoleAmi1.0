@@ -6,7 +6,7 @@ import 'ManageFaculty.dart';
 class ManageVerification extends StatelessWidget {
   String txt;
   TextEditingController _pass = new TextEditingController();
-  ManageVerification(String txt){
+  ManageVerification(String txt) {
     this.txt = txt;
   }
   @override
@@ -19,7 +19,7 @@ class ManageVerification extends StatelessWidget {
 
 class Verification extends StatefulWidget {
   String txt;
-  Verification(String txt){
+  Verification(String txt) {
     this.txt = txt;
   }
   @override
@@ -27,7 +27,6 @@ class Verification extends StatefulWidget {
 }
 
 class _VerificationState extends State<Verification> {
-
   TextEditingController _pass = new TextEditingController();
   String txt;
   bool _validate = false;
@@ -37,7 +36,7 @@ class _VerificationState extends State<Verification> {
     super.dispose();
   }
 
-  _VerificationState(String txt){
+  _VerificationState(String txt) {
     this.txt = txt;
   }
   bool _obscureText = true;
@@ -49,11 +48,11 @@ class _VerificationState extends State<Verification> {
         child: new SingleChildScrollView(
           child: new Card(
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)
-            ),
+                borderRadius: BorderRadius.circular(10.0)),
             //margin: const EdgeInsets.symmetric(vertical: 200.0),
             child: Container(
-              padding: const EdgeInsets.only(top: 15.0,right: 15.0,left: 15.0,bottom: 15.0),
+              padding: const EdgeInsets.only(
+                  top: 15.0, right: 15.0, left: 15.0, bottom: 15.0),
               child: new Column(
                 children: <Widget>[
                   new Text(
@@ -61,9 +60,7 @@ class _VerificationState extends State<Verification> {
                     style: Theme.of(context).textTheme.title,
                     //new TextStyle(color: Colors.black,fontSize: 11.0),
                   ),
-                  new Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0)
-                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                   new TextField(
                     controller: _pass,
                     autofocus: true,
@@ -81,8 +78,10 @@ class _VerificationState extends State<Verification> {
                         ),
                         prefixIcon: new Icon(Icons.lock),
                         suffixIcon: new IconButton(
-                          icon: new Icon(_obscureText?Icons.visibility_off : Icons.visibility),
-                          onPressed: (){
+                          icon: new Icon(_obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
                             setState(() {
                               _obscureText = !_obscureText;
                             });
@@ -90,23 +89,16 @@ class _VerificationState extends State<Verification> {
                         ),
                         border: new OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20.0),
-                        )
-                    ),
+                        )),
                   ),
-                  new Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0)
-                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                   new RaisedButton(
                     color: Colors.redAccent,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)
-                    ),
+                        borderRadius: BorderRadius.circular(10.0)),
                     child: new Text(
                       "Verify",
-                      style: new TextStyle(
-                          color: Colors.white,
-                          fontSize: 15.0
-                      ),
+                      style: new TextStyle(color: Colors.white, fontSize: 15.0),
                     ),
                     onPressed: () {
                       setState(() {
@@ -124,18 +116,16 @@ class _VerificationState extends State<Verification> {
                   new Align(
                     alignment: Alignment.bottomRight,
                     child: new OutlineButton(
-                      onPressed: ()=>{},
+                      onPressed: () => {},
                       splashColor: Colors.greenAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)
-                      ),
+                          borderRadius: BorderRadius.circular(50.0)),
                       child: new Text(
                         "Forgot password?",
                         style: new TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12.0,
-                            color: Colors.red
-                        ),
+                            color: Colors.red),
                       ),
                     ),
                   ),
@@ -147,13 +137,19 @@ class _VerificationState extends State<Verification> {
       ),
     );
   }
-  void _onClick(){
+
+  void _onClick() {
     String pass = "123";
     if (_pass.text.compareTo(pass) == 1) {
-      Fluttertoast.showToast(msg: "Incorect Password",gravity: ToastGravity.BOTTOM,toastLength: Toast.LENGTH_SHORT,);
-    } else if (_pass.text.compareTo(pass) == 0){
-      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => txt.startsWith("S")?new ManageStudent() : new ManageFaculty()));
+      Fluttertoast.showToast(
+        msg: "Incorect Password",
+        gravity: ToastGravity.BOTTOM,
+        toastLength: Toast.LENGTH_SHORT,
+      );
+    } else if (_pass.text.compareTo(pass) == 0) {
+      Navigator.of(context).pushReplacement(new MaterialPageRoute(
+          builder: (BuildContext context) =>
+              txt.startsWith("S") ? new ManageStudent() : new ManageFaculty()));
     }
   }
-
 }
