@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   String _username;
   void initState() {
     super.initState();
-    user != null?_username = user : setUser();
+    user != null ? _username = user : setUser();
   }
 
   void setUser() async {

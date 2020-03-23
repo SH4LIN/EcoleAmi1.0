@@ -18,119 +18,157 @@ class ManageInformation extends StatefulWidget {
 }
 
 class _ManageInformationState extends State<ManageInformation> {
-
-  List<String> getNames(){
-    var data = Firestore.instance
+  // List<String> names = ["Shalin"];
+  //List<String> enrollment = ["Shalin"];
+  /*void getNames() async {
+    await Firestore.instance
         .collection("student_details")
-        .getDocuments();
+        .getDocuments()
+        .then((QuerySnapshot snap) {
+      snap.documents.forEach((f) {
+        names.add(f.data['first_name'] +
+            " " +
+            f.data['middle_name'] +
+            " " +
+            f.data['last_name']);
+        enrollment.add(f.data['enrollment']);
+        print(f.data['first_name']);
+        print("Length" + names.length.toString());
+        print(names.elementAt(0));
+      });
+    });
+  }*/
+  int len = 0;
+  @override
+  void initState() {
+    super.initState();
+    //getNames();
   }
-  List<String> names = ["Shalin","Jayshil","Mrugen","Khushangee","Shashank"];
-  List<String> enrollment = ["176170307109","176170307035","166170307501","176170307114","176170307059"];
-  List<String> semester = ["6th","6th","6th","6th","6th"];
-  List<String> division = ["B","A","A","B","A"];
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: new Container(
-          padding: EdgeInsets.all(5.0),
-          child: new Column(
-            children: <Widget>[
-              new Padding(
-                  padding: EdgeInsets.only(top: 25.0)
-              ),
-              new Text("Student Manager",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
-              new Expanded(
-                child: new ListView.builder(
-                  itemBuilder: (BuildContext context,int index){
-                    return new Card(
-                      elevation: 20.0,
-                      child: new Container(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            new Padding(
-                              padding: EdgeInsets.only(left: 10.0,right: 5.0,bottom: 10.0),
-                              child: new Image(
-                                image: AssetImage('images/dummyimg.png'),
-                                width: 100.0,
-                                height: 100.0,
+      body: new Container(
+        padding: EdgeInsets.all(5.0),
+        child: new Column(
+          children: <Widget>[
+            new Padding(padding: EdgeInsets.only(top: 25.0)),
+            new Text(
+              "Student Manager",
+              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
+            new Expanded(
+              child: StreamBuilder(
+                stream: Firestore.instance
+                  .collection("student_details")
+                  .snapshots(),
+                builder:(context,snap) {
+                  len = snap.data.documents.length;
+                  return ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      return new Card(
+                        elevation: 20.0,
+                        child: new Container(
+                          padding: EdgeInsets.only(top: 20.0),
+                          child: new Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Stack(
+                                children: <Widget>[
+                                  new Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 10.0, right: 5.0, bottom: 20.0),
+                                    child: new Image(
+                                      image: AssetImage('images/dummyimg.png'),
+                                      width: 100.0,
+                                      height: 100.0,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            new Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                new Text(
-                                  "Name : "+names[index],
-                                  style: new TextStyle(
-                                      fontSize: 10.0,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                                new Padding(
-                                    padding: EdgeInsets.only(bottom: 5.0)
-                                ),
-                                new Text(
-                                  "Enrollment : "+enrollment[index],
-                                  style: new TextStyle(
-                                      fontSize: 10.0,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                                new Padding(
-                                    padding: EdgeInsets.only(bottom: 5.0)
-                                ),
-                                new Text(
-                                  "Semester : "+semester[index]+" "+"Division : "+division[index],
-                                  style: new TextStyle(
-                                      fontSize: 8.0
-                                  ),
-                                ),
-                                new Padding(
-                                    padding: EdgeInsets.only(bottom: 5.0)
-                                ),
-                                new Row(
-                                  children: <Widget>[
-                                    new OutlineButton(
-                                      onPressed: ()=>{},
-                                      child: new Text("Update",style: new TextStyle(color: Colors.green)),
-                                    ),
-                                    new Padding(
-                                      padding: EdgeInsets.only(right: 10.0),
-                                    ),
-                                    new OutlineButton(
-                                      onPressed: ()=>{},
-                                      child: new Text("Remove",style: new TextStyle(color: Colors.red)),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ],
+                              new Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  StreamBuilder(
+                                      stream: Firestore.instance
+                                          .collection("student_details")
+                                          .snapshots(),
+                                      builder: (context, snap) {
+                                        var items = snap.data.documents;
+                                        return Text(
+                                          "Name : " +
+                                              items[index]['first_name'] +
+                                              " " +
+                                              items[index]['middle_name'] +
+                                              " " +
+                                              items[index]['last_name'],
+                                          style: new TextStyle(
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.bold),
+                                        );
+                                      }),
+                                  new Padding(
+                                      padding: EdgeInsets.only(bottom: 5.0)),
+                                  StreamBuilder(
+                                      stream: Firestore.instance
+                                          .collection("student_details")
+                                          .snapshots(),
+                                      builder: (context, snap) {
+                                        var items = snap.data.documents;
+                                        return Text(
+                                          "Enrollment : " +
+                                              items[index]['enrollment'],
+
+                                          style: new TextStyle(
+                                              fontSize: 11.0,
+                                              fontWeight: FontWeight.bold),
+                                        );
+                                      }),
+                                  new Padding(
+                                      padding: EdgeInsets.only(bottom: 21.0)),
+                                  new Row(
+                                    children: <Widget>[
+                                      new OutlineButton(
+                                        onPressed: () => {},
+                                        child: new Text("Update",
+                                            style:
+                                            new TextStyle(color: Colors.green)),
+                                      ),
+                                      new Padding(
+                                        padding: EdgeInsets.only(right: 20.0),
+                                      ),
+                                      new OutlineButton(
+                                        onPressed: () => {},
+                                        child: new Text("Remove",
+                                            style:
+                                            new TextStyle(color: Colors.red)),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  itemCount: names.length,
-                ),
-              ),
-              new Align(
-                  alignment: Alignment.bottomRight,
-                  child: new FloatingActionButton(
-                    onPressed: (){
-                      Navigator.of(context).push(
-                          new MaterialPageRoute(
-                              builder: (BuildContext context) => new StudentAdd()
-                          )
                       );
                     },
-                    child: new Icon(Icons.add),
-                  )
+                    itemCount: len,
+                  );
+                }
               ),
-            ],
-          ),
-        )
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(new MaterialPageRoute(
+              builder: (BuildContext context) => new StudentAdd()));
+        },
+        child: new Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

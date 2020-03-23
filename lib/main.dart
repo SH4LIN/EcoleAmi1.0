@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'List.dart';
 
-void main(){
+void main() {
   runApp(new MyApp());
 }
 
@@ -10,9 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      theme: new ThemeData(
-         primarySwatch: Colors.blue
-      ),
+      theme: new ThemeData(primarySwatch: Colors.blue),
       home: new _LoginPage(),
     );
   }
@@ -35,4 +33,3 @@ class __LoginPageState extends State<_LoginPage> {
     );
   }
 }
-
