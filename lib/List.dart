@@ -6,8 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'Home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'StudentActivity.dart';
+
 var user;
 class List extends StatefulWidget {
   @override

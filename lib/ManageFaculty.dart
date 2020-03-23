@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'CommonAppBar.dart';
 import 'FacultyAdd.dart';
 
 class ManageFaculty extends StatelessWidget {
@@ -36,15 +36,11 @@ class _ManageInfoState extends State<ManageInfo> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      appBar: CommonAppBar("Manage Faculty Details"),
       body: new Container(
         padding: EdgeInsets.all(5.0),
         child: new Column(
           children: <Widget>[
-            new Padding(padding: EdgeInsets.only(top: 25.0)),
-            new Text(
-              "Faculty Manager",
-              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-            ),
             new Expanded(
               child: new ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
