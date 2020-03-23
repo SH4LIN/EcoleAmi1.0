@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +63,10 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
           padding: EdgeInsets.only(top: 25.0),
           children: <Widget>[
             new UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(15.0)
+              ),
               margin: EdgeInsets.only(bottom: 20.0),
               accountName: StreamBuilder(
                 stream: Firestore.instance

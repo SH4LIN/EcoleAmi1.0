@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,9 +38,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Ecoleami"),
-      ),
+      appBar: CommonAppBar("EcoleAmi"),
       drawer: new Drawer(
         elevation: 100.0,
         child: new ListView(
@@ -47,6 +46,10 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             new UserAccountsDrawerHeader(
               margin: EdgeInsets.only(bottom: 20.0),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(15.0)
+              ),
               accountName: StreamBuilder(
                 stream: Firestore.instance
                     .collection("admin_details")
