@@ -42,6 +42,7 @@ class _ListState extends State<List> {
     prf = await SharedPreferences.getInstance();
     if(prf != null){
       if(prf.getBool("isLoggedIn")){
+        user = prf.get("Username");
         switch(prf.get("Role")){
           case "student":
             Navigator.of(context).pushReplacement(

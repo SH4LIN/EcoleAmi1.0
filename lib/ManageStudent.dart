@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'StudentAdd.dart';
@@ -17,6 +18,12 @@ class ManageInformation extends StatefulWidget {
 }
 
 class _ManageInformationState extends State<ManageInformation> {
+
+  List<String> getNames(){
+    var data = Firestore.instance
+        .collection("student_details")
+        .getDocuments();
+  }
   List<String> names = ["Shalin","Jayshil","Mrugen","Khushangee","Shashank"];
   List<String> enrollment = ["176170307109","176170307035","166170307501","176170307114","176170307059"];
   List<String> semester = ["6th","6th","6th","6th","6th"];

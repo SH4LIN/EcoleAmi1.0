@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,12 +7,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'List.dart';
 import 'ManageVerification.dart';
-
+Widget buildError(BuildContext context, FlutterErrorDetails error) {
+  return Scaffold(
+      body: Center(
+        child: Text(
+          "Error appeared.",
+        ),
+      )
+  );
+}
 class StudentActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       home: new StudentActivityPage(),
+    builder: (BuildContext context, Widget widget) {
+      ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+        return buildError(context, errorDetails);
+      };
+      return widget;
+    },
     );
   }
 }
@@ -54,10 +70,18 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
                     .snapshots(),
                 // ignore: missing_return
                 builder: (context, snapshot) {
+                  if(snapshot.connectionState == ConnectionState.none){
+                    return Text("Loading...");
+                  }
                   if (snapshot.hasData) {
+                    while(_username == null || snapshot.data == null){
+                      Future.delayed(Duration(seconds: 1));
+                      print(_username);
+                    }
                     var username = snapshot.data;
                     return Text(username['first_name']);
                   }
+                  return Text("Loading...");
                 },
               ),
           accountEmail: StreamBuilder(
@@ -67,10 +91,18 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
                 .snapshots(),
             // ignore: missing_return
             builder: (context, snapshot) {
+              if(snapshot.connectionState == ConnectionState.none){
+                setUser();
+                return CircularProgressIndicator(backgroundColor: Colors.white,);
+              }
               if (snapshot.hasData) {
+                while(_username == null){
+                  Future.delayed(Duration(seconds: 1));
+                }
                 var username = snapshot.data;
                 return Text(username['email']);
               }
+              return CircularProgressIndicator();
             },
           ),
               currentAccountPicture: CircleAvatar(
