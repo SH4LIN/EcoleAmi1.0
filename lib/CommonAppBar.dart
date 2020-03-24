@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class CommonAppBar extends StatefulWidget implements PreferredSizeWidget {
   String appBarTitle;
   @override

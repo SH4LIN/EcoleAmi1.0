@@ -1,75 +1,75 @@
-import 'package:ecoleami1_0/CommonAppBar.dart';
-import 'package:ecoleami1_0/ManageStudent.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'CommonAppBar.dart';
+import 'ManageFaculty.dart';
 
-class StudentAdd extends StatelessWidget {
+// ignore: must_be_immutable
+class UpdateFaculty extends StatelessWidget {
+  int id;
+  UpdateFaculty(this.id);
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new AddDetails(),
+    return Scaffold(
+      body: UpdateFacultyData(this.id),
     );
   }
 }
 
-class AddDetails extends StatefulWidget {
+// ignore: must_be_immutable
+class UpdateFacultyData extends StatefulWidget {
+  int id;
+  UpdateFacultyData(this.id);
   @override
-  _AddDetailsState createState() => _AddDetailsState();
-}
-
-class _AddDetailsState extends State<AddDetails> {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      backgroundColor: Colors.grey,
-      appBar: CommonAppBar("Student Details"),
-      body: new Container(
-        child: new Center(
-          child: new Add(),
-        ),
-      ),
-    );
+  _UpdateFacultyState createState() {
+    return new _UpdateFacultyState(id);
   }
 }
 
-class Add extends StatefulWidget {
-  @override
-  _AddState createState() => _AddState();
-}
+class _UpdateFacultyState extends State<UpdateFacultyData> {
+  int id;
+  _UpdateFacultyState(this.id);
 
-class _AddState extends State<Add> {
-  bool _obscureText = true;
-
-  final databaseReference = Firestore.instance;
-
-//    TextEditingController _enr;
   TextEditingController _fName = new TextEditingController();
-  TextEditingController _mName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
-  TextEditingController _sem = new TextEditingController();
 
   bool _fValidate = false;
-  bool _mValidate = false;
   bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
-  bool _semValidate = false;
 
   void dispose() {
     super.dispose();
     _fName.dispose();
-    _mName.dispose();
     _lName.dispose();
     _eMail.dispose();
     _phone.dispose();
   }
 
+  bool _obscureText = true;
+  @override
+  void initState() {
+    super.initState();
+    print(id);
+    _fName.text = itemsFaculty[id]['first_name'];
+    _lName.text = itemsFaculty[id]['last_name'];
+    _eMail.text = itemsFaculty[id]['email'];
+    _phone.text = itemsFaculty[id]['phone_number'];
+  }
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CommonAppBar("Update Faculty Details"),
+      backgroundColor: Colors.grey,
+      body: BodyUpdate(context),
+    );
+  }
+  // ignore: non_constant_identifier_names
+  Widget BodyUpdate(BuildContext context) {
     return new ListView(
       children: <Widget>[
         new Container(
@@ -78,30 +78,15 @@ class _AddState extends State<Add> {
             child: new Card(
               elevation: 30.0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
+                  borderRadius: BorderRadius.circular(10.0)
+              ),
               child: Container(
                 padding: const EdgeInsets.all(15.0),
                 child: new Column(
                   children: <Widget>[
-                    new TextField(
-//                      controller: _enr,
-                      enabled: false,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Enrollment",
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.account_circle),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _fName,
                       keyboardType: TextInputType.text,
@@ -110,8 +95,9 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "First Name",
-                          errorText:
-                              _fValidate ? 'Please enter First Name' : null,
+                          errorText: _fValidate
+                              ? 'Please enter First Name'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -119,29 +105,12 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )),
+                          )
+                      ),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _mName,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Middle Name",
-                          errorText:
-                              _mValidate ? 'Please enter Middle Name' : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.person),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _lName,
                       keyboardType: TextInputType.text,
@@ -150,8 +119,9 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Last Name",
-                          errorText:
-                              _lValidate ? 'Please enter Last Name' : null,
+                          errorText: _lValidate
+                              ? 'Please enter Last Name'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -159,10 +129,13 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )),
+                          )
+                      ),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextFormField(
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
+                    ),
+                    new TextField(
                       controller: _eMail,
                       keyboardType: TextInputType.emailAddress,
                       cursorColor: Colors.purple,
@@ -180,9 +153,12 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.email),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )),
+                          )
+                      ),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
+                    ),
                     new TextField(
                       controller: _phone,
                       keyboardType: TextInputType.phone,
@@ -202,32 +178,13 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.phone),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )),
+                          )
+                      ),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _sem,
-                      maxLength: 1,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Semester",
-                          errorText:
-                              _semValidate ? 'Please enter Semester' : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.format_list_numbered),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
-//                      controller: _pass,
                       keyboardType: TextInputType.text,
                       obscureText: _obscureText,
                       enabled: false,
@@ -253,18 +210,26 @@ class _AddState extends State<Add> {
                           ),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )),
+                          )
+                      ),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0)
+                    ),
+                    new Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0)
+                    ),
                     new RaisedButton(
                       color: Colors.redAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
+                          borderRadius: BorderRadius.circular(10.0)
+                      ),
                       child: new Text(
-                        "Add",
-                        style:
-                            new TextStyle(color: Colors.white, fontSize: 15.0),
+                        "Update",
+                        style: new TextStyle(
+                            color: Colors.white,
+                            fontSize: 15.0
+                        ),
                       ),
                       onPressed: () {
                         setState(() {
@@ -272,11 +237,6 @@ class _AddState extends State<Add> {
                             _fValidate = true;
                           } else {
                             _fValidate = false;
-                          }
-                          if (_mName.text.isEmpty) {
-                            _mValidate = true;
-                          } else {
-                            _mValidate = false;
                           }
                           if (_lName.text.isEmpty) {
                             _lValidate = true;
@@ -293,17 +253,10 @@ class _AddState extends State<Add> {
                           } else {
                             _phoneValidate = false;
                           }
-                          if (_sem.text.isEmpty) {
-                            _semValidate = true;
-                          } else {
-                            _semValidate = false;
-                          }
-                          if (_fValidate == false &&
-                              _mValidate == false &&
-                              _lValidate == false &&
-                              _emailValidate == false &&
-                              _phoneValidate == false &&
-                              _semValidate == false) {
+                          if (_fName.text.isNotEmpty &&
+                              _lName.text.isNotEmpty &&
+                              _eMail.text.isNotEmpty &&
+                              _phone.text.isNotEmpty) {
                             _onClick();
                           }
                         });
@@ -319,10 +272,8 @@ class _AddState extends State<Add> {
       ],
     );
   }
-
-  void _onClick() async {
-    ProgressDialog pr = new ProgressDialog(context,
-        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+  void _onClick() async{
+    ProgressDialog pr = new ProgressDialog(context, type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
     pr.style(
         borderRadius: 20.0,
         elevation: 20.0,
@@ -335,60 +286,20 @@ class _AddState extends State<Add> {
           wordSpacing: 2.0,
         ));
     await pr.show();
-    final snapShot = await Firestore.instance
-        .collection("student_details")
-        .document(_phone.text)
-        .get();
-    if (snapShot == null || !snapShot.exists) {
-      await databaseReference
-          .collection("student_details")
-          .document(_phone.text.toString())
-          .setData({
-        'enrollment': "------------",
+    try {
+      await Firestore.instance.collection('faculty_details').document(
+          itemsFaculty[id].documentID).updateData({
         'first_name': _fName.text,
-        'middle_name': _mName.text,
         'last_name': _lName.text,
         'email': _eMail.text,
         'phone_number': _phone.text,
-        'semester': _sem.text,
       });
-      final snapShot = await databaseReference
-          .collection("login_details")
-          .document(_phone.text)
-          .get();
-      print(snapShot.exists.toString());
-                      print(_phone.text);
-                      print(snapShot!=null);
-      if (snapShot == null || snapShot.exists) {
-
-      }else {
-        await databaseReference
-            .collection("login_details")
-            .document(_phone.text)
-            .setData({'password': null, 'role': "student"});
-      }
-      Fluttertoast.showToast(
-          msg: "Record Added Successfully", gravity: ToastGravity.BOTTOM);
+    }catch(e){
       pr.hide();
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => new ManageStudent()));
-    } else {
-      Fluttertoast.showToast(
-          msg: "Record Exist",
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.black);
-      pr.hide();
+      print(e.toString());
     }
-//   DocumentReference ref = await databaseReference.collection("Student")
-//        .add({
-//      'first_name': _fName.text,
-//      'middle_name': _mName.text,
-//      'last_name': _lName.text,
-//      'email': _eMail.text,
-//      'phone_num': _phone.text,
-//      'sem': _sem.text,
-//    });
+    pr.hide();
+    Fluttertoast.showToast(msg: "Record Updated");
+    Navigator.of(context).pop();
   }
-
-//print(ref.documentID);
 }

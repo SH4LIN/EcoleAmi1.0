@@ -1,22 +1,25 @@
+import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/ManageStudent.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'ManageFaculty.dart';
 
+// ignore: must_be_immutable
 class ManageVerification extends StatelessWidget {
   String txt;
-  TextEditingController _pass = new TextEditingController();
+  //TextEditingController _pass = new TextEditingController();
   ManageVerification(String txt) {
     this.txt = txt;
   }
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Verification(txt),
+    return new Scaffold(
+      body: new Verification(txt),
     );
   }
 }
 
+// ignore: must_be_immutable
 class Verification extends StatefulWidget {
   String txt;
   Verification(String txt) {
@@ -43,23 +46,21 @@ class _VerificationState extends State<Verification> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.grey,
+      appBar: CommonAppBar("Verification"),
       body: new Align(
         alignment: Alignment.center,
         child: new SingleChildScrollView(
           child: new Card(
+            margin: EdgeInsets.symmetric(horizontal: 15.0,vertical: 15.0),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             //margin: const EdgeInsets.symmetric(vertical: 200.0),
             child: Container(
               padding: const EdgeInsets.only(
-                  top: 15.0, right: 15.0, left: 15.0, bottom: 15.0),
+                  top: 20.0, right: 15.0, left: 15.0, bottom: 15.0),
               child: new Column(
                 children: <Widget>[
-                  new Text(
-                    "Info Management Verification",
-                    style: Theme.of(context).textTheme.title,
-                    //new TextStyle(color: Colors.black,fontSize: 11.0),
-                  ),
                   new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                   new TextField(
                     controller: _pass,

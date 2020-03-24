@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/MainScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
-import 'List.dart';
+
 import 'ManageVerification.dart';
+import 'SplashScreen.dart';
 
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new HomePage(),
+    return new Scaffold(
+      body: new HomePage(),
     );
   }
 }
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.grey,
       appBar: CommonAppBar("EcoleAmi"),
       drawer: new Drawer(
         elevation: 100.0,
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> {
               margin: EdgeInsets.only(bottom: 20.0),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(15.0)
+                borderRadius: BorderRadius.circular(5.0)
               ),
               accountName: StreamBuilder(
                 stream: Firestore.instance
@@ -149,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                   prf.setBool("isLoggedIn", false);
                   Navigator.of(context).pop();
                   Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                      builder: (BuildContext context) => new MyApp()));
+                      builder: (BuildContext context) => new MainScreen()));
                 })
           ],
         ),
@@ -201,7 +203,7 @@ class _HomePageState extends State<HomePage> {
             title: Text("Under Construction!"),
             elevation: 20.0,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)),
+                borderRadius: BorderRadius.circular(15.0)),
             content: new Text(
                 "This Part of Application is Still Under Construction"),
             actions: <Widget>[

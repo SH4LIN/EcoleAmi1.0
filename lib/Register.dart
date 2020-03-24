@@ -5,11 +5,8 @@ void main() => runApp(new Register());
 class Register extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: new _RegisterPage(),
+    return new Scaffold(
+      body: new _RegisterPage(),
     );
   }
 }

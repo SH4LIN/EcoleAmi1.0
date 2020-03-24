@@ -6,9 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'Home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'SplashScreen.dart';
 import 'StudentActivity.dart';
 
-var user;
 class List extends StatefulWidget {
   @override
   _ListState createState() => _ListState();
@@ -38,41 +38,10 @@ class _ListState extends State<List> {
     prf.setString("Role", role);
     user = _userName.text;
   }
-  void checkState() async{
-    prf = await SharedPreferences.getInstance();
-    if(prf != null){
-      if(prf.getBool("isLoggedIn")){
-        user = prf.get("Username");
-        switch(prf.get("Role")){
-          case "student":
-            Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new StudentActivity()
-                )
-            );
-            break;
-          case "admin":
-            Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new Home()
-                )
-            );
-            break;
-          case "faculty":
-            break;
-          case "parent":
-            break;
-        }
-      }
-      else{
-
-      }
-    }
-  }
   @override
   void initState(){
     super.initState();
-    checkState();
+    //checkState();
   }
   @override
   Widget build(BuildContext context) {
