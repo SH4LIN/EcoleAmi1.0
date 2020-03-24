@@ -379,16 +379,4 @@ class _AddState extends State<Add> {
           backgroundColor: Colors.black);
       pr.hide();
     }
-//   DocumentReference ref = await databaseReference.collection("Student")
-//        .add({
-//      'first_name': _fName.text,
-//      'middle_name': _mName.text,
-//      'last_name': _lName.text,
-//      'email': _eMail.text,
-//      'phone_num': _phone.text,
-//      'sem': _sem.text,
-//    });
-  }
-
-//print(ref.documentID);
 }
