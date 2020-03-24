@@ -1,16 +1,19 @@
+import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/ManageFaculty.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class FacultyAdd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new AddInfo(),
+    return new Scaffold(
+      body: new AddInfo(),
     );
   }
 }
+
 class AddInfo extends StatefulWidget {
   @override
   _AddInfoState createState() => _AddInfoState();
@@ -20,6 +23,8 @@ class _AddInfoState extends State<AddInfo> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.grey,
+      appBar: CommonAppBar("Faculty Details"),
       body: new Container(
         child: new Center(
           child: new Add(),
@@ -35,9 +40,7 @@ class Add extends StatefulWidget {
 }
 
 class _AddState extends State<Add> {
-
   final databaseReference = Firestore.instance;
-
 
 //    TextEditingController _enr;
   TextEditingController _fName = new TextEditingController();
@@ -63,38 +66,28 @@ class _AddState extends State<Add> {
   Widget build(BuildContext context) {
     return new ListView(
       children: <Widget>[
-        new Align(
-          alignment: Alignment.topCenter,
-          child: new Text(
-            "Faculty Details",
-            style: new TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),
-          ),
-        ),
         new Container(
-          padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-              ),
+                  borderRadius: BorderRadius.circular(10.0)),
               child: Container(
                 padding: const EdgeInsets.all(15.0),
                 child: new Column(
                   children: <Widget>[
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _fName,
-                      autofocus: true,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "First Name",
-                          errorText: _fValidate ? 'Please enter First Name' : null,
+                          errorText:
+                              _fValidate ? 'Please enter First Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -102,12 +95,9 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _lName,
                       keyboardType: TextInputType.text,
@@ -116,7 +106,8 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Last Name",
-                          errorText: _lValidate ? 'Please enter Last Name' : null,
+                          errorText:
+                              _lValidate ? 'Please enter Last Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -124,12 +115,9 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _eMail,
                       keyboardType: TextInputType.emailAddress,
@@ -138,7 +126,9 @@ class _AddState extends State<Add> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Email Address",
-                          errorText: _emailValidate ? 'Please enter Email Address' : null,
+                          errorText: _emailValidate
+                              ? 'Please enter Email Address'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -146,12 +136,9 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.email),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _phone,
                       keyboardType: TextInputType.phone,
@@ -161,7 +148,9 @@ class _AddState extends State<Add> {
                       maxLength: 10,
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
-                          errorText: _phoneValidate ? 'Please enter Phone Number' : null,
+                          errorText: _phoneValidate
+                              ? 'Please enter Phone Number'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -169,12 +158,9 @@ class _AddState extends State<Add> {
                           prefixIcon: new Icon(Icons.phone),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       keyboardType: TextInputType.text,
                       obscureText: _obscureText,
@@ -190,8 +176,10 @@ class _AddState extends State<Add> {
                           ),
                           prefixIcon: new Icon(Icons.lock),
                           suffixIcon: new IconButton(
-                            icon: new Icon(_obscureText?Icons.visibility_off : Icons.visibility),
-                            onPressed: (){
+                            icon: new Icon(_obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
                               setState(() {
                                 _obscureText = !_obscureText;
                               });
@@ -199,34 +187,47 @@ class _AddState extends State<Add> {
                           ),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                     new RaisedButton(
                       color: Colors.redAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)
-                      ),
+                          borderRadius: BorderRadius.circular(10.0)),
                       child: new Text(
                         "Add",
-                        style: new TextStyle(
-                            color: Colors.white,
-                            fontSize: 15.0
-                        ),
+                        style:
+                            new TextStyle(color: Colors.white, fontSize: 15.0),
                       ),
                       onPressed: () {
                         setState(() {
-                          if (_fName.text.isEmpty) { _fValidate = true; } else { _fValidate = false; }
-                          if (_lName.text.isEmpty) { _lValidate = true; } else { _lValidate = false; }
-                          if (_eMail.text.isEmpty) { _emailValidate = true; } else { _emailValidate = false; }
-                          if (_phone.text.isEmpty) { _phoneValidate = true; } else { _phoneValidate = false; }
-                          if (_fName.text.isNotEmpty && _lName.text.isNotEmpty && _eMail.text.isNotEmpty && _phone.text.isNotEmpty ) { _onClick(); }
+                          if (_fName.text.isEmpty) {
+                            _fValidate = true;
+                          } else {
+                            _fValidate = false;
+                          }
+                          if (_lName.text.isEmpty) {
+                            _lValidate = true;
+                          } else {
+                            _lValidate = false;
+                          }
+                          if (_eMail.text.isEmpty) {
+                            _emailValidate = true;
+                          } else {
+                            _emailValidate = false;
+                          }
+                          if (_phone.text.isEmpty) {
+                            _phoneValidate = true;
+                          } else {
+                            _phoneValidate = false;
+                          }
+                          if (_fName.text.isNotEmpty &&
+                              _lName.text.isNotEmpty &&
+                              _eMail.text.isNotEmpty &&
+                              _phone.text.isNotEmpty) {
+                            _onClick();
+                          }
                         });
                       },
                       splashColor: Colors.red,
@@ -240,30 +241,66 @@ class _AddState extends State<Add> {
       ],
     );
   }
-  void _onClick() {
-    databaseReference.collection("Faculty")
-        .document("1")
-        .setData({
-      'first_name': _fName.text,
-      'last_name': _lName.text,
-      'email': _eMail.text,
-      'phone_num': _phone.text,
-    });
 
-/*   DocumentReference ref = await databaseReference.collection("Student")
-        .add({
-      'first_name': _fName.text,
-      'middle_name': _mName.text,
-      'last_name': _lName.text,
-      'email': _eMail.text,
-      'phone_num': _phone.text,
-      'sem': _sem.text,
-    });*/
+  void _onClick() async {
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        ));
+    pr.show();
+    final snapShot = await Firestore.instance
+        .collection("faculty_details")
+        .document(_phone.text)
+        .get();
+    if (snapShot == null || !snapShot.exists) {
+      await databaseReference
+          .collection("faculty_details")
+          .document(_phone.text)
+          .setData({
+        'first_name': _fName.text,
+        'last_name': _lName.text,
+        'email': _eMail.text,
+        'phone_number': _phone.text,
+      });
+      final snapShot = await databaseReference
+          .collection("login_details")
+          .document(_phone.text)
+          .get();
+      print(snapShot.exists.toString());
+      print(_phone.text);
+      print(snapShot!=null);
+      if (snapShot == null || snapShot.exists) {
 
-    Fluttertoast.showToast(msg: "Record Added Successfully",gravity: ToastGravity.BOTTOM);
-    Navigator.of(context).push(
-        new MaterialPageRoute(builder: (BuildContext context)=>new ManageFaculty())
-    );
+      }
+      else{
+        await databaseReference
+            .collection("login_details")
+            .document(_phone.text)
+            .setData({'password': null, 'role': "faculty"});
+      }
+      pr.hide();
+      Fluttertoast.showToast(
+          msg: "Record Added Successfully", gravity: ToastGravity.BOTTOM);
+      pr.hide();
+      Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext context) => new ManageFaculty()));
+    }
+    else{
+      Fluttertoast.showToast(
+          msg: "Record Exist",
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.black);
+      pr.hide();
+    }
   }
 
 //print(ref.documentID);

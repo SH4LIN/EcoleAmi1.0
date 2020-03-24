@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/UpdateStudent.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'CommonAppBar.dart';
 import 'StudentAdd.dart';
+
+var itemsStudent;
 
 class ManageStudent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new ManageInformation(),
+    return new Scaffold(
+      body: new ManageInformation(),
     );
   }
 }
@@ -43,7 +47,6 @@ class _ManageInformationState extends State<ManageInformation> {
   @override
   void initState() {
     super.initState();
-    //getNames();
   }
 
   @override
@@ -57,19 +60,18 @@ class _ManageInformationState extends State<ManageInformation> {
           children: <Widget>[
             new Flexible(
               child: StreamBuilder(
-                stream: Firestore.instance
-                  .collection("student_details")
-                  .snapshots(),
-                builder:(context,snap) {
-                  len = snap.data.documents.length;
-                  return ListView.builder(
-                    itemBuilder: _getListItemTile,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: len,
-                  );
-                }
-              ),
+                  stream: Firestore.instance
+                      .collection("student_details")
+                      .snapshots(),
+                  builder: (context, snap) {
+                    len = snap.data.documents.length;
+                    return ListView.builder(
+                      itemBuilder: _getListItemTile,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: len,
+                    );
+                  }),
             ),
           ],
         ),
@@ -84,25 +86,30 @@ class _ManageInformationState extends State<ManageInformation> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-  Widget _getListItemTile(BuildContext context, int index){
+
+  Widget _getListItemTile(BuildContext context, int index) {
     return new Card(
       elevation: 10.0,
-      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       borderOnForeground: true,
       child: new Container(
-        padding: EdgeInsets.only(top: 20.0),
+        padding: EdgeInsets.only(top: 15.0,bottom: 15.0),
         child: new Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Stack(
               children: <Widget>[
-                new Padding(
-                  padding: EdgeInsets.only(
-                      left: 10.0, right: 5.0, bottom: 20.0),
-                  child: new Image(
-                    image: AssetImage('images/dummyimg.png'),
-                    width: 100.0,
-                    height: 100.0,
+                Container(
+                  width: 100.0,
+                  height: 90.0,
+                  margin: EdgeInsets.only(left: 10.0, right: 7.0),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: AssetImage('images/dummyimg.png')),
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    color: Colors.redAccent,
                   ),
                 ),
               ],
@@ -116,58 +123,54 @@ class _ManageInformationState extends State<ManageInformation> {
                         .collection("student_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      var items = snap.data.documents;
+                      itemsStudent = snap.data.documents;
+                      /*print(items.runtimeType);
+                      print(items[index].documentID);
+                      print(snap.data.runtimeType);*/
                       return Text(
                         "Name : " +
-                            items[index]['first_name'] +
+                            itemsStudent[index]['first_name'] +
                             " " +
-                            items[index]['middle_name'] +
+                            itemsStudent[index]['middle_name'] +
                             " " +
-                            items[index]['last_name'],
+                            itemsStudent[index]['last_name'],
                         style: new TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold),
+                            fontSize: 12.0, fontWeight: FontWeight.bold),
                       );
                     }),
-                new Padding(
-                    padding: EdgeInsets.only(bottom: 5.0)),
+                new Padding(padding: EdgeInsets.only(bottom: 5.0)),
                 StreamBuilder(
                     stream: Firestore.instance
                         .collection("student_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      var items = snap.data.documents;
+                      itemsStudent = snap.data.documents;
                       return Text(
-                        "Enrollment : " +
-                            items[index]['enrollment'],
-
+                        "Enrollment : " + itemsStudent[index]['enrollment'],
                         style: new TextStyle(
-                            fontSize: 11.0,
-                            fontWeight: FontWeight.bold),
+                            fontSize: 11.0, fontWeight: FontWeight.bold),
                       );
                     }),
-                new Padding(
-                    padding: EdgeInsets.only(bottom: 21.0)),
+                new Padding(padding: EdgeInsets.only(bottom: 21.0)),
                 new Row(
                   children: <Widget>[
                     new OutlineButton(
                       onPressed: () => {
-                        Navigator.push(context, new MaterialPageRoute(builder: (context){
-                          return new UpdateStudentData();
+                        Navigator.push(context,
+                            new MaterialPageRoute(builder: (context) {
+                          return new UpdateStudent(index);
                         }))
                       },
                       child: new Text("Update",
-                          style:
-                          new TextStyle(color: Colors.green)),
+                          style: new TextStyle(color: Colors.green)),
                     ),
                     new Padding(
                       padding: EdgeInsets.only(right: 20.0),
                     ),
                     new OutlineButton(
-                      onPressed: () => {},
+                      onPressed: () => studentRemove(index),
                       child: new Text("Remove",
-                          style:
-                          new TextStyle(color: Colors.red)),
+                          style: new TextStyle(color: Colors.red)),
                     )
                   ],
                 )
@@ -177,5 +180,69 @@ class _ManageInformationState extends State<ManageInformation> {
         ),
       ),
     );
+  }
+
+  void studentRemove(int id) {
+    var _document = itemsStudent[id].documentID;
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        ));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Caution!"),
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
+            content: new Text("Are You Sure You Want To Remove This User"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text("Cancel")),
+              new FlatButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await pr.show();
+                    try {
+                      await Firestore.instance
+                          .collection('student_details')
+                          .document(_document)
+                          .delete();
+                      final snapShot = await Firestore.instance
+                          .collection('login_details')
+                          .document(_document)
+                          .get();
+                      /*print(snapShot.exists.toString());
+                      print(_document);
+                      print(snapShot!=null);*/
+                      if (snapShot != null || snapShot.exists) {
+                        await Firestore.instance
+                            .collection('login_details')
+                            .document(_document)
+                            .delete();
+                      }
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                    pr.hide();
+                    Fluttertoast.showToast(msg: "Record Removed");
+                  },
+                  child: new Text("Yes"))
+            ],
+          );
+        });
   }
 }

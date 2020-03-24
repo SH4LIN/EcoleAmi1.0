@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
-import 'List.dart';
+import 'MainScreen.dart';
+
 import 'ManageVerification.dart';
+import 'SplashScreen.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -19,14 +21,14 @@ Widget buildError(BuildContext context, FlutterErrorDetails error) {
 class StudentActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new StudentActivityPage(),
-      builder: (BuildContext context, Widget widget) {
+    return new Scaffold(
+      body: new StudentActivityPage(),
+      /*builder: (BuildContext context, Widget widget) {
         ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
           return buildError(context, errorDetails);
         };
         return widget;
-      },
+      },*/
     );
   }
 }
@@ -54,9 +56,8 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Ecoleami"),
-      ),
+      backgroundColor: Colors.grey,
+      appBar: CommonAppBar("Ecoleami"),
       drawer: new Drawer(
         elevation: 100.0,
         child: new ListView(
@@ -65,7 +66,7 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
             new UserAccountsDrawerHeader(
               decoration: BoxDecoration(
                   color: Colors.black45,
-                  borderRadius: BorderRadius.circular(15.0)
+                  borderRadius: BorderRadius.circular(5.0)
               ),
               margin: EdgeInsets.only(bottom: 20.0),
               accountName: StreamBuilder(
@@ -185,7 +186,7 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
                   prf.setBool("isLoggedIn", false);
                   Navigator.of(context).pop();
                   Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                      builder: (BuildContext context) => new MyApp()));
+                      builder: (BuildContext context) => new MainScreen()));
                 })
           ],
         ),
@@ -237,7 +238,7 @@ class _StudentActivityPageState extends State<StudentActivityPage> {
             title: Text("Under Construction!"),
             elevation: 20.0,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)),
+                borderRadius: BorderRadius.circular(15.0)),
             content: new Text(
                 "This Part of Application is Still Under Construction"),
             actions: <Widget>[
