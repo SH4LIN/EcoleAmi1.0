@@ -109,7 +109,7 @@ class _ManageInfoState extends State<ManageInfo> {
                             " " +
                             itemsFaculty[index]['last_name'],
                         style: new TextStyle(
-                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       );
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -122,7 +122,7 @@ class _ManageInfoState extends State<ManageInfo> {
                       return Text(
                         "Email : " + itemsFaculty[index]['email'],
                         style: new TextStyle(
-                            fontSize: 11.0, fontWeight: FontWeight.bold),
+                            fontSize: 8.0, fontWeight: FontWeight.bold),
                       );
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 21.0)),

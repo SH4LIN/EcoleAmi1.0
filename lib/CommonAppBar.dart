@@ -7,14 +7,12 @@ class CommonAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
   CommonAppBar(this.appBarTitle);
   @override
-  _CommonAppBarState createState(){
+  _CommonAppBarState createState() {
     return _CommonAppBarState(this.appBarTitle);
   }
-
-
 }
 
-class _CommonAppBarState extends State<CommonAppBar>{
+class _CommonAppBarState extends State<CommonAppBar> {
   String appBarTitle;
 
   _CommonAppBarState(this.appBarTitle);
@@ -22,12 +20,15 @@ class _CommonAppBarState extends State<CommonAppBar>{
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 10.0,
-      title: Text(appBarTitle,style: TextStyle(color: Colors.black)),
+      title: Text(appBarTitle, style: TextStyle(color: Colors.black)),
       centerTitle: true,
       iconTheme: IconThemeData(
         color: Colors.black,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+      ),
       backgroundColor: Colors.white,
       primary: true,
     );

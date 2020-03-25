@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'FacultyActivity.dart';
 import 'Home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'SplashScreen.dart';
@@ -263,6 +264,11 @@ class _ListState extends State<List> {
                 msg: "Login successfully",
                 gravity: ToastGravity.BOTTOM,
                 toastLength: Toast.LENGTH_SHORT,
+              );
+              Navigator.of(context).pushReplacement(
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new FacultyActivity()
+                  )
               );
               pr.hide();
               break;

@@ -291,6 +291,7 @@ class _AddState extends State<Add> {
       Fluttertoast.showToast(
           msg: "Record Added Successfully", gravity: ToastGravity.BOTTOM);
       pr.hide();
+      Navigator.pop(context);
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) => new ManageFaculty()));
     }
