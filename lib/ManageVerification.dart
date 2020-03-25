@@ -148,6 +148,7 @@ class _VerificationState extends State<Verification> {
         toastLength: Toast.LENGTH_SHORT,
       );
     } else if (_pass.text.compareTo(pass) == 0) {
+      Navigator.pop(context);
       Navigator.push(context, new MaterialPageRoute(builder: (context){
         return txt.startsWith("S") ? new ManageStudent() : new ManageFaculty();
       }));

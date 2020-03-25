@@ -135,7 +135,7 @@ class _ManageInformationState extends State<ManageInformation> {
                             " " +
                             itemsStudent[index]['last_name'],
                         style: new TextStyle(
-                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       );
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -148,7 +148,7 @@ class _ManageInformationState extends State<ManageInformation> {
                       return Text(
                         "Enrollment : " + itemsStudent[index]['enrollment'],
                         style: new TextStyle(
-                            fontSize: 11.0, fontWeight: FontWeight.bold),
+                            fontSize: 8.0, fontWeight: FontWeight.bold),
                       );
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 21.0)),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'FacultyActivity.dart';
 import 'Home.dart';
 import 'MainScreen.dart';
 import 'StudentActivity.dart';
@@ -37,6 +38,11 @@ class _SplashScreenState extends State<SplashScreen> {
             );
             break;
           case "faculty":
+            Navigator.of(context).pushReplacement(
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new FacultyActivity()
+                )
+            );
             break;
           case "parent":
             break;
