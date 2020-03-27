@@ -38,8 +38,6 @@ class StudentActivityPage extends StatefulWidget {
   _StudentActivityPageState createState() => _StudentActivityPageState();
 }
 
-
-
 class _StudentActivityPageState extends State<StudentActivityPage>
     with SingleTickerProviderStateMixin {
   SharedPreferences prf;
@@ -52,11 +50,24 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
     NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
   ];
-  Color backgroundColor = Colors.white;
+  TextEditingController _fName = new TextEditingController();
+  TextEditingController _mName = new TextEditingController();
+  TextEditingController _lName = new TextEditingController();
+  TextEditingController _eMail = new TextEditingController();
+  TextEditingController _phone = new TextEditingController();
+  TextEditingController _sem = new TextEditingController();
+  TextEditingController _enr = new TextEditingController();
+  bool _fValidate = false;
+  bool _mValidate = false;
+  bool _lValidate = false;
+  bool _emailValidate = false;
+  bool _phoneValidate = false;
+  bool _semValidate = false;
+  Color backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.grey,
       appBar: CommonAppBar("Ecoleami"),
       drawer: new Drawer(
         elevation: 100.0,
@@ -196,8 +207,16 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       ),
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
+      backgroundColor: selectedIndex == 0
+          ? Colors.purpleAccent
+          : selectedIndex == 1
+              ? Colors.red
+              : selectedIndex == 2
+                  ? Colors.greenAccent
+                  : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
+
   Widget BottomNavBar() {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -206,7 +225,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           boxShadow: [BoxShadow(color: Colors.black, blurRadius: 10)],
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
-          color: backgroundColor),
+          color: Colors.white),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: items.map((item) {
@@ -282,16 +301,18 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       ]),
     );
   }
+
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
       children: <Widget>[
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-          height: 200.0,
+          margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+          height: 180.0,
           width: 300.0,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
           child: Carousel(
-            boxFit: BoxFit.cover,
+            dotColor: Colors.grey,
             borderRadius: true,
             radius: Radius.circular(50.0),
             autoplayDuration: Duration(seconds: 5),
@@ -311,19 +332,416 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             images: [
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
                   image: 'https://wallpapercave.com/wp/wp2071259.jpg'),
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
                   image: 'https://wallpapercave.com/wp/wp2071220.jpg'),
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                      'https://images8.alphacoders.com/102/thumb-1920-1021373.jpg'),
             ],
           ),
-        )
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          margin: EdgeInsets.only(top: 15.0),
+          height: 175.0,
+          alignment: Alignment.topLeft,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(left: 10),
+                child: Text(
+                  "Events",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2.0),
+                ),
+              ),
+              Container(
+                height: 140.0,
+                padding: EdgeInsets.all(5.0),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: 175.0,
+          alignment: Alignment.topLeft,
+          margin: EdgeInsets.only(top: 15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(left: 10),
+                child: Text(
+                  "College Schedule",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2.0),
+                ),
+              ),
+              Container(
+                height: 140.0,
+                padding: EdgeInsets.all(5.0),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: 175.0,
+          alignment: Alignment.topLeft,
+          margin: EdgeInsets.only(top: 15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(left: 10),
+                child: Text(
+                  "Fee Payment",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2.0),
+                ),
+              ),
+              Container(
+                height: 140.0,
+                padding: EdgeInsets.all(5.0),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
-
+  bool stat = false;
   Widget _buildBodyProfile() {
-    return Text("Profile");
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(top: 20.0),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(100.0),
+              child: FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  image: 'https://wallpapercave.com/wp/wp2071259.jpg'),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
+              child: Column(
+                children: <Widget>[
+                  stat == false
+                      ? Row(
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: TextField(
+                                controller: _enr,
+                                keyboardType: TextInputType.number,
+                                cursorColor: Colors.purple,
+                                cursorRadius: Radius.circular(50.0),
+                                cursorWidth: 3.0,
+                                decoration: new InputDecoration(
+                                    hintText: "Enrollment",
+                                    hintStyle: new TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.white70,
+                                    ),
+                                    prefixIcon: new Icon(Icons.account_circle),
+                                    border: new OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    )),
+                              ),
+                              margin: EdgeInsets.only(right: 15),
+                            ),
+                            RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  stat = true;
+                                  print(stat);
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              colorBrightness: Brightness.light,
+                              elevation: 24.0,
+                              animationDuration: Duration(seconds: 5),
+                              child: Text("Update"),
+                            )
+                          ],
+                        )
+                      : TextField(
+                          controller: _enr,
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Enrollment",
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.account_circle),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _fName,
+                    enabled: false,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "First Name",
+                        errorText:
+                            _fValidate ? 'Please enter First Name' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.person),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _mName,
+                    enabled: false,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Middle Name",
+                        errorText:
+                            _mValidate ? 'Please enter Middle Name' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.person),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _lName,
+                    enabled: false,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Last Name",
+                        errorText: _lValidate ? 'Please enter Last Name' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.person),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextFormField(
+                    controller: _eMail,
+                    enabled: false,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Email Address",
+                        errorText: _emailValidate
+                            ? 'Please enter Email Address'
+                            : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.email),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _phone,
+                    keyboardType: TextInputType.phone,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    enabled: false,
+                    maxLength: 10,
+                    decoration: new InputDecoration(
+                        hintText: "Phone Number",
+                        errorText:
+                            _phoneValidate ? 'Please enter Phone Number' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.phone),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _sem,
+                    maxLength: 1,
+                    enabled: false,
+                    keyboardType: TextInputType.number,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Semester",
+                        errorText:
+                            _semValidate ? 'Please enter Semester' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.format_list_numbered),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+    ;
   }
 
   Widget _buildBodyQnA() {
@@ -350,6 +768,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         break;
     }
   }
+
   @override
   void initState() {
     super.initState();
