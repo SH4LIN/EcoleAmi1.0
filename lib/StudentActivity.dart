@@ -141,32 +141,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               ),
               arrowColor: Colors.red,
             ),
-            new ListTile(
-              title: new Text(
-                "Manage Student",
-                style: Theme.of(context).textTheme.subhead,
-              ),
-              trailing: new Icon(Icons.account_circle),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        new ManageVerification("Student")));
-              },
-            ),
-            new ListTile(
-              title: new Text(
-                "Manage Faculty",
-                style: Theme.of(context).textTheme.subhead,
-              ),
-              trailing: new Icon(Icons.account_circle),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        new ManageVerification("Faculty")));
-              },
-            ),
+
             new ListTile(
               title: new Text(
                 "Dummy 1",
@@ -333,19 +308,14 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             },
             images: [
               FadeInImage.assetNetwork(
-                placeholder: 'images/loading.gif',
-                fit: BoxFit.fill,
-                image: 'https://wallpapercave.com/wp/wp2071259.jpg',
-              ),
-              FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
-                  image: 'https://wallpapercave.com/wp/wp2071220.jpg'),
+                  image: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
                   image:
-                      'https://images8.alphacoders.com/102/thumb-1920-1021373.jpg'),
+                  "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
             ],
           ),
         ),
@@ -390,7 +360,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -449,7 +419,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -508,7 +478,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                                  'https://wallpapercave.com/wp/wp2071259.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -546,7 +516,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
-                  image: 'https://wallpapercave.com/wp/wp2071259.jpg'),
+                  image: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
