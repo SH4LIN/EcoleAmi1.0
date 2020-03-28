@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'MainScreen.dart';
@@ -208,7 +210,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.purpleAccent
+          ? Colors.grey
           : selectedIndex == 1
               ? Colors.red
               : selectedIndex == 2
@@ -331,9 +333,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             },
             images: [
               FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  fit: BoxFit.fill,
-                  image: 'https://wallpapercave.com/wp/wp2071259.jpg'),
+                placeholder: 'images/loading.gif',
+                fit: BoxFit.fill,
+                image: 'https://wallpapercave.com/wp/wp2071259.jpg',
+              ),
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
@@ -526,6 +529,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       ],
     );
   }
+
   bool stat = false;
   Widget _buildBodyProfile() {
     return SingleChildScrollView(
@@ -741,11 +745,127 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         ),
       ),
     );
-    ;
   }
 
   Widget _buildBodyQnA() {
-    return Text("QnA");
+    return ListView(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.65,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Text(
+                                      "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
+                                  nip: BubbleNip.leftTop,
+                                ),
+                              ]),
+                              padding: EdgeInsets.only(top: 25.0, left: 5),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Text(
+                                      "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
+                                  nip: BubbleNip.leftTop,
+                                ),
+                              ]),
+                              padding: EdgeInsets.only(top: 25.0, right: 5),
+                            ),
+                          ],
+                        ),
+                      ],
+                  );
+                },
+                reverse: true,
+                itemCount: 10,
+              ),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 25),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 8),
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.insert_emoticon,
+                                    ),
+                                    onPressed: null),
+                                SizedBox(width: 8),
+                                Expanded(
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.multiline,
+                                  minLines: 1,
+                                  maxLines: 100,
+                                  decoration: InputDecoration(
+                                    hintText: 'Type a message',
+                                    border: InputBorder.none,
+                                    alignLabelWithHint: true,
+                                  ),
+                                )),
+                                Icon(Icons.attach_file,
+                                    color: Theme.of(context).hintColor),
+                                SizedBox(width: 8.0),
+                                Icon(Icons.camera_alt,
+                                    color: Theme.of(context).hintColor),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 25),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildBodySettings() {

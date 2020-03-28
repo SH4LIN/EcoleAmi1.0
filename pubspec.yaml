@@ -31,6 +31,9 @@ dependencies:
   connectivity: ^0.4.8+2
   carousel_slider: ^1.4.1
   rxdart: ^0.18.0
+  bubble: ^1.1.9+1
+  shimmer: ^1.1.0
+  cached_network_image: ^2.0.0
   carousel_pro: ^1.0.0
   flutter_screenutil: ^1.0.2
   progress_dialog: ^1.2.1
