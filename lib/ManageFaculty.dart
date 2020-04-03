@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/UpdateFaculty.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'CommonAppBar.dart';
 import 'FacultyAdd.dart';
 import 'UpdateFaculty.dart';
@@ -143,7 +145,7 @@ class _ManageInfoState extends State<ManageInfo> {
                       padding: EdgeInsets.only(right: 20.0),
                     ),
                     new OutlineButton(
-                      onPressed: () =>{}, //studentRemove(index),
+                      onPressed: () => facultyRemove(index),
                       child: new Text("Remove",
                           style: new TextStyle(color: Colors.red)),
                     )
@@ -155,6 +157,69 @@ class _ManageInfoState extends State<ManageInfo> {
         ),
       ),
     );
+  }
+  void facultyRemove(int id) {
+    var _document = itemsFaculty[id].documentID;
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        ));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Caution!"),
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
+            content: new Text("Are You Sure You Want To Remove This User"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text("Cancel")),
+              new FlatButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await pr.show();
+                    try {
+                      await Firestore.instance
+                          .collection('faculty_details')
+                          .document(_document)
+                          .delete();
+                      final snapShot = await Firestore.instance
+                          .collection('login_details')
+                          .document(_document)
+                          .get();
+                      /*print(snapShot.exists.toString());
+                      print(_document);
+                      print(snapShot!=null);*/
+                      if (snapShot != null || snapShot.exists) {
+                        await Firestore.instance
+                            .collection('login_details')
+                            .document(_document)
+                            .delete();
+                      }
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                    pr.hide();
+                    Fluttertoast.showToast(msg: "Record Removed");
+                  },
+                  child: new Text("Yes"))
+            ],
+          );
+        });
   }
 }
 

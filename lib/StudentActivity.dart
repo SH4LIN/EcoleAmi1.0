@@ -141,7 +141,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               ),
               arrowColor: Colors.red,
             ),
-
             new ListTile(
               title: new Text(
                 "Dummy 1",
@@ -166,19 +165,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
-            new ListTile(
-                title: new Text(
-                  "Logout",
-                  style: Theme.of(context).textTheme.subhead,
-                ),
-                trailing: new Icon(Icons.arrow_back),
-                onTap: () async {
-                  SharedPreferences prf = await SharedPreferences.getInstance();
-                  prf.setBool("isLoggedIn", false);
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                      builder: (BuildContext context) => new MainScreen()));
-                })
           ],
         ),
       ),
@@ -192,6 +178,28 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   ? Colors.greenAccent
                   : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
+  }
+
+  void _onItemTapped1() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Under Construction!"),
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
+            content: new Text(
+                "This Part of Application is Still Under Construction"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text("Close"))
+            ],
+          );
+        });
   }
 
   Widget BottomNavBar() {
@@ -220,28 +228,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-  void _onItemTapped1() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Under Construction!"),
-            elevation: 20.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            content: new Text(
-                "This Part of Application is Still Under Construction"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text("Close"))
-            ],
-          );
-        });
-  }
-
   Widget _buildItem(NavigationItem item, bool isSelected) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
@@ -261,7 +247,11 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             IconTheme(
               data: IconThemeData(
                   size: 25.0,
-                  color: isSelected ? backgroundColor : Colors.black),
+                  color: isSelected
+                      ? item.title.data.compareTo("Settings") == 0
+                          ? Colors.white
+                          : backgroundColor
+                      : Colors.black),
               child: item.icon,
             ),
             Padding(
@@ -269,7 +259,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               child: isSelected
                   ? Text(
                       item.title.data,
-                      style: TextStyle(color: backgroundColor),
+                      style: TextStyle(
+                          color: item.title.data.compareTo("Settings") == 0
+                              ? Colors.white
+                              : backgroundColor),
                     )
                   : Container(),
             )
@@ -310,12 +303,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
-                  image: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                  image:
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
                   image:
-                  "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
+                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
             ],
           ),
         ),
@@ -516,7 +510,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
-                  image: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                  image:
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
@@ -729,45 +724,45 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: Wrap(children: <Widget>[
-                                Bubble(
-                                  elevation: 10.0,
-                                  shadowColor: Colors.white,
-                                  child: Text(
-                                      "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
-                                  nip: BubbleNip.leftTop,
-                                ),
-                              ]),
-                              padding: EdgeInsets.only(top: 25.0, left: 5),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: Wrap(children: <Widget>[
-                                Bubble(
-                                  elevation: 10.0,
-                                  shadowColor: Colors.white,
-                                  child: Text(
-                                      "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
-                                  nip: BubbleNip.leftTop,
-                                ),
-                              ]),
-                              padding: EdgeInsets.only(top: 25.0, right: 5),
-                            ),
-                          ],
-                        ),
-                      ],
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: Wrap(children: <Widget>[
+                              Bubble(
+                                elevation: 10.0,
+                                shadowColor: Colors.white,
+                                child: Text(
+                                    "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
+                                nip: BubbleNip.leftTop,
+                              ),
+                            ]),
+                            padding: EdgeInsets.only(top: 25.0, left: 5),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: Wrap(children: <Widget>[
+                              Bubble(
+                                elevation: 10.0,
+                                shadowColor: Colors.white,
+                                child: Text(
+                                    "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
+                                nip: BubbleNip.rightTop,
+                              ),
+                            ]),
+                            padding: EdgeInsets.only(top: 25.0, right: 5),
+                          ),
+                        ],
+                      ),
+                    ],
                   );
                 },
                 reverse: true,
@@ -796,7 +791,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                 SizedBox(width: 8),
                                 Expanded(
                                     child: TextFormField(
-                                      keyboardType: TextInputType.multiline,
+                                  keyboardType: TextInputType.multiline,
                                   minLines: 1,
                                   maxLines: 100,
                                   decoration: InputDecoration(
@@ -839,7 +834,52 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   }
 
   Widget _buildBodySettings() {
-    return Text("Settings");
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: ListView(
+        children: <Widget>[
+          ListTile(
+            leading: Icon(
+              Icons.info_outline,
+              color: Colors.white,
+            ),
+            title: Text(
+              "About Us",
+              style: TextStyle(color: Colors.white),
+            ),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.call,
+              color: Colors.white,
+            ),
+            title: Text(
+              "Contact Us",
+              style: TextStyle(color: Colors.white),
+            ),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+          ),
+          ListTile(
+              title: new Text(
+                "Logout",
+                style: TextStyle(color: Colors.white),
+              ),
+              trailing: new Icon(Icons.arrow_forward_ios, color: Colors.white),
+              leading: Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
+              onTap: () async {
+                SharedPreferences prf = await SharedPreferences.getInstance();
+                prf.setBool("isLoggedIn", false);
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                    builder: (BuildContext context) => new MainScreen()));
+              })
+        ],
+      ),
+    );
   }
 
   Widget callPage(index) {
