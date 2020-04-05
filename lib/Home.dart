@@ -43,121 +43,119 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: CommonAppBar("EcoleAmi"),
-        drawer: new Drawer(
-          elevation: 100.0,
-          child: new ListView(
-            padding: EdgeInsets.only(top: 25.0),
-            children: <Widget>[
-              new UserAccountsDrawerHeader(
-                margin: EdgeInsets.only(bottom: 20.0),
-                decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(5.0)),
-                accountName: StreamBuilder(
-                  stream: Firestore.instance
-                      .collection("admin_details")
-                      .document(_username)
-                      .snapshots(),
-                  // ignore: missing_return
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      var username = snapshot.data;
-                      return Text(
-                          username['first_name'] + " " + username['last_name']);
-                    }
-                  },
-                ),
-                accountEmail: StreamBuilder(
-                  stream: Firestore.instance
-                      .collection("admin_details")
-                      .document(_username)
-                      .snapshots(),
-                  // ignore: missing_return
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      var username = snapshot.data;
-                      return Text(username['email']);
-                    }
-                  },
-                ),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor:
-                      Theme.of(context).platform == TargetPlatform.iOS
-                          ? Colors.blue
-                          : Colors.white,
-                  child: Text(
-                    "A",
-                    style: TextStyle(fontSize: 40.0),
-                  ),
-                ),
-                arrowColor: Colors.red,
-              ),
-              new ListTile(
-                title: new Text(
-                  "Manage Student",
-                  style: Theme.of(context).textTheme.subhead,
-                ),
-                trailing: new Icon(Icons.account_circle),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          new ManageVerification("Student")));
+      appBar: CommonAppBar("EcoleAmi"),
+      drawer: new Drawer(
+        elevation: 100.0,
+        child: new ListView(
+          padding: EdgeInsets.only(top: 25.0),
+          children: <Widget>[
+            new UserAccountsDrawerHeader(
+              margin: EdgeInsets.only(bottom: 20.0),
+              decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(5.0)),
+              accountName: StreamBuilder(
+                stream: Firestore.instance
+                    .collection("admin_details")
+                    .document(_username)
+                    .snapshots(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var username = snapshot.data;
+                    return Text(
+                        username['first_name'] + " " + username['last_name']);
+                  }
                 },
               ),
-              new ListTile(
-                title: new Text(
-                  "Manage Faculty",
-                  style: Theme.of(context).textTheme.subhead,
-                ),
-                trailing: new Icon(Icons.account_circle),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          new ManageVerification("Faculty")));
+              accountEmail: StreamBuilder(
+                stream: Firestore.instance
+                    .collection("admin_details")
+                    .document(_username)
+                    .snapshots(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var username = snapshot.data;
+                    return Text(username['email']);
+                  }
                 },
               ),
-              new ListTile(
-                title: new Text(
-                  "Add Events",
-                  style: Theme.of(context).textTheme.subhead,
+              currentAccountPicture: CircleAvatar(
+                backgroundColor:
+                    Theme.of(context).platform == TargetPlatform.iOS
+                        ? Colors.blue
+                        : Colors.white,
+                child: Text(
+                  "A",
+                  style: TextStyle(fontSize: 40.0),
                 ),
-                trailing: new Icon(Icons.add_circle),
-                onTap: (){
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => new AddEvent()));
-                },
               ),
-              new ListTile(
-                title: new Text(
-                  "Dummy 2",
-                  style: Theme.of(context).textTheme.subhead,
-                ),
-                trailing: new Icon(Icons.cancel),
-                onTap: _onItemTapped1,
+              arrowColor: Colors.red,
+            ),
+            new ListTile(
+              title: new Text(
+                "Manage Student",
+                style: Theme.of(context).textTheme.subhead,
               ),
-              new ListTile(
-                title: new Text(
-                  "Dummy 3",
-                  style: Theme.of(context).textTheme.subhead,
-                ),
-                trailing: new Icon(Icons.cancel),
-                onTap: _onItemTapped1,
+              trailing: new Icon(Icons.account_circle),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        new ManageVerification("Student")));
+              },
+            ),
+            new ListTile(
+              title: new Text(
+                "Manage Faculty",
+                style: Theme.of(context).textTheme.subhead,
               ),
-            ],
-          ),
+              trailing: new Icon(Icons.account_circle),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        new ManageVerification("Faculty")));
+              },
+            ),
+            new ListTile(
+              title: new Text(
+                "Generate Detain List",
+                style: Theme.of(context).textTheme.subhead,
+              ),
+              trailing: new Icon(Icons.access_time),
+              onTap: _onItemTapped1,
+            ),
+            new ListTile(
+              title: new Text(
+                "Enter Examination Marks",
+                style: Theme.of(context).textTheme.subhead,
+              ),
+              trailing: new Icon(Icons.transit_enterexit),
+              onTap: _onItemTapped1,
+            ),
+          ],
         ),
-        bottomNavigationBar: BottomNavBar(),
+      ),
+      bottomNavigationBar: BottomNavBar(),
+      floatingActionButton: selectedIndex == 0
+          ? FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: () {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (context) => new AddEvent()));
+              },
+            )
+          : null,
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
           ? Colors.grey
           : selectedIndex == 1
-          ? Colors.red
-          : selectedIndex == 2
-          ? Colors.greenAccent
-          : selectedIndex == 3 ? Colors.black : Colors.grey,
+              ? Colors.red
+              : selectedIndex == 2
+                  ? Colors.greenAccent
+                  : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
 
@@ -203,9 +201,9 @@ class _HomePageState extends State<HomePage> {
       height: 45,
       decoration: isSelected
           ? BoxDecoration(
-        color: item.color,
-        borderRadius: BorderRadius.circular(16.0),
-      )
+              color: item.color,
+              borderRadius: BorderRadius.circular(16.0),
+            )
           : null,
       child: ListView(scrollDirection: Axis.horizontal, children: <Widget>[
         Row(
@@ -216,8 +214,8 @@ class _HomePageState extends State<HomePage> {
                   size: 25.0,
                   color: isSelected
                       ? item.title.data.compareTo("Settings") == 0
-                      ? Colors.white
-                      : backgroundColor
+                          ? Colors.white
+                          : backgroundColor
                       : Colors.black),
               child: item.icon,
             ),
@@ -225,12 +223,12 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.only(left: 15.0),
               child: isSelected
                   ? Text(
-                item.title.data,
-                style: TextStyle(
-                    color: item.title.data.compareTo("Settings") == 0
-                        ? Colors.white
-                        : backgroundColor),
-              )
+                      item.title.data,
+                      style: TextStyle(
+                          color: item.title.data.compareTo("Settings") == 0
+                              ? Colors.white
+                              : backgroundColor),
+                    )
                   : Container(),
             )
           ],
@@ -238,6 +236,7 @@ class _HomePageState extends State<HomePage> {
       ]),
     );
   }
+
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
@@ -270,12 +269,12 @@ class _HomePageState extends State<HomePage> {
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
                   image:
-                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
               FadeInImage.assetNetwork(
                   placeholder: 'images/loading.gif',
                   fit: BoxFit.fill,
                   image:
-                  "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
+                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
             ],
           ),
         ),
@@ -320,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -379,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -438,7 +437,7 @@ class _HomePageState extends State<HomePage> {
                               height: 100,
                               fit: BoxFit.cover,
                               image:
-                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text("Maisaie",
@@ -460,7 +459,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  bool stat = false;
   Widget _buildBodyProfile() {
     return SingleChildScrollView(
       child: Container(
@@ -477,79 +475,21 @@ class _HomePageState extends State<HomePage> {
                   height: 120,
                   fit: BoxFit.cover,
                   image:
-                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
               child: Column(
                 children: <Widget>[
-                  stat == false
-                      ? Row(
-                    children: <Widget>[
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.65,
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Enrollment",
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.account_circle),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        ),
-                        margin: EdgeInsets.only(right: 15),
-                      ),
-                      RaisedButton(
-                        onPressed: () {
-                          setState(() {
-                            stat = true;
-                            print(stat);
-                          });
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        colorBrightness: Brightness.light,
-                        elevation: 24.0,
-                        animationDuration: Duration(seconds: 5),
-                        child: Text("Update"),
-                      )
-                    ],
-                  )
-                      : TextField(
-                    keyboardType: TextInputType.number,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Enrollment",
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.account_circle),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextFormField(
-                    //controller: _eMail,
+                  TextFormField(
                     enabled: false,
                     keyboardType: TextInputType.emailAddress,
                     cursorColor: Colors.purple,
                     cursorRadius: Radius.circular(50.0),
                     cursorWidth: 3.0,
                     decoration: new InputDecoration(
-                        hintText: "Email Address",
-                       /* errorText: _emailValidate
+                        hintText: "Name",
+                        /* errorText: _emailValidate
                             ? 'Please enter Email Address'
                             : null,*/
                         hintStyle: new TextStyle(
@@ -561,6 +501,50 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(20.0),
                         )),
                   ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  TextFormField(
+                    enabled: false,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Email Address",
+                        /* errorText: _emailValidate
+                            ? 'Please enter Email Address'
+                            : null,*/
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.email),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  TextFormField(
+                    //controller: _eMail,
+                    enabled: false,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Phone Number",
+                        /* errorText: _emailValidate
+                            ? 'Please enter Email Address'
+                            : null,*/
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: new Icon(Icons.email),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                 ],
               ),
             )
@@ -649,15 +633,15 @@ class _HomePageState extends State<HomePage> {
                                 SizedBox(width: 8),
                                 Expanded(
                                     child: TextFormField(
-                                      keyboardType: TextInputType.multiline,
-                                      minLines: 1,
-                                      maxLines: 100,
-                                      decoration: InputDecoration(
-                                        hintText: 'Type a message',
-                                        border: InputBorder.none,
-                                        alignLabelWithHint: true,
-                                      ),
-                                    )),
+                                  keyboardType: TextInputType.multiline,
+                                  minLines: 1,
+                                  maxLines: 100,
+                                  decoration: InputDecoration(
+                                    hintText: 'Type a message',
+                                    border: InputBorder.none,
+                                    alignLabelWithHint: true,
+                                  ),
+                                )),
                                 Icon(Icons.attach_file,
                                     color: Theme.of(context).hintColor),
                                 SizedBox(width: 8.0),
@@ -706,7 +690,6 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.white),
             ),
             trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-
           ),
           ListTile(
             leading: Icon(
@@ -730,8 +713,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
               ),
               onTap: () async {
-                SharedPreferences prf =
-                await SharedPreferences.getInstance();
+                SharedPreferences prf = await SharedPreferences.getInstance();
                 prf.setBool("isLoggedIn", false);
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacement(new MaterialPageRoute(
@@ -781,6 +763,7 @@ class _HomePageState extends State<HomePage> {
         });
   }
 }
+
 class NavigationItem {
   final Icon icon;
   final Text title;
