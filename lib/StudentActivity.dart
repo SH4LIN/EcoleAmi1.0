@@ -3,13 +3,13 @@ import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'MainScreen.dart';
-import 'ManageVerification.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'SplashScreen.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -45,6 +45,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   SharedPreferences prf;
   String _username;
   int selectedIndex = 0;
+  String _enrCheck;
+  int id;
   List<NavigationItem> items = [
     NavigationItem(Icon(Icons.home), Text("Home"), Colors.deepPurpleAccent),
     NavigationItem(
@@ -59,6 +61,9 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   TextEditingController _phone = new TextEditingController();
   TextEditingController _sem = new TextEditingController();
   TextEditingController _enr = new TextEditingController();
+  TextEditingController _finalEnr = new TextEditingController();
+
+  bool _enrValidate = false;
   bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
@@ -494,8 +499,52 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-  bool stat = false;
+  void setProfile() async {
+    Firestore.instance
+        .collection("student_details")
+        .document(_username)
+        .get()
+        .then((document) {
+      _enrCheck = document['enrollment'];
+      _finalEnr.text = document['enrollment'];
+      _fName.text = document['first_name'];
+      _mName.text = document['middle_name'];
+      _lName.text = document['last_name'];
+      _eMail.text = document['email'];
+      _phone.text = document['phone_number'];
+      _sem.text = document['semester'];
+    });
+    /*StreamBuilder(
+      stream: Firestore.instance
+          .collection("student_details")
+          .document(_username)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return Text("Loading...");
+        }
+        if (snapshot.hasData) {
+          while (_username == null || snapshot.data == null) {
+            Future.delayed(Duration(seconds: 1));
+            print(_username);
+          }
+          var document = snapshot.data;
+          _enrCheck = document['enrollment'];
+          _finalEnr.text = document['enrollment'];
+          _fName.text = document['first_name'];
+          _mName.text = document['middle_name'];
+          _lName.text = document['last_name'];
+          _eMail.text = document['email'];
+          _phone.text = document['phone_number'];
+          _sem.text = document['semester'];
+        }
+        return Text("Loading...");
+      },
+    );*/
+  }
+
   Widget _buildBodyProfile() {
+    print(_enrCheck);
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.only(top: 20.0),
@@ -517,13 +566,76 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
               child: Column(
                 children: <Widget>[
-                  stat == false
-                      ? Row(
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.65,
-                              child: TextField(
-                                controller: _enr,
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      // ignore: missing_return
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _fName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _enrCheck = document['enrollment'];
+                        }
+                        return (_enrCheck.compareTo("------------")) == 0
+                            ? Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.65,
+                                    child: TextField(
+                                      controller: _enr,
+                                      keyboardType: TextInputType.number,
+                                      cursorColor: Colors.purple,
+                                      cursorRadius: Radius.circular(50.0),
+                                      cursorWidth: 3.0,
+                                      decoration: new InputDecoration(
+                                          hintText: "Enrollment",
+                                          errorText: _enrValidate
+                                              ? 'Please enter valid Enrollment'
+                                              : null,
+                                          hintStyle: new TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white70,
+                                          ),
+                                          prefixIcon:
+                                              new Icon(Icons.account_circle),
+                                          border: new OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          )),
+                                    ),
+                                    margin: EdgeInsets.only(right: 15),
+                                  ),
+                                  RaisedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_enr.text.isEmpty) {
+                                          _enrValidate = true;
+                                        } else if (_enr.text.length != 12) {
+                                          _enrValidate = true;
+                                        } else {
+                                          _enrValidate = false;
+                                          _updateEnr();
+                                        }
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    colorBrightness: Brightness.light,
+                                    elevation: 24.0,
+                                    animationDuration: Duration(seconds: 5),
+                                    child: Text("Update"),
+                                  )
+                                ],
+                              )
+                            : TextField(
+                                controller: _finalEnr,
+                                enabled: false,
                                 keyboardType: TextInputType.number,
                                 cursorColor: Colors.purple,
                                 cursorRadius: Radius.circular(50.0),
@@ -538,171 +650,223 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                     border: new OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20.0),
                                     )),
+                              );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _fName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _fName.text = document['first_name'];
+                        }
+                        return new TextField(
+                          controller: _fName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                                  _fValidate ? 'Please enter First Name' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
                               ),
-                              margin: EdgeInsets.only(right: 15),
-                            ),
-                            RaisedButton(
-                              onPressed: () {
-                                setState(() {
-                                  stat = true;
-                                  print(stat);
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _mName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _mName.text = document['middle_name'];
+                        }
+                        return new TextField(
+                          controller: _mName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _mValidate
+                                  ? 'Please enter Middle Name'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
                               ),
-                              colorBrightness: Brightness.light,
-                              elevation: 24.0,
-                              animationDuration: Duration(seconds: 5),
-                              child: Text("Update"),
-                            )
-                          ],
-                        )
-                      : TextField(
-                          controller: _enr,
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _lName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _lName.text = document['last_name'];
+                        }
+                        return new TextField(
+                          controller: _lName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                                  _lValidate ? 'Please enter Last Name' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _eMail.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _eMail.text = document['email'];
+                        }
+                        return new TextFormField(
+                          controller: _eMail,
+                          enabled: false,
+                          keyboardType: TextInputType.emailAddress,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _emailValidate
+                                  ? 'Please enter Email Address'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.email),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _phone.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _phone.text = document['phone_number'];
+                        }
+                        return new TextField(
+                          controller: _phone,
+                          keyboardType: TextInputType.phone,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          enabled: false,
+                          maxLength: 10,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _phoneValidate
+                                  ? 'Please enter Phone Number'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.phone),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _sem.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _sem.text = document['semester'];
+                        }
+                        return new TextField(
+                          controller: _sem,
+                          maxLength: 1,
+                          enabled: false,
                           keyboardType: TextInputType.number,
                           cursorColor: Colors.purple,
                           cursorRadius: Radius.circular(50.0),
                           cursorWidth: 3.0,
                           decoration: new InputDecoration(
-                              hintText: "Enrollment",
+                              hintText: "Loading ...",
+                              errorText:
+                                  _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
                               ),
-                              prefixIcon: new Icon(Icons.account_circle),
+                              prefixIcon: new Icon(Icons.format_list_numbered),
                               border: new OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               )),
-                        ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _fName,
-                    enabled: false,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "First Name",
-                        errorText:
-                            _fValidate ? 'Please enter First Name' : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.person),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _mName,
-                    enabled: false,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Middle Name",
-                        errorText:
-                            _mValidate ? 'Please enter Middle Name' : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.person),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _lName,
-                    enabled: false,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Last Name",
-                        errorText: _lValidate ? 'Please enter Last Name' : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.person),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextFormField(
-                    controller: _eMail,
-                    enabled: false,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Email Address",
-                        errorText: _emailValidate
-                            ? 'Please enter Email Address'
-                            : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.email),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _phone,
-                    keyboardType: TextInputType.phone,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    enabled: false,
-                    maxLength: 10,
-                    decoration: new InputDecoration(
-                        hintText: "Phone Number",
-                        errorText:
-                            _phoneValidate ? 'Please enter Phone Number' : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.phone),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _sem,
-                    maxLength: 1,
-                    enabled: false,
-                    keyboardType: TextInputType.number,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Semester",
-                        errorText:
-                            _semValidate ? 'Please enter Semester' : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.format_list_numbered),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
+                        );
+                      }),
                 ],
               ),
             )
@@ -712,7 +876,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
+  TextEditingController _msg = new TextEditingController();
+  int _type = 0;
   Widget _buildBodyQnA() {
+    //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
     return ListView(
       children: <Widget>[
         Column(
@@ -791,6 +958,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                 SizedBox(width: 8),
                                 Expanded(
                                     child: TextFormField(
+                                  controller: _msg,
                                   keyboardType: TextInputType.multiline,
                                   minLines: 1,
                                   maxLines: 100,
@@ -819,7 +987,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     Container(
                       margin: EdgeInsets.only(top: 25),
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            sendMessage(_msg.text, _type);
+                            _msg.clear();
+                          });
+                        },
                         child: CircleAvatar(
                           child: Icon(Icons.send),
                         ),
@@ -831,6 +1004,31 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         ),
       ],
     );
+  }
+
+  void sendMessage(String msg, int type) async {
+    if (msg.isNotEmpty) {
+      await Firestore.instance
+          .collection('QnA')
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': msg,
+        'date': DateTime.now().day.toString() +
+            "/" +
+            DateTime.now().month.toString() +
+            "/" +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
+            ":" +
+            DateTime.now().minute.toString() +
+            ":" +
+            DateTime.now().second.toString(),
+        'type': type
+      });
+    } else {
+      Fluttertoast.showToast(msg: "Nothing To Send",gravity: ToastGravity.CENTER);
+    }
   }
 
   Widget _buildBodySettings() {
@@ -903,12 +1101,26 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   void initState() {
     super.initState();
     user != null ? _username = user : setUser();
+    setProfile();
   }
 
   void setUser() async {
     prf = await SharedPreferences.getInstance();
     _username = prf.get("Username");
     //Fluttertoast.showToast(msg: prf.get("Username"));
+  }
+
+  void _updateEnr() async {
+    try {
+      await Firestore.instance
+          .collection('student_details')
+          .document(_username)
+          .updateData({
+        'enrollment': _enr.text,
+      });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }
 
