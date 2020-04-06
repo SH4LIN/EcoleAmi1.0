@@ -879,6 +879,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   TextEditingController _msg = new TextEditingController();
   int _type = 0;
   Widget _buildBodyQnA() {
+    var msgItems;
     //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
     return ListView(
       children: <Widget>[
@@ -888,53 +889,73 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.65,
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Wrap(children: <Widget>[
-                              Bubble(
-                                elevation: 10.0,
-                                shadowColor: Colors.white,
-                                child: Text(
-                                    "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
-                                nip: BubbleNip.leftTop,
-                              ),
-                            ]),
-                            padding: EdgeInsets.only(top: 25.0, left: 5),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Wrap(children: <Widget>[
-                              Bubble(
-                                elevation: 10.0,
-                                shadowColor: Colors.white,
-                                child: Text(
-                                    "Hello My Name Is Shalin Shah I am From GovernMent Polytechnic Ahmedabad"),
-                                nip: BubbleNip.rightTop,
-                              ),
-                            ]),
-                            padding: EdgeInsets.only(top: 25.0, right: 5),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-                reverse: true,
-                itemCount: 10,
-              ),
+              child: StreamBuilder(
+                  stream: Firestore.instance.collection('QnA').orderBy('timestamp',descending: true).snapshots(),
+                  builder: (context, snapshot) {
+                    if(snapshot!= null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        return Column(
+                          crossAxisAlignment: (senderUsername.compareTo(_username)) == 0?CrossAxisAlignment.end:CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery.of(context).size.width*0.5,
+                              alignment: (senderUsername.compareTo(_username)) == 0?Alignment.topRight:Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                          (senderUsername.compareTo(_username)) == 0?"You":senderUsername,
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontSize: 12
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black
+                                        ),
+                                      ),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                              msgItems[index]['time'],
+                                            style: TextStyle(
+                                              color: Colors.grey[500],
+                                              fontSize: 10
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  nip: (senderUsername.compareTo(_username)) == 0?BubbleNip.rightTop:BubbleNip.leftTop,
+                                ),
+                              ]),
+                              padding: EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems.length,
+                    );
+                  }),
             ),
             Align(
                 alignment: Alignment.bottomCenter,
@@ -1014,6 +1035,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           .setData({
         'userid': _username,
         'message': msg,
+        'timestamp': DateTime.now(),
         'date': DateTime.now().day.toString() +
             "/" +
             DateTime.now().month.toString() +
@@ -1027,7 +1049,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         'type': type
       });
     } else {
-      Fluttertoast.showToast(msg: "Nothing To Send",gravity: ToastGravity.CENTER);
+      Fluttertoast.showToast(
+          msg: "Nothing To Send", gravity: ToastGravity.CENTER);
     }
   }
 
