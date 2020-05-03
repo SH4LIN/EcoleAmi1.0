@@ -44,20 +44,34 @@ class _AddState extends State<Add> {
 
   final databaseReference = Firestore.instance;
 
-//    TextEditingController _enr;
+  List<String> _semesterList = ['1', '2', '3', '4', '5', '6'];
+  String _selectedSemester;
+  List<String> _divisionList = [
+    'A1',
+    'A2',
+    'A3',
+    'B1',
+    'B2',
+    'B3',
+    'C1',
+    'C2',
+    'C3'
+  ];
+  String _selectedDivision;
+
   TextEditingController _fName = new TextEditingController();
   TextEditingController _mName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
-  TextEditingController _sem = new TextEditingController();
+  TextEditingController _parentPhone = new TextEditingController();
 
   bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
-  bool _semValidate = false;
+  bool _parentValidate = false;
 
   void dispose() {
     super.dispose();
@@ -66,6 +80,7 @@ class _AddState extends State<Add> {
     _lName.dispose();
     _eMail.dispose();
     _phone.dispose();
+    _parentPhone.dispose();
   }
 
   @override
@@ -73,7 +88,6 @@ class _AddState extends State<Add> {
     return new ListView(
       children: <Widget>[
         new Container(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,
@@ -111,7 +125,7 @@ class _AddState extends State<Add> {
                       decoration: new InputDecoration(
                           hintText: "First Name",
                           errorText:
-                              _fValidate ? 'Please enter First Name' : null,
+                          _fValidate ? 'Please enter First Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -131,7 +145,7 @@ class _AddState extends State<Add> {
                       decoration: new InputDecoration(
                           hintText: "Middle Name",
                           errorText:
-                              _mValidate ? 'Please enter Middle Name' : null,
+                          _mValidate ? 'Please enter Middle Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -151,7 +165,7 @@ class _AddState extends State<Add> {
                       decoration: new InputDecoration(
                           hintText: "Last Name",
                           errorText:
-                              _lValidate ? 'Please enter Last Name' : null,
+                          _lValidate ? 'Please enter Last Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -171,7 +185,7 @@ class _AddState extends State<Add> {
                       decoration: new InputDecoration(
                           hintText: "Email Address",
                           errorText: _emailValidate
-                              ? 'Please enter Email Address'
+                              ? 'Please enter valid Email Address'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -193,7 +207,7 @@ class _AddState extends State<Add> {
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
                           errorText: _phoneValidate
-                              ? 'Please enter Phone Number'
+                              ? 'Please enter valid Phone Number'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -205,22 +219,87 @@ class _AddState extends State<Add> {
                           )),
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    Container(
+                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(
+                        border:
+                        Border.all(style: BorderStyle.solid, width: 0.80),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+/*                      iconEnabledColor: Colors.white,
+                      iconDisabledColor: Colors.white,*/
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        underline: SizedBox(),
+                        items: _semesterList.map((String val) {
+                          return new DropdownMenuItem<String>(
+                            value: val,
+                            child: new Text(val),
+                          );
+                        }).toList(),
+                        hint: Text("Semester"),
+                        onChanged: (String newVal) {
+                          setState(() {
+                            this._selectedSemester = newVal;
+                            print(_selectedSemester);
+                          });
+                        },
+                        value: _selectedSemester,
+                        isExpanded: true,
+                      ),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    Container(
+                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+//                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(
+                        border:
+                        Border.all(style: BorderStyle.solid, width: 0.80),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: DropdownButton<String>(
+                        /*iconEnabledColor: Colors.white,
+                        iconDisabledColor: Colors.white,*/
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        underline: SizedBox(),
+                        items: _divisionList.map((String val) {
+                          return new DropdownMenuItem<String>(
+                            value: val,
+                            child: new Text(val),
+                          );
+                        }).toList(),
+                        hint: Text("Division"),
+                        onChanged: (String newVal) {
+                          setState(() {
+                            this._selectedDivision = newVal;
+                          });
+                        },
+                        value: _selectedDivision,
+                        isExpanded: true,
+                      ),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
-                      controller: _sem,
-                      maxLength: 1,
-                      keyboardType: TextInputType.number,
+                      controller: _parentPhone,
+                      maxLength: 10,
+                      keyboardType: TextInputType.phone,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
-                          hintText: "Semester",
-                          errorText:
-                              _semValidate ? 'Please enter Semester' : null,
+                          hintText: "Parent's Phone Number",
+                          errorText: _parentValidate
+                              ? 'Please enter valid Parent\'s Phone number'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
                           ),
-                          prefixIcon: new Icon(Icons.format_list_numbered),
+                          prefixIcon: new Icon(Icons.phone),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           )),
@@ -264,7 +343,7 @@ class _AddState extends State<Add> {
                       child: new Text(
                         "Add",
                         style:
-                            new TextStyle(color: Colors.white, fontSize: 15.0),
+                        new TextStyle(color: Colors.white, fontSize: 15.0),
                       ),
                       onPressed: () {
                         setState(() {
@@ -288,22 +367,23 @@ class _AddState extends State<Add> {
                           } else {
                             _emailValidate = false;
                           }
-                          if (_phone.text.isEmpty) {
+                          if (_phone.text.isEmpty || _phone.text.length < 10) {
                             _phoneValidate = true;
                           } else {
                             _phoneValidate = false;
                           }
-                          if (_sem.text.isEmpty) {
-                            _semValidate = true;
+                          if (_parentPhone.text.isEmpty ||
+                              _parentPhone.text.length < 10) {
+                            _parentValidate = true;
                           } else {
-                            _semValidate = false;
+                            _parentValidate = false;
                           }
                           if (_fValidate == false &&
                               _mValidate == false &&
                               _lValidate == false &&
                               _emailValidate == false &&
                               _phoneValidate == false &&
-                              _semValidate == false) {
+                              _parentValidate == false) {
                             _onClick();
                           }
                         });
@@ -350,22 +430,39 @@ class _AddState extends State<Add> {
         'last_name': _lName.text,
         'email': _eMail.text,
         'phone_number': _phone.text,
-        'semester': _sem.text,
+        'semester': _selectedSemester,
+        'division': _selectedDivision,
+        'parent_phone_number': _parentPhone.text,
       });
+      await databaseReference
+          .collection("parent_details")
+          .document(_parentPhone.text.toString())
+          .setData({
+        'phone_number': _parentPhone.text,
+        'student_name': _fName.text + " " + _mName.text + " " + _lName.text,
+        'student_email': _eMail.text,
+        'student_phone_number': _phone.text,
+        'student_semester': _selectedSemester,
+        'student_division': _selectedDivision,
+      });
+
       final snapShot = await databaseReference
           .collection("login_details")
           .document(_phone.text)
           .get();
       print(snapShot.exists.toString());
-                      print(_phone.text);
-                      print(snapShot!=null);
+      print(_phone.text);
+      print(snapShot != null);
       if (snapShot == null || snapShot.exists) {
-
-      }else {
+      } else {
         await databaseReference
             .collection("login_details")
             .document(_phone.text)
             .setData({'password': null, 'role': "student"});
+        await databaseReference
+            .collection("login_details")
+            .document(_parentPhone.text)
+            .setData({'password': null, 'role': "parent"});
       }
       Fluttertoast.showToast(
           msg: "Record Added Successfully", gravity: ToastGravity.BOTTOM);

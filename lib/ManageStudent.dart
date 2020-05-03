@@ -182,8 +182,16 @@ class _ManageInformationState extends State<ManageInformation> {
     );
   }
 
-  void studentRemove(int id) {
+  void studentRemove(int id) async{
     var _document = itemsStudent[id].documentID;
+    var _parentDocument;
+    await Firestore.instance
+        .collection("student_details")
+        .document(_document)
+        .get()
+        .then((document) {
+      _parentDocument = document['parent_phone_number'];
+    });
     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
     pr.style(
@@ -197,52 +205,83 @@ class _ManageInformationState extends State<ManageInformation> {
           fontSize: 19.0,
           wordSpacing: 2.0,
         ));
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Caution!"),
-            elevation: 20.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            content: new Text("Are You Sure You Want To Remove This User"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text("Cancel")),
-              new FlatButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    await pr.show();
-                    try {
-                      await Firestore.instance
-                          .collection('student_details')
-                          .document(_document)
-                          .delete();
-                      final snapShot = await Firestore.instance
-                          .collection('login_details')
-                          .document(_document)
-                          .get();
-                      /*print(snapShot.exists.toString());
+    showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.5),
+        transitionBuilder: (context, a1, a2, widget) {
+          final curvedValue = Curves.easeInOutBack.transform(a1.value) - 1.0;
+          return Transform(
+            transform: Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                shape: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16.0)),
+                title: Text(
+                  'Remove Student?',
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22),
+                ),
+                content: Text('Areyou sure you want to remove this student?'),
+                actions: <Widget>[
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: new Text(
+                        "Cancel",
+                        style: TextStyle(fontSize: 18),
+                      )),
+                  new FlatButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await pr.show();
+                        try {
+                          await Firestore.instance
+                              .collection('student_details')
+                              .document(_document)
+                              .delete();
+                          final snapShot = await Firestore.instance
+                              .collection('login_details')
+                              .document(_document)
+                              .get();
+                          await Firestore.instance
+                              .collection("parent_details")
+                              .document(_parentDocument)
+                              .delete();
+                          await Firestore.instance
+                              .collection("login_details")
+                              .document(_parentDocument)
+                              .delete();
+                          /*print(snapShot.exists.toString());
                       print(_document);
                       print(snapShot!=null);*/
-                      if (snapShot != null || snapShot.exists) {
-                        await Firestore.instance
-                            .collection('login_details')
-                            .document(_document)
-                            .delete();
-                      }
-                    } catch (e) {
-                      print(e.toString());
-                    }
-                    pr.hide();
-                    Fluttertoast.showToast(msg: "Record Removed");
-                  },
-                  child: new Text("Yes"))
-            ],
+                          if (snapShot != null || snapShot.exists) {
+                            await Firestore.instance
+                                .collection('login_details')
+                                .document(_document)
+                                .delete();
+                          }
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                        pr.hide();
+                        Fluttertoast.showToast(msg: "Record Removed");
+                      },
+                      child: new Text(
+                        "Remove",
+                        style: TextStyle(color: Colors.red, fontSize: 18),
+                      ))
+                ],
+              ),
+            ),
           );
-        });
+        },
+        transitionDuration: Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {});
   }
 }

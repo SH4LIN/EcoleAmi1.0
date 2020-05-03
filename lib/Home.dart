@@ -28,6 +28,12 @@ class _HomePageState extends State<HomePage> {
   SharedPreferences prf;
   String _username;
   Color backgroundColor;
+  TextEditingController _fName = new TextEditingController();
+  TextEditingController _eMail = new TextEditingController();
+  TextEditingController _phone = new TextEditingController();
+  bool _fValidate = false;
+  bool _emailValidate = false;
+  bool _phoneValidate = false;
 
   void initState() {
     super.initState();
@@ -66,6 +72,9 @@ class _HomePageState extends State<HomePage> {
                     return Text(
                         username['first_name'] + " " + username['last_name']);
                   }
+                  else{
+                    return CircularProgressIndicator();
+                  }
                 },
               ),
               accountEmail: StreamBuilder(
@@ -78,6 +87,9 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.hasData) {
                     var username = snapshot.data;
                     return Text(username['email']);
+                  }
+                  else{
+                    return Text("Loading");
                   }
                 },
               ),
@@ -459,7 +471,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBodyProfile() {
+  /*Widget _buildBodyProfile() {
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.only(top: 20.0),
@@ -489,9 +501,9 @@ class _HomePageState extends State<HomePage> {
                     cursorWidth: 3.0,
                     decoration: new InputDecoration(
                         hintText: "Name",
-                        /* errorText: _emailValidate
+                        *//* errorText: _emailValidate
                             ? 'Please enter Email Address'
-                            : null,*/
+                            : null,*//*
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.white70,
@@ -510,9 +522,9 @@ class _HomePageState extends State<HomePage> {
                     cursorWidth: 3.0,
                     decoration: new InputDecoration(
                         hintText: "Email Address",
-                        /* errorText: _emailValidate
+                        *//* errorText: _emailValidate
                             ? 'Please enter Email Address'
-                            : null,*/
+                            : null,*//*
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.white70,
@@ -532,9 +544,9 @@ class _HomePageState extends State<HomePage> {
                     cursorWidth: 3.0,
                     decoration: new InputDecoration(
                         hintText: "Phone Number",
-                        /* errorText: _emailValidate
+                        *//* errorText: _emailValidate
                             ? 'Please enter Email Address'
-                            : null,*/
+                            : null,*//*
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.white70,
@@ -552,7 +564,144 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }*/
+  Widget _buildBodyProfile() {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(top: 20.0),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(100.0),
+              child: FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  image:
+                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
+              child: Column(
+                children: <Widget>[
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("admin_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _fName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _fName.text = document['first_name']+" "+document['last_name'];
+                        }
+                        return new TextField(
+                          controller: _fName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                              _fValidate ? 'Please enter First Name' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("admin_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _eMail.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _eMail.text = document['email'];
+                        }
+                        return new TextFormField(
+                          controller: _eMail,
+                          enabled: false,
+                          keyboardType: TextInputType.emailAddress,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _emailValidate
+                                  ? 'Please enter Email Address'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.email),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("admin_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _phone.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _phone.text = document['phone_number'];
+                        }
+                        return new TextField(
+                          controller: _phone,
+                          keyboardType: TextInputType.phone,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          enabled: false,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _phoneValidate
+                                  ? 'Please enter Phone Number'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.phone),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
+
 
   Widget _buildBodyQnA() {
     return ListView(
@@ -713,17 +862,59 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
               ),
               onTap: () async {
-                SharedPreferences prf = await SharedPreferences.getInstance();
-                prf.setBool("isLoggedIn", false);
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                    builder: (BuildContext context) => new MainScreen()));
+                showGeneralDialog(
+                    barrierColor: Colors.black.withOpacity(0.5),
+                    transitionBuilder: (context, a1, a2, widget) {
+                      final curvedValue = Curves.easeInOutBack.transform(
+                          a1.value) - 1.0;
+                      return Transform(
+                        transform: Matrix4.translationValues(
+                            0.0, curvedValue * 200, 0.0),
+                        child: Opacity(
+                          opacity: a1.value,
+                          child: AlertDialog(
+                            shape: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16.0)),
+                            title: Text('Caution!', style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25),),
+                            content: Text('Are You Sure You Want To Logout?'),
+                            actions: <Widget>[
+                              new FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: new Text(
+                                    "Cancel", style: TextStyle(fontSize: 18),)),
+                              new FlatButton(
+                                  onPressed: () async {
+                                    SharedPreferences prf = await SharedPreferences
+                                        .getInstance();
+                                    prf.setBool("isLoggedIn", false);
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushReplacement(
+                                        new MaterialPageRoute(
+                                            builder: (
+                                                BuildContext context) => new MainScreen()));
+                                  },
+                                  child: new Text("Logout", style: TextStyle(
+                                      color: Colors.red, fontSize: 18),))
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    transitionDuration: Duration(milliseconds: 200),
+                    barrierDismissible: true,
+                    barrierLabel: '',
+                    context: context,
+                    pageBuilder: (context, animation1, animation2) {});
               })
         ],
       ),
     );
   }
-
   Widget callPage(index) {
     switch (index) {
       case 0:

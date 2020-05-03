@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'MainScreen.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'SplashScreen.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -54,23 +53,28 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
     NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
   ];
-  TextEditingController _fName = new TextEditingController();
+
   TextEditingController _mName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
+  TextEditingController _fName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
   TextEditingController _sem = new TextEditingController();
   TextEditingController _enr = new TextEditingController();
+  TextEditingController _div = new TextEditingController();
+  TextEditingController _parent_phone = new TextEditingController();
   TextEditingController _finalEnr = new TextEditingController();
 
   bool _enrValidate = false;
-  bool _fValidate = false;
+
   bool _mValidate = false;
   bool _lValidate = false;
+  bool _fValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
   bool _semValidate = false;
   Color backgroundColor;
+  bool showEmoji;
 
   @override
   Widget build(BuildContext context) {
@@ -514,33 +518,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       _phone.text = document['phone_number'];
       _sem.text = document['semester'];
     });
-    /*StreamBuilder(
-      stream: Firestore.instance
-          .collection("student_details")
-          .document(_username)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.none) {
-          return Text("Loading...");
-        }
-        if (snapshot.hasData) {
-          while (_username == null || snapshot.data == null) {
-            Future.delayed(Duration(seconds: 1));
-            print(_username);
-          }
-          var document = snapshot.data;
-          _enrCheck = document['enrollment'];
-          _finalEnr.text = document['enrollment'];
-          _fName.text = document['first_name'];
-          _mName.text = document['middle_name'];
-          _lName.text = document['last_name'];
-          _eMail.text = document['email'];
-          _phone.text = document['phone_number'];
-          _sem.text = document['semester'];
-        }
-        return Text("Loading...");
-      },
-    );*/
   }
 
   Widget _buildBodyProfile() {
@@ -560,7 +537,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   height: 120,
                   fit: BoxFit.cover,
                   image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
@@ -579,78 +556,78 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         if (snapshot.hasData) {
                           var document = snapshot.data;
                           _enrCheck = document['enrollment'];
+                          _finalEnr.text = document['enrollment'];
                         }
                         return (_enrCheck.compareTo("------------")) == 0
                             ? Row(
-                                children: <Widget>[
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.65,
-                                    child: TextField(
-                                      controller: _enr,
-                                      keyboardType: TextInputType.number,
-                                      cursorColor: Colors.purple,
-                                      cursorRadius: Radius.circular(50.0),
-                                      cursorWidth: 3.0,
-                                      decoration: new InputDecoration(
-                                          hintText: "Enrollment",
-                                          errorText: _enrValidate
-                                              ? 'Please enter valid Enrollment'
-                                              : null,
-                                          hintStyle: new TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white70,
-                                          ),
-                                          prefixIcon:
-                                              new Icon(Icons.account_circle),
-                                          border: new OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          )),
-                                    ),
-                                    margin: EdgeInsets.only(right: 15),
-                                  ),
-                                  RaisedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (_enr.text.isEmpty) {
-                                          _enrValidate = true;
-                                        } else if (_enr.text.length != 12) {
-                                          _enrValidate = true;
-                                        } else {
-                                          _enrValidate = false;
-                                          _updateEnr();
-                                        }
-                                      });
-                                    },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    colorBrightness: Brightness.light,
-                                    elevation: 24.0,
-                                    animationDuration: Duration(seconds: 5),
-                                    child: Text("Update"),
-                                  )
-                                ],
-                              )
-                            : TextField(
-                                controller: _finalEnr,
-                                enabled: false,
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: TextField(
+                                controller: _enr,
                                 keyboardType: TextInputType.number,
                                 cursorColor: Colors.purple,
                                 cursorRadius: Radius.circular(50.0),
                                 cursorWidth: 3.0,
                                 decoration: new InputDecoration(
                                     hintText: "Enrollment",
+                                    errorText: _enrValidate
+                                        ? 'Please enter valid Enrollment'
+                                        : null,
                                     hintStyle: new TextStyle(
                                       fontSize: 15.0,
                                       color: Colors.white70,
                                     ),
-                                    prefixIcon: new Icon(Icons.account_circle),
+                                    prefixIcon:
+                                    new Icon(Icons.account_circle),
                                     border: new OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
+                                      borderRadius:
+                                      BorderRadius.circular(20.0),
                                     )),
-                              );
+                              ),
+                              margin: EdgeInsets.only(right: 15),
+                            ),
+                            RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (_enr.text.isEmpty) {
+                                    _enrValidate = true;
+                                  } else if (_enr.text.length != 12) {
+                                    _enrValidate = true;
+                                  } else {
+                                    _enrValidate = false;
+                                    _updateEnr();
+                                  }
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              colorBrightness: Brightness.light,
+                              elevation: 24.0,
+                              animationDuration: Duration(seconds: 5),
+                              child: Text("Update"),
+                            )
+                          ],
+                        )
+                            : TextField(
+                          controller: _finalEnr,
+                          enabled: false,
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Enrollment",
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.account_circle),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
                       }),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
@@ -676,7 +653,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? 'Please enter First Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -747,7 +724,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _lValidate ? 'Please enter Last Name' : null,
+                              _lValidate ? 'Please enter Last Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -815,7 +792,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           cursorRadius: Radius.circular(50.0),
                           cursorWidth: 3.0,
                           enabled: false,
-                          maxLength: 10,
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText: _phoneValidate
@@ -847,7 +823,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         }
                         return new TextField(
                           controller: _sem,
-                          maxLength: 1,
                           enabled: false,
                           keyboardType: TextInputType.number,
                           cursorColor: Colors.purple,
@@ -856,12 +831,84 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _semValidate ? 'Please enter Semester' : null,
+                              _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
                               ),
                               prefixIcon: new Icon(Icons.format_list_numbered),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _div.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _div.text = document['division'];
+                        }
+                        return new TextField(
+                          controller: _div,
+                          enabled: false,
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                              _semValidate ? 'Please enter Semester' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.format_list_numbered),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _parent_phone.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _parent_phone.text = document['parent_phone_number'];
+                          if(document['parent_phone_number'] == null){
+                            _parent_phone.text = "No Data";
+                          }
+                        }
+                        return new TextField(
+                          controller: _parent_phone,
+                          enabled: false,
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              errorText:
+                              _semValidate ? 'Please enter Semester' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.phone),
                               border: new OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               )),
@@ -953,7 +1000,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         );
                       },
                       reverse: true,
-                      itemCount: msgItems.length,
+                      itemCount: msgItems != null?msgItems.length:0,
                     );
                   }),
             ),
@@ -963,7 +1010,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(top: 25),
+                        margin: EdgeInsets.only(top: 15),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(26),
                           child: Container(
@@ -975,7 +1022,11 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                     icon: Icon(
                                       Icons.insert_emoticon,
                                     ),
-                                    onPressed: null),
+                                    onPressed: (){
+                                      setState(() {
+                                        showEmoji = !showEmoji;
+                                      });
+                                    }),
                                 SizedBox(width: 8),
                                 Expanded(
                                     child: TextFormField(
@@ -989,10 +1040,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                     alignLabelWithHint: true,
                                   ),
                                 )),
-                                Icon(Icons.attach_file,
-                                    color: Theme.of(context).hintColor),
-                                SizedBox(width: 8.0),
-                                Icon(Icons.camera_alt,
+                                Icon(Icons.image,
                                     color: Theme.of(context).hintColor),
                                 SizedBox(width: 8.0),
                                 SizedBox(width: 8.0),
@@ -1006,7 +1054,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       width: 5.0,
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 25),
+                      margin: EdgeInsets.only(top: 15),
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
@@ -1092,11 +1140,44 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 color: Colors.white,
               ),
               onTap: () async {
-                SharedPreferences prf = await SharedPreferences.getInstance();
-                prf.setBool("isLoggedIn", false);
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                    builder: (BuildContext context) => new MainScreen()));
+                showGeneralDialog(
+                    barrierColor: Colors.black.withOpacity(0.5),
+                    transitionBuilder: (context, a1, a2, widget) {
+                      final curvedValue = Curves.easeInOutBack.transform(a1.value) -   1.0;
+                      return Transform(
+                        transform: Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
+                        child: Opacity(
+                          opacity: a1.value,
+                          child: AlertDialog(
+                            shape: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16.0)),
+                            title: Text('Caution!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 25),),
+                            content: Text('Are You Sure You Want To Logout?'),
+                            actions: <Widget>[
+                              new FlatButton(
+                                  onPressed:  () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: new Text("Cancel", style: TextStyle(fontSize: 18),)),
+                              new FlatButton(
+                                  onPressed: () async {
+                                    SharedPreferences prf = await SharedPreferences.getInstance();
+                                    prf.setBool("isLoggedIn", false);
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                                        builder: (BuildContext context) => new MainScreen()));
+                                  },
+                                  child: new Text("Logout", style: TextStyle(color: Colors.red, fontSize: 18),))
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    transitionDuration: Duration(milliseconds: 200),
+                    barrierDismissible: true,
+                    barrierLabel: '',
+                    context: context,
+                    pageBuilder: (context, animation1, animation2) {});
               })
         ],
       ),
@@ -1125,6 +1206,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     super.initState();
     user != null ? _username = user : setUser();
     setProfile();
+    showEmoji = false;
   }
 
   void setUser() async {
@@ -1134,6 +1216,14 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   }
 
   void _updateEnr() async {
+    String _parent;
+    Firestore.instance
+        .collection("student_details")
+        .document(_username)
+        .get()
+        .then((document) {
+      _parent = document['parent_phone_number'];
+    });
     try {
       await Firestore.instance
           .collection('student_details')
@@ -1141,6 +1231,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           .updateData({
         'enrollment': _enr.text,
       });
+      await Firestore.instance
+          .collection('parent_details')
+          .document(_parent)
+          .updateData({
+        'student_enrollment': _enr.text,
+      });
+
     } catch (e) {
       print(e.toString());
     }

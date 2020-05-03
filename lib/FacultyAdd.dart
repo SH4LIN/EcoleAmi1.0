@@ -67,7 +67,6 @@ class _AddState extends State<Add> {
     return new ListView(
       children: <Widget>[
         new Container(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,

@@ -7,22 +7,24 @@ import 'package:progress_dialog/progress_dialog.dart';
 
 import 'CommonAppBar.dart';
 
- // ignore: must_be_immutable
- class UpdateStudent extends StatelessWidget {
-   int id;
-   UpdateStudent(this.id);
-   @override
-   Widget build(BuildContext context) {
-     return Scaffold(
+// ignore: must_be_immutable
+class UpdateStudent extends StatelessWidget {
+  int id;
+  UpdateStudent(this.id);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
       body: UpdateStudentData(this.id),
-     );
-   }
- }
+    );
+  }
+}
 
 // ignore: must_be_immutable
 class UpdateStudentData extends StatefulWidget {
-   int id;
-   UpdateStudentData(this.id);
+  int id;
+
+  UpdateStudentData(this.id);
+
   @override
   _UpdateStudentState createState() {
     return new _UpdateStudentState(id);
@@ -30,22 +32,30 @@ class UpdateStudentData extends StatefulWidget {
 }
 
 class _UpdateStudentState extends State<UpdateStudentData> {
-   int id;
-   _UpdateStudentState(this.id);
-
-   bool _obscureText = true;
-
-   final databaseReference = Firestore.instance;
-
-//    TextEditingController _enr;
-
-
+  int id;
+  _UpdateStudentState(this.id);
+  bool _obscureText = true;
+  final databaseReference = Firestore.instance;
+  List<String> _semesterList = ['1', '2', '3', '4', '5', '6'];
+  String _selectedSemester = "1";
+  List<String> _divisionList = [
+    'A1',
+    'A2',
+    'A3',
+    'B1',
+    'B2',
+    'B3',
+    'C1',
+    'C2',
+    'C3'
+  ];
+  String _selectedDivision = "A1";
   bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
-  bool _semValidate = false;
+  bool _parentValidate = false;
 
   void dispose() {
     super.dispose();
@@ -54,14 +64,17 @@ class _UpdateStudentState extends State<UpdateStudentData> {
     _lName.dispose();
     _eMail.dispose();
     _phone.dispose();
+    _parentPhone.dispose();
   }
+
   TextEditingController _fName = new TextEditingController();
   TextEditingController _mName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
-  TextEditingController _sem = new TextEditingController();
+  TextEditingController _parentPhone = new TextEditingController();
   TextEditingController _enr = new TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -71,11 +84,17 @@ class _UpdateStudentState extends State<UpdateStudentData> {
     _lName.text = itemsStudent[id]['last_name'];
     _eMail.text = itemsStudent[id]['email'];
     _phone.text = itemsStudent[id]['phone_number'];
-    _sem.text = itemsStudent[id]['semester'];
-    if(itemsStudent[id]['enrollment'] != null || itemsStudent[id]['enrollment'] != "null") {
+    _selectedSemester = itemsStudent[id]['semester'];
+    _selectedDivision = itemsStudent[id]['division'];
+    _parentPhone.text = itemsStudent[id]['parent_phone_number'];
+//    _sem.text = itemsStudent[id]['semester'];
+
+    if (itemsStudent[id]['enrollment'] != null ||
+        itemsStudent[id]['enrollment'] != "null") {
       _enr.text = itemsStudent[id]['enrollment'];
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,12 +103,12 @@ class _UpdateStudentState extends State<UpdateStudentData> {
       body: BodyUpdate(context),
     );
   }
+
   // ignore: non_constant_identifier_names
-  Widget BodyUpdate(BuildContext context){
+  Widget BodyUpdate(BuildContext context) {
     return new ListView(
       children: <Widget>[
         new Container(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,
@@ -209,7 +228,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
                           errorText: _phoneValidate
-                              ? 'Please enter Phone Number'
+                              ? 'Please valid enter Phone Number'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -221,22 +240,87 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                           )),
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    Container(
+                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(
+                        border:
+                        Border.all(style: BorderStyle.solid, width: 0.80),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+/*                      iconEnabledColor: Colors.white,
+                      iconDisabledColor: Colors.white,*/
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        underline: SizedBox(),
+                        items: _semesterList.map((String val) {
+                          return new DropdownMenuItem<String>(
+                            value: val,
+                            child: new Text(val),
+                          );
+                        }).toList(),
+                        hint: Text("Semester"),
+                        onChanged: (String newVal) {
+                          setState(() {
+                            this._selectedSemester = newVal;
+                            print(_selectedSemester);
+                          });
+                        },
+                        value: _selectedSemester,
+                        isExpanded: true,
+                      ),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    Container(
+                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+//                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(
+                        border:
+                        Border.all(style: BorderStyle.solid, width: 0.80),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: DropdownButton<String>(
+                        /*iconEnabledColor: Colors.white,
+                        iconDisabledColor: Colors.white,*/
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        underline: SizedBox(),
+                        items: _divisionList.map((String val) {
+                          return new DropdownMenuItem<String>(
+                            value: val,
+                            child: new Text(val),
+                          );
+                        }).toList(),
+                        hint: Text("Division"),
+                        onChanged: (String newVal) {
+                          setState(() {
+                            this._selectedDivision = newVal;
+                          });
+                        },
+                        value: _selectedDivision,
+                        isExpanded: true,
+                      ),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
-                      controller: _sem,
-                      maxLength: 1,
-                      keyboardType: TextInputType.number,
+                      controller: _parentPhone,
+                      maxLength: 10,
+                      keyboardType: TextInputType.phone,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
-                          hintText: "Semester",
-                          errorText:
-                          _semValidate ? 'Please enter Semester' : null,
+                          hintText: "Parent's Phone Number",
+                          errorText: _parentValidate
+                              ? 'Please enter valid Parent\'s Phone number'
+                              : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
                           ),
-                          prefixIcon: new Icon(Icons.format_list_numbered),
+                          prefixIcon: new Icon(Icons.phone),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           )),
@@ -304,22 +388,23 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                           } else {
                             _emailValidate = false;
                           }
-                          if (_phone.text.isEmpty) {
+                          if (_phone.text.isEmpty || _phone.text.length < 10) {
                             _phoneValidate = true;
                           } else {
                             _phoneValidate = false;
                           }
-                          if (_sem.text.isEmpty) {
-                            _semValidate = true;
+                          if (_parentPhone.text.isEmpty ||
+                              _parentPhone.text.length < 10) {
+                            _parentValidate = true;
                           } else {
-                            _semValidate = false;
+                            _parentValidate = false;
                           }
                           if (_fValidate == false &&
                               _mValidate == false &&
                               _lValidate == false &&
                               _emailValidate == false &&
                               _phoneValidate == false &&
-                              _semValidate == false) {
+                              _parentValidate == false) {
                             _onClick();
                           }
                         });
@@ -351,8 +436,10 @@ class _UpdateStudentState extends State<UpdateStudentData> {
       ),
     );*/
   }
-  void _onClick() async{
-    ProgressDialog pr = new ProgressDialog(context, type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+
+  void _onClick() async {
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
     pr.style(
         borderRadius: 20.0,
         elevation: 20.0,
@@ -366,17 +453,32 @@ class _UpdateStudentState extends State<UpdateStudentData> {
         ));
     await pr.show();
     try {
-      await Firestore.instance.collection('student_details').document(
-          itemsStudent[id].documentID).updateData({
+      await Firestore.instance
+          .collection('student_details')
+          .document(itemsStudent[id].documentID)
+          .updateData({
         'enrollment': _enr.text,
         'email': _eMail.text,
         'first_name': _fName.text,
         'last_name': _lName.text,
         'middle_name': _mName.text,
         'phone_number': _phone.text,
-        'semester': _sem.text
+        'semester': _selectedSemester,
+        'division': _selectedDivision,
+        'parent_phone_number': _parentPhone.text,
       });
-    }catch(e){
+      await Firestore.instance
+          .collection("parent_details")
+          .document(_parentPhone.text)
+          .updateData({
+        'student_division': _selectedDivision,
+        'student_email': _eMail.text,
+        'student_name': _fName.text + " " + _mName.text + " " + _lName.text,
+        'student_phone_number': _phone.text,
+        'student_semester': _selectedSemester,
+        'phone': _parentPhone.text,
+      });
+    } catch (e) {
       pr.hide();
       print(e.toString());
     }
