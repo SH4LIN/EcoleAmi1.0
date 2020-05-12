@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'StudentActivity.dart';
 import 'SetPassword.dart';
 import 'MainScreen.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,7 +42,7 @@ class __RegisterPageState extends State<_RegisterPage> {
 
   String phoneNo;
   String smsOTP;
-  String verificationId;
+  static String verificationId;
   String errorMessage = '';
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -61,170 +63,141 @@ class __RegisterPageState extends State<_RegisterPage> {
     super.initState();
   }
 
-  Future<void> verifyPhone() async {
-    final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {
-      this.verificationId = verId;
-    };
+  Future<void> verifyPhone(String phone, BuildContext context) async {
+    saveSate();
+    FirebaseAuth _auth = FirebaseAuth.instance;
 
-    final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
-      this.verificationId = verId;
-      showBottom(context).then((value) {
-        print('sign in');
-      });
-    };
-    try {
-      await _auth.verifyPhoneNumber(
-          phoneNumber: this.phoneNo,
-          codeAutoRetrievalTimeout: autoRetrieve,
-          codeSent: smsOTPSent,
-          timeout: const Duration(seconds: 20),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
-            print(phoneAuthCredential);
-          },
-          verificationFailed: (AuthException exceptio) {
-            print('${exceptio.message}');
-          });
-    } catch (e) {
-      handleError(e);
-    }
-  }
+    _auth.verifyPhoneNumber(
+        phoneNumber: phone,
+        timeout: Duration(seconds: 60),
+        verificationCompleted: (AuthCredential credential) async {
+          AuthResult result = await _auth.signInWithCredential(credential);
 
-  Future<bool> smsOTPDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: Text('Enter SMS Code'),
-            content: Container(
-              height: 85,
-              child: Column(children: [
-                TextField(
-                  onChanged: (value) {
-                    this.smsOTP = value;
-                  },
-                ),
-                (errorMessage != ''
-                    ? Text(
-                        errorMessage,
-                        style: TextStyle(color: Colors.red),
-                      )
-                    : Container())
-              ]),
-            ),
-            contentPadding: EdgeInsets.all(10),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Done'),
-                onPressed: () {
-                  signIn();
-                  /*_auth.currentUser().then((user) {
-                    if (user != null) {
-                      Navigator.of(context).pop();
-                      if (role == "parent") {
-                        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                            builder: (BuildContext context) => new SetParentDetails()));
-                      } else {
-                        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                            builder: (BuildContext context) => new SetPassword()));
-                      }
-                    } else {
-                      signIn();
-                    }
-                  });*/
-                },
-              )
-            ],
+          FirebaseUser user = result.user;
+
+          if (user != null) {
+            Navigator.of(context).pop();
+            if (role == "parent") {
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new SetParentDetails()));
+            } else {
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new SetPassword()));
+            }
+          } else {
+            print("Error");
+          }
+        },
+        verificationFailed: (AuthException exception) {
+          errorMessage = exception.toString();
+        },
+        codeSent: (String verificationId, [int forceResendingToken]) {
+          Fluttertoast.showToast(
+            msg: "OTP sent on " + phone,
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.grey,
           );
-        });
+          showBottom(context);
+        },
+        codeAutoRetrievalTimeout: null);
   }
 
   // ignore: missing_return
-  Future<bool> showBottom(BuildContext context) {
-    showBottomSheet(
+  Future<void> showBottom(BuildContext context) {
+    showModalBottomSheet(
+        isDismissible: false,
         context: context,
-        elevation: 20,
         builder: (context) {
           return Container(
-              padding: const EdgeInsets.all(15.0),
-              height: 300,
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.black))
-              ),
-              child: new Center(
-                child: new Wrap(
-                  children: <Widget>[
-                    Center(child: Text("OTP Verification",style: Theme.of(context).textTheme.title,),),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: TextField(
-                        onChanged: (value) {
-                          this.smsOTP = value;
-                        },
-                        controller: _otp,
-                        autofocus: true,
-                        maxLength: 6,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.purple,
-                        cursorRadius: Radius.circular(50.0),
-                        cursorWidth: 3.0,
-                        decoration: new InputDecoration(
-                            errorText: errorMessage,
-                            hintText: "Enter OTP",
-                            hintStyle: new TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.grey,
-                            ),
-                            prefixIcon: new Icon(Icons.message),
-                            border: new OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
+            padding: const EdgeInsets.all(15.0),
+            color: Colors.white,
+            height: 600,
+            child: new Wrap(
+              children: <Widget>[
+                new TextField(
+                  onChanged: (value) {
+                    this.smsOTP = value;
+                  },
+                  controller: _otp,
+                  autofocus: true,
+                  maxLength: 6,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.purple,
+                  cursorRadius: Radius.circular(50.0),
+                  cursorWidth: 3.0,
+                  decoration: new InputDecoration(
+                      hintText: "Enter OTP",
+                      errorText: _otpValidate ? "Invalid OTP" : null,
+                      hintStyle: new TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.grey,
+                      ),
+                      prefixIcon: new Icon(Icons.message),
+                      border: new OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      )),
+                ),
+                new Padding(
+                    padding: const EdgeInsets.only(bottom: 40.0, left: 150)),
+                new RaisedButton(
+                    color: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: new Text(
+                      "Verify",
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        wordSpacing: 2.0,
+                        letterSpacing: 0.3,
                       ),
                     ),
-                    new Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: 40.0)),
-                    Center(
-                      child: new RaisedButton(
-                          color: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: new Text(
-                            "Verify",
-                            style: new TextStyle(
-                              color: Colors.white,
-                              fontSize: 15.0,
-                              wordSpacing: 2.0,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                          splashColor: Colors.red,
-                          onPressed: () async {
-                            saveSate();
-                            print("Pressed");
-                            _auth.currentUser().then((user) {
-                              if (user != null) {
-                                Navigator.of(context).pop();
-                                if (role == "parent") {
-                                  Navigator.of(context).pushReplacement(
-                                      new MaterialPageRoute(
-                                          builder: (
-                                              BuildContext context) => new SetParentDetails()));
-                                } else {
-                                  Navigator.of(context).pushReplacement(
-                                      new MaterialPageRoute(
-                                          builder: (
-                                              BuildContext context) => new SetPassword()));
-                                }
-                              } else {
-                                signIn();
-                              }
-                            });
-                          }),
-                    )
-                  ],
-                ),
-              ));
+                    splashColor: Colors.red,
+                    onPressed: () async {
+                      if (_otp.text.length < 6) {
+                        setState(() {
+                          _otpValidate = true;
+                          errorMessage = "Invalid OTP";
+                        });
+                      } else {
+                        setState(() {
+                          _otpValidate = false;
+                        });
+                        try {
+                          AuthCredential credential =
+                              PhoneAuthProvider.getCredential(
+                                  verificationId: verificationId,
+                                  smsCode: _otp.text.trim());
+                          AuthResult result =
+                              await _auth.signInWithCredential(credential);
+                          FirebaseUser user = result.user;
+                          print(user);
+                          if (user != null) {
+                            Navigator.of(context).pop();
+                            if (role == "parent") {
+                              Navigator.of(context).pushReplacement(
+                                  new MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          new SetParentDetails()));
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                  new MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          new SetPassword()));
+                            }
+                          } else {
+                            print("Error");
+                          }
+                        } catch (e) {
+                          handleError(e);
+                        }
+                      }
+                    })
+              ],
+            ),
+          );
+
         });
   }
 
@@ -274,9 +247,10 @@ class __RegisterPageState extends State<_RegisterPage> {
     }
   }
 
-  Future<void> _checkUser() async{
+  // ignore: missing_return
+  Future<void> _checkUser() {
     // ignore: missing_return
-    await Firestore.instance
+    Firestore.instance
         .collection("login_details")
         .document(_userName.text)
         .get()
@@ -285,9 +259,10 @@ class __RegisterPageState extends State<_RegisterPage> {
         dialogNoUser();
       } else {
         pass = document['password'];
-        if (pass != null && pass != "") {
+        print(pass);
+        if (pass != null) {
           allreadyRegistered();
-        } else if (pass == null || pass == "") {
+        } else if (pass == null) {
           role = document['role'];
           print(role);
           switch (role) {
@@ -299,7 +274,7 @@ class __RegisterPageState extends State<_RegisterPage> {
                   .then((document) {
                 if (document.exists) {
                   final String phone = "+91" + _userName.text.trim();
-                  verifyPhone();
+                  verifyPhone(phone, context);
                 } else {
                   dialogNoUser();
                 }
@@ -313,7 +288,7 @@ class __RegisterPageState extends State<_RegisterPage> {
                   .then((document) {
                 if (document.exists) {
                   final phone = "+91" + _userName.text.trim();
-                  verifyPhone();
+                  verifyPhone(phone, context);
                 } else {
                   dialogNoUser();
                 }
@@ -327,7 +302,7 @@ class __RegisterPageState extends State<_RegisterPage> {
                   .then((document) {
                 if (document.exists) {
                   final phone = "+91" + _userName.text.trim();
-                  verifyPhone();
+                  verifyPhone(phone, context);
                 } else {
                   dialogNoUser();
                 }
@@ -349,7 +324,7 @@ class __RegisterPageState extends State<_RegisterPage> {
             children: <Widget>[
               new Container(
                 padding:
-                    const EdgeInsets.only(left: 10.0, right: 10.0, top: 50),
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 50),
                 child: new Form(
                   child: new Card(
                     elevation: 30.0,

@@ -49,7 +49,7 @@ class _AddEventState extends State<AddEvent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return new Scaffold(
       appBar: CommonAppBar("Add Event"),
       backgroundColor: Colors.grey,
       body: new Container(
@@ -97,7 +97,7 @@ class _AddEventState extends State<AddEvent> {
                             cursorRadius: Radius.circular(50.0),
                             cursorWidth: 3.0,
                             decoration: new InputDecoration(
-                                /*prefixIcon: Padding(
+                              /*prefixIcon: Padding(
                                   padding: const EdgeInsetsDirectional.only(
                                       bottom: 43.0),
                                   child: new Icon(Icons.description),
@@ -172,169 +172,156 @@ class _AddEventState extends State<AddEvent> {
                               padding: const EdgeInsets.only(bottom: 15.0)),
                           _image != null
                               ? Center(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Stack(
-                                        alignment: Alignment.topRight,
-                                        children: <Widget>[
-                                          Image.asset(
+                            child: Column(
+                              children: <Widget>[
+                                Stack(
+                                  alignment: Alignment.topRight,
+                                  children: <Widget>[
+                                    /*Image.asset(
                                             _image.path,
                                             height: 150,
                                             fit: BoxFit.fitWidth,
                                             alignment: Alignment.center,
-                                          ),
-                                          IconButton(
-                                              icon: Icon(
-                                                Icons.cancel,
-                                                color: Colors.tealAccent,
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _image = null;
-                                                });
-                                              })
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      RaisedButton(
-                                        onPressed: _chooseFile,
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.add_photo_alternate,
-                                                color: Colors.white,
-                                                size: 30,
-                                              ),
-                                              SizedBox(
-                                                width: 8,
-                                              ),
-                                              Text(
-                                                "Change Image",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              )
-                                            ],
-                                          ),
+                                          ),*/
+                                    Image.file(_image, height: 150,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center,
+                                    ),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.cancel,
+                                          color: Colors.tealAccent,
                                         ),
-                                        color: Colors.redAccent,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        padding: EdgeInsets.only(
-                                            left: 40,
-                                            right: 40,
-                                            top: 10,
-                                            bottom: 10),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      RaisedButton(
                                         onPressed: () {
                                           setState(() {
-                                            if (_title.text.isEmpty) {
-                                              _titleValidate = true;
-                                            } else {
-                                              _titleValidate = false;
-                                            }
-                                            if (_description.text.isEmpty) {
-                                              _desValidate = true;
-                                            } else {
-                                              _desValidate = false;
-                                            }
-                                            if (date1.toString() == null) {
-                                              _dateValidate = true;
-                                            } else {
-                                              _dateValidate = false;
-                                            }
-                                            if (_titleValidate == false &&
-                                                _desValidate == false &&
-                                                _dateValidate == false) {
-                                              _uploadFile();
-                                            }
+                                            _image = null;
                                           });
-                                        },
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        color: Colors.redAccent,
-                                        child: Text(
-                                          "Add",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              : Column(
-                                  children: <Widget>[
-                                    RaisedButton(
-                                      onPressed: _chooseFile,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: Icon(
+                                        })
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                RaisedButton(
+                                  onPressed: _showBottom,
+                                  child: Container(
+                                    width:
+                                    MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(
                                           Icons.add_photo_alternate,
                                           color: Colors.white,
                                           size: 30,
                                         ),
-                                      ),
-                                      color: Colors.redAccent,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      padding: EdgeInsets.only(
-                                          left: 40,
-                                          right: 40,
-                                          top: 10,
-                                          bottom: 10),
-                                    ),
-                                    new Padding(
-                                        padding: const EdgeInsets.only(bottom: 5.0)),
-                                    RaisedButton(
-                                      onPressed: _chooseFileFromCamera,
-                                      child: Container(
-                                        width:
-                                        MediaQuery.of(context).size.width,
-                                        child: Icon(
-                                          Icons.photo_camera,
-                                          color: Colors.white,
-                                          size: 30,
+                                        SizedBox(
+                                          width: 8,
                                         ),
-                                      ),
-                                      color: Colors.redAccent,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(20)),
-                                      padding: EdgeInsets.only(
-                                          left: 40,
-                                          right: 40,
-                                          top: 10,
-                                          bottom: 10),
+                                        Text(
+                                          "Change Image",
+                                          style: TextStyle(
+                                              color: Colors.white),
+                                        )
+                                      ],
                                     ),
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    RaisedButton(
-                                      onPressed: _uploadFile,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      color: Colors.redAccent,
-                                      child: Text(
-                                        "Add",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    )
-                                  ],
+                                  ),
+                                  color: Colors.redAccent,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20)),
+                                  padding: EdgeInsets.only(
+                                      left: 40,
+                                      right: 40,
+                                      top: 10,
+                                      bottom: 10),
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                RaisedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_title.text.isEmpty) {
+                                        _titleValidate = true;
+                                      } else {
+                                        _titleValidate = false;
+                                      }
+                                      if (_description.text.isEmpty) {
+                                        _desValidate = true;
+                                      } else {
+                                        _desValidate = false;
+                                      }
+                                      if (date1.toString() == null) {
+                                        _dateValidate = true;
+                                      } else {
+                                        _dateValidate = false;
+                                      }
+                                      if (_titleValidate == false &&
+                                          _desValidate == false &&
+                                          _dateValidate == false) {
+                                        _uploadFile();
+                                      }
+                                    });
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20)),
+                                  color: Colors.redAccent,
+                                  child: Text(
+                                    "Add",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 )
+                              ],
+                            ),
+                          )
+                              : Column(
+                            children: <Widget>[
+                              RaisedButton(
+                                onPressed: _showBottom,
+                                child: Container(
+                                  width:
+                                  MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width,
+                                  child: Icon(
+                                    Icons.add_a_photo,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                ),
+                                color: Colors.redAccent,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(20)),
+                                padding: EdgeInsets.only(
+                                    left: 40,
+                                    right: 40,
+                                    top: 10,
+                                    bottom: 10),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              RaisedButton(
+                                onPressed: _uploadFile,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(20)),
+                                color: Colors.redAccent,
+                                child: Text(
+                                  "Add",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -346,6 +333,52 @@ class _AddEventState extends State<AddEvent> {
         ),
       ),
     );
+  }
+
+  Future _showBottom() async {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return new Container(
+            padding: const EdgeInsets.all(15.0),
+            color: Colors.grey,
+            height: 150,
+            child: new Center(
+              child: new ListView(
+                children: <Widget>[
+                  ListTile(
+                    leading: Icon(
+                      Icons.photo,
+                      color: Colors.white,
+                    ),
+                    title: Text(
+                      "Gallery",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _chooseFile();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.camera,
+                      color: Colors.white,
+                    ),
+                    title: Text(
+                      "Camera",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _chooseFileFromCamera();
+                    },
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Future _chooseFile() async {

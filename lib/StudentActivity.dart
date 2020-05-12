@@ -1,13 +1,21 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:compressimage/compressimage.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'MainScreen.dart';
+import 'package:path/path.dart' as Path;
 import 'package:carousel_pro/carousel_pro.dart';
+import 'ShowImage.dart';
 import 'SplashScreen.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
@@ -43,6 +51,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     with SingleTickerProviderStateMixin {
   SharedPreferences prf;
   String _username;
+  var _image;
   int selectedIndex = 0;
   String _enrCheck;
   int id;
@@ -416,12 +425,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
+                          CachedNetworkImage(
+                              placeholder: (context,url)=>Center(child: CircularProgressIndicator()),
                               width: 170.0,
                               height: 100,
                               fit: BoxFit.cover,
-                              image:
+                              imageUrl:
                                   'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
@@ -924,7 +933,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   }
 
   TextEditingController _msg = new TextEditingController();
-  int _type = 0;
+  int _type;
   Widget _buildBodyQnA() {
     var msgItems;
     //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
@@ -945,6 +954,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     return ListView.builder(
                       itemBuilder: (context, index) {
                         String senderUsername = msgItems[index]['userid'];
+                        int type = msgItems[index]['type'];
                         return Column(
                           crossAxisAlignment: (senderUsername.compareTo(_username)) == 0?CrossAxisAlignment.end:CrossAxisAlignment.start,
                           children: <Widget>[
@@ -967,13 +977,20 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                         ),
                                       ),
                                       SizedBox(height: 8),
-                                      Text(
+                                      type == 0?Text(
                                         msgItems[index]['message'],
                                         softWrap: true,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.black
                                         ),
+                                      ):GestureDetector(
+                                        onTap: (){
+                                          print(index);
+                                          Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => ShowImage(msgItems[index]['message'])));
+                                        },
+                                        child: CachedNetworkImage(imageUrl: msgItems[index]['message'],placeholder: (context,url) => Center(child: CircularProgressIndicator()),
+                                          errorWidget: (context,url,error) => new Icon(Icons.error),),
                                       ),
                                       SizedBox(height: 3),
                                       Row(
@@ -1017,17 +1034,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                             color: Colors.white,
                             child: Row(
                               children: <Widget>[
-                                SizedBox(width: 8),
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.insert_emoticon,
-                                    ),
-                                    onPressed: (){
-                                      setState(() {
-                                        showEmoji = !showEmoji;
-                                      });
-                                    }),
-                                SizedBox(width: 8),
+                                SizedBox(width: 16),
                                 Expanded(
                                     child: TextFormField(
                                   controller: _msg,
@@ -1040,8 +1047,11 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                     alignLabelWithHint: true,
                                   ),
                                 )),
-                                Icon(Icons.image,
-                                    color: Theme.of(context).hintColor),
+                                GestureDetector(
+                                  onTap: ()=>sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
                                 SizedBox(width: 8.0),
                                 SizedBox(width: 8.0),
                               ],
@@ -1058,7 +1068,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
-                            sendMessage(_msg.text, _type);
+                            _type = 0;
+                            sendMessage(_msg.text);
                             _msg.clear();
                           });
                         },
@@ -1074,8 +1085,78 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       ],
     );
   }
+  var _uploadedFileURL;
+  void sendImage() async{
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = null;
+      _image = image;
+      _type = 1;
+    });
+    if(_image != null) {
+      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      await CompressImage.compress(imageSrc: _image.path, desiredQuality: 50); //desiredQuality ranges from 0 to 100
+      print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
+      print(_image.path);
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('QnA Images/${Path.basename(_image.path)}}');
+      StorageUploadTask uploadTask = storageReference.putFile(_image);
 
-  void sendMessage(String msg, int type) async {
+      await uploadTask.onComplete;
+      print('File Uploaded');
+      await storageReference.getDownloadURL().then((fileURL) {
+        print(fileURL);
+        if(fileURL == null){
+          throw Exception("URL Null");
+        }
+          _uploadedFileURL = fileURL;
+      });
+      if(_uploadedFileURL == null){
+        throw Exception("URL Null..");
+      }
+      print("URL: "+_uploadedFileURL);
+      await Firestore.instance
+          .collection('QnA')
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': _uploadedFileURL,
+        'timestamp': DateTime.now(),
+        'date': DateTime
+            .now()
+            .day
+            .toString() +
+            "/" +
+            DateTime
+                .now()
+                .month
+                .toString() +
+            "/" +
+            DateTime
+                .now()
+                .year
+                .toString(),
+        'time': DateTime
+            .now()
+            .hour
+            .toString() +
+            ":" +
+            DateTime
+                .now()
+                .minute
+                .toString() +
+            ":" +
+            DateTime
+                .now()
+                .second
+                .toString(),
+        'type': _type
+      });
+    }
+  }
+
+  void sendMessage(String msg) async {
     if (msg.isNotEmpty) {
       await Firestore.instance
           .collection('QnA')
@@ -1094,7 +1175,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             DateTime.now().minute.toString() +
             ":" +
             DateTime.now().second.toString(),
-        'type': type
+        'type': _type
       });
     } else {
       Fluttertoast.showToast(

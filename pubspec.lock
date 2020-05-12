@@ -92,6 +92,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.14.11"
+  compressimage:
+    dependency: "direct main"
+    description:
+      name: compressimage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   connectivity:
     dependency: "direct main"
     description:

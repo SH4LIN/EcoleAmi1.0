@@ -1,8 +1,12 @@
+//import 'dart:html';
+
+import 'package:ecoleami1_0/SplashScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Register.dart';
 import 'MainScreen.dart';
@@ -59,14 +63,14 @@ class _SetParentDetailsState extends State<SetParentDetails> {
           children: <Widget>[
             new Container(
               padding:
-                  const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                  const EdgeInsets.only(left: 24.0, right: 25.0, top: 25.0),
               child: new Form(
                   child: new Card(
                 elevation: 30.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
                 child: Container(
-                  padding: const EdgeInsets.all(15.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: new Column(
                     children: <Widget>[
                       new ExpansionTile(
@@ -100,11 +104,12 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                                         fontSize: 15.0,
                                         color: Colors.white70,
                                       ),
-                                      prefixIcon: new Icon(Icons.person),
-                                      border: new OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      )),
+                                      prefixIcon:
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 15.0),
+                                        child: Icon(Icons.person),
+                                      )
+                                      ),
                                 );
                               }),
                           new Padding(
@@ -140,11 +145,12 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                                               fontSize: 15.0,
                                               color: Colors.white70,
                                             ),
-                                            prefixIcon: new Icon(Icons.person),
-                                            border: new OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                            )),
+                                            prefixIcon:
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 15.0),
+                                              child: Icon(Icons.person),
+                                            )
+                                           ),
                                       );
                               }),
                         ],
@@ -156,7 +162,7 @@ class _SetParentDetailsState extends State<SetParentDetails> {
             ),
             new Container(
               padding:
-                  const EdgeInsets.only(left: 10.0, right: 10.0, top: 15.0),
+                  const EdgeInsets.only(left: 24.0, right: 25.0, top: 30.0),
               child: new Form(
                   child: new Card(
                 elevation: 30.0,
