@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'ChangePassword.dart';
 import 'MainScreen.dart';
 import 'package:path/path.dart' as Path;
 import 'package:carousel_pro/carousel_pro.dart';
@@ -426,7 +426,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           CachedNetworkImage(
-                              placeholder: (context,url)=>Center(child: CircularProgressIndicator()),
+                              placeholder: (context, url) =>
+                                  Center(child: CircularProgressIndicator()),
                               width: 170.0,
                               height: 100,
                               fit: BoxFit.cover,
@@ -546,7 +547,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   height: 120,
                   fit: BoxFit.cover,
                   image:
-                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
@@ -569,74 +570,75 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         }
                         return (_enrCheck.compareTo("------------")) == 0
                             ? Row(
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.65,
-                              child: TextField(
-                                controller: _enr,
+                                children: <Widget>[
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.65,
+                                    child: TextField(
+                                      controller: _enr,
+                                      keyboardType: TextInputType.number,
+                                      cursorColor: Colors.purple,
+                                      cursorRadius: Radius.circular(50.0),
+                                      cursorWidth: 3.0,
+                                      decoration: new InputDecoration(
+                                          hintText: "Enrollment",
+                                          errorText: _enrValidate
+                                              ? 'Please enter valid Enrollment'
+                                              : null,
+                                          hintStyle: new TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white70,
+                                          ),
+                                          prefixIcon:
+                                              new Icon(Icons.account_circle),
+                                          border: new OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          )),
+                                    ),
+                                    margin: EdgeInsets.only(right: 15),
+                                  ),
+                                  RaisedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_enr.text.isEmpty) {
+                                          _enrValidate = true;
+                                        } else if (_enr.text.length != 12) {
+                                          _enrValidate = true;
+                                        } else {
+                                          _enrValidate = false;
+                                          _updateEnr();
+                                        }
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    colorBrightness: Brightness.light,
+                                    elevation: 24.0,
+                                    animationDuration: Duration(seconds: 5),
+                                    child: Text("Update"),
+                                  )
+                                ],
+                              )
+                            : TextField(
+                                controller: _finalEnr,
+                                enabled: false,
                                 keyboardType: TextInputType.number,
                                 cursorColor: Colors.purple,
                                 cursorRadius: Radius.circular(50.0),
                                 cursorWidth: 3.0,
                                 decoration: new InputDecoration(
                                     hintText: "Enrollment",
-                                    errorText: _enrValidate
-                                        ? 'Please enter valid Enrollment'
-                                        : null,
                                     hintStyle: new TextStyle(
                                       fontSize: 15.0,
                                       color: Colors.white70,
                                     ),
-                                    prefixIcon:
-                                    new Icon(Icons.account_circle),
+                                    prefixIcon: new Icon(Icons.account_circle),
                                     border: new OutlineInputBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(20.0),
+                                      borderRadius: BorderRadius.circular(20.0),
                                     )),
-                              ),
-                              margin: EdgeInsets.only(right: 15),
-                            ),
-                            RaisedButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (_enr.text.isEmpty) {
-                                    _enrValidate = true;
-                                  } else if (_enr.text.length != 12) {
-                                    _enrValidate = true;
-                                  } else {
-                                    _enrValidate = false;
-                                    _updateEnr();
-                                  }
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              colorBrightness: Brightness.light,
-                              elevation: 24.0,
-                              animationDuration: Duration(seconds: 5),
-                              child: Text("Update"),
-                            )
-                          ],
-                        )
-                            : TextField(
-                          controller: _finalEnr,
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Enrollment",
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.account_circle),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
+                              );
                       }),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
@@ -662,7 +664,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                              _fValidate ? 'Please enter First Name' : null,
+                                  _fValidate ? 'Please enter First Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -733,7 +735,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                              _lValidate ? 'Please enter Last Name' : null,
+                                  _lValidate ? 'Please enter Last Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -840,7 +842,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                              _semValidate ? 'Please enter Semester' : null,
+                                  _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -875,7 +877,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                              _semValidate ? 'Please enter Semester' : null,
+                                  _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -899,7 +901,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         if (snapshot.hasData) {
                           var document = snapshot.data;
                           _parent_phone.text = document['parent_phone_number'];
-                          if(document['parent_phone_number'] == null){
+                          if (document['parent_phone_number'] == null) {
                             _parent_phone.text = "No Data";
                           }
                         }
@@ -912,7 +914,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           cursorWidth: 3.0,
                           decoration: new InputDecoration(
                               errorText:
-                              _semValidate ? 'Please enter Semester' : null,
+                                  _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -934,168 +936,223 @@ class _StudentActivityPageState extends State<StudentActivityPage>
 
   TextEditingController _msg = new TextEditingController();
   int _type;
+  var _semester;
   Widget _buildBodyQnA() {
     var msgItems;
     //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
-    return ListView(
-      children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.65,
-              child: StreamBuilder(
-                  stream: Firestore.instance.collection('QnA').orderBy('timestamp',descending: true).snapshots(),
-                  builder: (context, snapshot) {
-                    if(snapshot!= null && snapshot.hasData) {
-                      msgItems = snapshot.data.documents;
-                    }
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        String senderUsername = msgItems[index]['userid'];
-                        int type = msgItems[index]['type'];
-                        return Column(
-                          crossAxisAlignment: (senderUsername.compareTo(_username)) == 0?CrossAxisAlignment.end:CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width*0.5,
-                              alignment: (senderUsername.compareTo(_username)) == 0?Alignment.topRight:Alignment.topLeft,
-                              child: Wrap(children: <Widget>[
-                                Bubble(
-                                  padding: BubbleEdges.only(left: 8),
-                                  elevation: 10.0,
-                                  shadowColor: Colors.white,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                          (senderUsername.compareTo(_username)) == 0?"You":senderUsername,
-                                        style: TextStyle(
-                                          color: Colors.grey[700],
-                                          fontSize: 12
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      type == 0?Text(
-                                        msgItems[index]['message'],
-                                        softWrap: true,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black
-                                        ),
-                                      ):GestureDetector(
-                                        onTap: (){
-                                          print(index);
-                                          Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => ShowImage(msgItems[index]['message'])));
-                                        },
-                                        child: CachedNetworkImage(imageUrl: msgItems[index]['message'],placeholder: (context,url) => Center(child: CircularProgressIndicator()),
-                                          errorWidget: (context,url,error) => new Icon(Icons.error),),
-                                      ),
-                                      SizedBox(height: 3),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          Text(
-                                              msgItems[index]['time'],
-                                            style: TextStyle(
-                                              color: Colors.grey[500],
-                                              fontSize: 10
+    Firestore.instance
+        .collection("student_details")
+        .document(_username)
+        .get()
+        .then((snapshot) {
+      setState(() {
+        _semester = snapshot["semester"];
+      });
+    });
+    return _semester != null
+        ? ListView(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: StreamBuilder(
+                        stream: Firestore.instance
+                            .collection('QnA')
+                            .document("student")
+                            .collection(_semester)
+                            .orderBy('timestamp', descending: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot != null && snapshot.hasData) {
+                            msgItems = snapshot.data.documents;
+                          }
+                          return ListView.builder(
+                            itemBuilder: (context, index) {
+                              String senderUsername = msgItems[index]['userid'];
+                              int type = msgItems[index]['type'];
+                              return Column(
+                                crossAxisAlignment:
+                                    (senderUsername.compareTo(_username)) == 0
+                                        ? CrossAxisAlignment.end
+                                        : CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    alignment:
+                                        (senderUsername.compareTo(_username)) ==
+                                                0
+                                            ? Alignment.topRight
+                                            : Alignment.topLeft,
+                                    child: Wrap(children: <Widget>[
+                                      Bubble(
+                                        padding: BubbleEdges.only(left: 8),
+                                        elevation: 10.0,
+                                        shadowColor: Colors.white,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              (senderUsername.compareTo(
+                                                          _username)) ==
+                                                      0
+                                                  ? "You"
+                                                  : senderUsername,
+                                              style: TextStyle(
+                                                  color: Colors.grey[700],
+                                                  fontSize: 12),
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(height: 8),
+                                            type == 0
+                                                ? Text(
+                                                    msgItems[index]['message'],
+                                                    softWrap: true,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black),
+                                                  )
+                                                : GestureDetector(
+                                                    onTap: () {
+                                                      print(index);
+                                                      Navigator.of(context).push(
+                                                          new MaterialPageRoute(
+                                                              builder: (BuildContext
+                                                                      context) =>
+                                                                  ShowImage(msgItems[
+                                                                          index]
+                                                                      [
+                                                                      'message'])));
+                                                    },
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: msgItems[index]
+                                                          ['message'],
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          Center(
+                                                              child:
+                                                                  CircularProgressIndicator()),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          new Icon(Icons.error),
+                                                    ),
+                                                  ),
+                                            SizedBox(height: 3),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: <Widget>[
+                                                Text(
+                                                  msgItems[index]['time'],
+                                                  style: TextStyle(
+                                                      color: Colors.grey[500],
+                                                      fontSize: 10),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        nip: (senderUsername
+                                                    .compareTo(_username)) ==
+                                                0
+                                            ? BubbleNip.rightTop
+                                            : BubbleNip.leftTop,
                                       ),
+                                    ]),
+                                    padding:
+                                        EdgeInsets.only(top: 10.0, left: 8),
+                                    margin: EdgeInsets.only(bottom: 8),
+                                  ),
+                                ],
+                              );
+                            },
+                            reverse: true,
+                            itemCount: msgItems != null ? msgItems.length : 0,
+                          );
+                        }),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(top: 15),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(26),
+                                child: Container(
+                                  color: Colors.white,
+                                  child: Row(
+                                    children: <Widget>[
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                          child: TextFormField(
+                                        controller: _msg,
+                                        keyboardType: TextInputType.multiline,
+                                        minLines: 1,
+                                        maxLines: 100,
+                                        decoration: InputDecoration(
+                                          hintText: 'Type a message',
+                                          border: InputBorder.none,
+                                          alignLabelWithHint: true,
+                                        ),
+                                      )),
+                                      GestureDetector(
+                                        onTap: () => sendImage(),
+                                        child: Icon(Icons.image,
+                                            color: Theme.of(context).hintColor),
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      SizedBox(width: 8.0),
                                     ],
                                   ),
-                                  nip: (senderUsername.compareTo(_username)) == 0?BubbleNip.rightTop:BubbleNip.leftTop,
                                 ),
-                              ]),
-                              padding: EdgeInsets.only(top: 10.0, left: 8),
-                              margin: EdgeInsets.only(bottom: 8),
-                            ),
-                          ],
-                        );
-                      },
-                      reverse: true,
-                      itemCount: msgItems != null?msgItems.length:0,
-                    );
-                  }),
-            ),
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 15),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(26),
-                          child: Container(
-                            color: Colors.white,
-                            child: Row(
-                              children: <Widget>[
-                                SizedBox(width: 16),
-                                Expanded(
-                                    child: TextFormField(
-                                  controller: _msg,
-                                  keyboardType: TextInputType.multiline,
-                                  minLines: 1,
-                                  maxLines: 100,
-                                  decoration: InputDecoration(
-                                    hintText: 'Type a message',
-                                    border: InputBorder.none,
-                                    alignLabelWithHint: true,
-                                  ),
-                                )),
-                                GestureDetector(
-                                  onTap: ()=>sendImage(),
-                                  child: Icon(Icons.image,
-                                      color: Theme.of(context).hintColor),
-                                ),
-                                SizedBox(width: 8.0),
-                                SizedBox(width: 8.0),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 5.0,
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _type = 0;
-                            sendMessage(_msg.text);
-                            _msg.clear();
-                          });
-                        },
-                        child: CircleAvatar(
-                          child: Icon(Icons.send),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ],
-        ),
-      ],
-    );
+                          SizedBox(
+                            width: 5.0,
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 15),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _type = 0;
+                                  sendMessage(_msg.text);
+                                  _msg.clear();
+                                });
+                              },
+                              child: CircleAvatar(
+                                child: Icon(Icons.send),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                ],
+              ),
+            ],
+          )
+        : Center(child: CircularProgressIndicator());
   }
+
   var _uploadedFileURL;
-  void sendImage() async{
+  void sendImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = null;
       _image = image;
       _type = 1;
     });
-    if(_image != null) {
+    if (_image != null) {
       print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
-      await CompressImage.compress(imageSrc: _image.path, desiredQuality: 50); //desiredQuality ranges from 0 to 100
+      await CompressImage.compress(
+          imageSrc: _image.path,
+          desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
       print(_image.path);
       StorageReference storageReference = FirebaseStorage.instance
@@ -1107,50 +1164,34 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       print('File Uploaded');
       await storageReference.getDownloadURL().then((fileURL) {
         print(fileURL);
-        if(fileURL == null){
+        if (fileURL == null) {
           throw Exception("URL Null");
         }
-          _uploadedFileURL = fileURL;
+        _uploadedFileURL = fileURL;
       });
-      if(_uploadedFileURL == null){
+      if (_uploadedFileURL == null) {
         throw Exception("URL Null..");
       }
-      print("URL: "+_uploadedFileURL);
+      print("URL: " + _uploadedFileURL);
       await Firestore.instance
           .collection('QnA')
+          .document('student')
+          .collection(_semester)
           .document(DateTime.now().toString())
           .setData({
         'userid': _username,
         'message': _uploadedFileURL,
         'timestamp': DateTime.now(),
-        'date': DateTime
-            .now()
-            .day
-            .toString() +
+        'date': DateTime.now().day.toString() +
             "/" +
-            DateTime
-                .now()
-                .month
-                .toString() +
+            DateTime.now().month.toString() +
             "/" +
-            DateTime
-                .now()
-                .year
-                .toString(),
-        'time': DateTime
-            .now()
-            .hour
-            .toString() +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
             ":" +
-            DateTime
-                .now()
-                .minute
-                .toString() +
+            DateTime.now().minute.toString() +
             ":" +
-            DateTime
-                .now()
-                .second
-                .toString(),
+            DateTime.now().second.toString(),
         'type': _type
       });
     }
@@ -1160,6 +1201,8 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     if (msg.isNotEmpty) {
       await Firestore.instance
           .collection('QnA')
+          .document('student')
+          .collection(_semester)
           .document(DateTime.now().toString())
           .setData({
         'userid': _username,
@@ -1188,6 +1231,21 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: ListView(
         children: <Widget>[
+          ListTile(
+              leading: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              title: Text(
+                "Change Password",
+                style: TextStyle(color: Colors.white),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+              onTap: () {
+                Navigator.of(context).push (new MaterialPageRoute(
+                    builder: (BuildContext context) => new ChangePassword()));
+              }
+          ),
           ListTile(
             leading: Icon(
               Icons.info_outline,
@@ -1224,31 +1282,49 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 showGeneralDialog(
                     barrierColor: Colors.black.withOpacity(0.5),
                     transitionBuilder: (context, a1, a2, widget) {
-                      final curvedValue = Curves.easeInOutBack.transform(a1.value) -   1.0;
+                      final curvedValue =
+                          Curves.easeInOutBack.transform(a1.value) - 1.0;
                       return Transform(
-                        transform: Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
+                        transform: Matrix4.translationValues(
+                            0.0, curvedValue * 200, 0.0),
                         child: Opacity(
                           opacity: a1.value,
                           child: AlertDialog(
                             shape: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16.0)),
-                            title: Text('Caution!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 25),),
+                            title: Text(
+                              'Caution!',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                            ),
                             content: Text('Are You Sure You Want To Logout?'),
                             actions: <Widget>[
                               new FlatButton(
-                                  onPressed:  () {
+                                  onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: new Text("Cancel", style: TextStyle(fontSize: 18),)),
+                                  child: new Text(
+                                    "Cancel",
+                                    style: TextStyle(fontSize: 18),
+                                  )),
                               new FlatButton(
                                   onPressed: () async {
-                                    SharedPreferences prf = await SharedPreferences.getInstance();
+                                    SharedPreferences prf =
+                                        await SharedPreferences.getInstance();
                                     prf.setBool("isLoggedIn", false);
                                     Navigator.of(context).pop();
-                                    Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                                        builder: (BuildContext context) => new MainScreen()));
+                                    Navigator.of(context).pushReplacement(
+                                        new MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                new MainScreen()));
                                   },
-                                  child: new Text("Logout", style: TextStyle(color: Colors.red, fontSize: 18),))
+                                  child: new Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                        color: Colors.red, fontSize: 18),
+                                  ))
                             ],
                           ),
                         ),
@@ -1318,7 +1394,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           .updateData({
         'student_enrollment': _enr.text,
       });
-
     } catch (e) {
       print(e.toString());
     }

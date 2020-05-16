@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AddEvent.dart';
+import 'ChangePassword.dart';
 import 'ManageVerification.dart';
 import 'SplashScreen.dart';
 
@@ -829,6 +830,21 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: ListView(
         children: <Widget>[
+          ListTile(
+              leading: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              title: Text(
+                "Change Password",
+                style: TextStyle(color: Colors.white),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+              onTap: () {
+                Navigator.of(context).push (new MaterialPageRoute(
+                    builder: (BuildContext context) => new ChangePassword()));
+              }
+          ),
           ListTile(
             leading: Icon(
               Icons.info_outline,

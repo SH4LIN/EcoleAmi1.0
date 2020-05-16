@@ -1,15 +1,22 @@
 import 'dart:async';
 import 'package:bubble/bubble.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AddEvent.dart';
+import 'ChangePassword.dart';
 import 'MainScreen.dart';
 import 'ManageVerification.dart';
+import 'ShowImage.dart';
 import 'SplashScreen.dart';
 import 'TakeAttendance.dart';
 
@@ -46,7 +53,7 @@ class FacultyActivityPage extends StatefulWidget {
 }
 
 class _FacultyActivityPageState extends State<FacultyActivityPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   SharedPreferences prf;
   String _username;
   int selectedIndex = 0;
@@ -707,190 +714,26 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
     );
   }
 
-  TextEditingController _msg = new TextEditingController();
-  int _type = 0;
-  Widget _buildBodyQnA() {
-    var msgItems;
-    //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
-    return ListView(
-      children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.65,
-              child: StreamBuilder(
-                  stream: Firestore.instance.collection('QnA').orderBy('timestamp',descending: true).snapshots(),
-                  builder: (context, snapshot) {
-                    if(snapshot!= null && snapshot.hasData) {
-                      msgItems = snapshot.data.documents;
-                    }
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        String senderUsername = msgItems[index]['userid'];
-                        return Column(
-                          crossAxisAlignment: (senderUsername.compareTo(_username)) == 0?CrossAxisAlignment.end:CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width*0.5,
-                              alignment: (senderUsername.compareTo(_username)) == 0?Alignment.topRight:Alignment.topLeft,
-                              child: Wrap(children: <Widget>[
-                                Bubble(
-                                  padding: BubbleEdges.only(left: 8),
-                                  elevation: 10.0,
-                                  shadowColor: Colors.white,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        (senderUsername.compareTo(_username)) == 0?"You":senderUsername,
-                                        style: TextStyle(
-                                            color: Colors.grey[700],
-                                            fontSize: 12
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        msgItems[index]['message'],
-                                        softWrap: true,
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black
-                                        ),
-                                      ),
-                                      SizedBox(height: 3),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          Text(
-                                            msgItems[index]['time'],
-                                            style: TextStyle(
-                                                color: Colors.grey[500],
-                                                fontSize: 10
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  nip: (senderUsername.compareTo(_username)) == 0?BubbleNip.rightTop:BubbleNip.leftTop,
-                                ),
-                              ]),
-                              padding: EdgeInsets.only(top: 10.0, left: 8),
-                              margin: EdgeInsets.only(bottom: 8),
-                            ),
-                          ],
-                        );
-                      },
-                      reverse: true,
-                      itemCount: msgItems != null?msgItems.length:0,
-                    );
-                  }),
-            ),
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 15),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(26),
-                          child: Container(
-                            color: Colors.white,
-                            child: Row(
-                              children: <Widget>[
-                                SizedBox(width: 8),
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.insert_emoticon,
-                                    ),
-                                    onPressed: (){
-                                      setState(() {
-                                        showEmoji = !showEmoji;
-                                      });
-                                    }),
-                                SizedBox(width: 8),
-                                Expanded(
-                                    child: TextFormField(
-                                      controller: _msg,
-                                      keyboardType: TextInputType.multiline,
-                                      minLines: 1,
-                                      maxLines: 100,
-                                      decoration: InputDecoration(
-                                        hintText: 'Type a message',
-                                        border: InputBorder.none,
-                                        alignLabelWithHint: true,
-                                      ),
-                                    )),
-                                Icon(Icons.image,
-                                    color: Theme.of(context).hintColor),
-                                SizedBox(width: 8.0),
-                                SizedBox(width: 8.0),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 5.0,
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            sendMessage(_msg.text, _type);
-                            _msg.clear();
-                          });
-                        },
-                        child: CircleAvatar(
-                          child: Icon(Icons.send),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ],
-        ),
-      ],
-    );
-  }
-
-  void sendMessage(String msg, int type) async {
-    if (msg.isNotEmpty) {
-      await Firestore.instance
-          .collection('QnA')
-          .document(DateTime.now().toString())
-          .setData({
-        'userid': _username,
-        'message': msg,
-        'timestamp': DateTime.now(),
-        'date': DateTime.now().day.toString() +
-            "/" +
-            DateTime.now().month.toString() +
-            "/" +
-            DateTime.now().year.toString(),
-        'time': DateTime.now().hour.toString() +
-            ":" +
-            DateTime.now().minute.toString() +
-            ":" +
-            DateTime.now().second.toString(),
-        'type': type
-      });
-    } else {
-      Fluttertoast.showToast(
-          msg: "Nothing To Send", gravity: ToastGravity.CENTER);
-    }
-  }
-
   Widget _buildBodySettings() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: ListView(
         children: <Widget>[
+          ListTile(
+              leading: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              title: Text(
+                "Change Password",
+                style: TextStyle(color: Colors.white),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+              onTap: () {
+                Navigator.of(context).push (new MaterialPageRoute(
+                    builder: (BuildContext context) => new ChangePassword()));
+              }
+          ),
           ListTile(
             leading: Icon(
               Icons.info_outline,
@@ -1002,6 +845,724 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
   }
 
 }
+
+class _buildBodyQnA extends StatefulWidget {
+  @override
+  __buildBodyQnAState createState() => __buildBodyQnAState();
+}
+
+class __buildBodyQnAState extends State<_buildBodyQnA> with SingleTickerProviderStateMixin {
+  TabController _tabController;
+  @override
+  void initState() {
+    _tabController = new TabController(length: 2, vsync: this);
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Container(
+        child: Column(
+            children: <Widget>[
+              Divider(),
+              TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.black,
+                indicatorPadding: EdgeInsets.all(60),
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.black,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                    color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+                tabs: [
+                  Text("Students"),
+                  Text("Parents")
+                ],
+              ),
+              Divider(),
+              Expanded(
+                child: TabBarView(children: [
+                  Students(),
+                  Parents()
+                ],controller: _tabController,),
+              )
+            ]),
+      ),
+    );
+  }
+  Widget Students(){
+    return ListView.builder(
+      itemBuilder: (context,index){
+        index = index +1;
+        return Card(
+          margin: EdgeInsets.all(8),
+          child: ListTile(
+            leading: Text("Semester"),
+            trailing: Icon(Icons.arrow_forward_ios),
+            title: Text(index.toString()),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Student_Semester(index.toString())));
+            },
+          ),
+        );
+      },
+      itemCount: 6,
+    );
+  }
+
+
+  Widget Parents(){
+    return ListView.builder(
+      itemBuilder: (context,index){
+        index = index +1;
+        return Card(
+          margin: EdgeInsets.all(8),
+          child: ListTile(
+            leading: Text("Semester"),
+            trailing: Icon(Icons.arrow_forward_ios),
+            title: Text(index.toString()),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Parents_Semester(index.toString())));
+            },
+          ),
+        );
+      },
+      itemCount: 6,
+    );
+  }
+}
+
+class Student_Semester extends StatefulWidget {
+  final String sem;
+  Student_Semester(this.sem);
+  @override
+  _Student_SemesterState createState() => _Student_SemesterState(sem);
+}
+
+class _Student_SemesterState extends State<Student_Semester> {
+  final sem;
+  SharedPreferences prf;
+  _Student_SemesterState(this.sem);
+  String _username;
+  @override
+  void initState() {
+    user != null ? _username = user : setUser();
+    super.initState();
+  }
+  void setUser() async {
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+    //Fluttertoast.showToast(msg: prf.get("Username"));
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CommonAppBar("Student QnA Semester: "+sem.toString()),
+      body: Student_QnA(),
+    );
+  }
+  TextEditingController _msg = new TextEditingController();
+  int _type;
+  var _image;
+
+  Widget Student_QnA(){
+    var msgItems;
+    return sem != null
+        ? ListView(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.76,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("student")
+                      .collection(sem.toString())
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : senderUsername,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
+                                        },
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) {
+                                          return Center(child: Icon(Icons.error));
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
+                                ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      controller: _msg,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
+        : Center(child: CircularProgressIndicator());
+  }
+
+  var _uploadedFileURL;
+  void sendImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = null;
+      _image = image;
+      _type = 1;
+    });
+    if (_image != null) {
+      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      await CompressImage.compress(
+          imageSrc: _image.path,
+          desiredQuality: 50); //desiredQuality ranges from 0 to 100
+      print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
+      print(_image.path);
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('QnA Images/${Path.basename(_image.path)}}');
+      StorageUploadTask uploadTask = storageReference.putFile(_image);
+
+      await uploadTask.onComplete;
+      print('File Uploaded');
+      await storageReference.getDownloadURL().then((fileURL) {
+        print(fileURL);
+        if (fileURL == null) {
+          throw Exception("URL Null");
+        }
+        _uploadedFileURL = fileURL;
+      });
+      if (_uploadedFileURL == null) {
+        throw Exception("URL Null..");
+      }
+      print("URL: " + _uploadedFileURL);
+      await Firestore.instance
+          .collection('QnA')
+          .document('student')
+          .collection(sem)
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': _uploadedFileURL,
+        'timestamp': DateTime.now(),
+        'date': DateTime.now().day.toString() +
+            "/" +
+            DateTime.now().month.toString() +
+            "/" +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
+            ":" +
+            DateTime.now().minute.toString() +
+            ":" +
+            DateTime.now().second.toString(),
+        'type': _type
+      });
+    }
+  }
+
+  void sendMessage(String msg) async {
+    if (msg.isNotEmpty) {
+      await Firestore.instance
+          .collection('QnA')
+          .document('student')
+          .collection(sem.toString())
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': msg,
+        'timestamp': DateTime.now(),
+        'date': DateTime.now().day.toString() +
+            "/" +
+            DateTime.now().month.toString() +
+            "/" +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
+            ":" +
+            DateTime.now().minute.toString() +
+            ":" +
+            DateTime.now().second.toString(),
+        'type': _type
+      });
+    } else {
+      Fluttertoast.showToast(
+          msg: "Nothing To Send", gravity: ToastGravity.CENTER);
+    }
+  }
+}
+
+
+
+class Parents_Semester extends StatefulWidget {
+  final sem;
+  Parents_Semester(this.sem);
+  @override
+  _Parents_SemesterState createState() => _Parents_SemesterState(sem);
+}
+
+class _Parents_SemesterState extends State<Parents_Semester> {
+  final sem;
+  _Parents_SemesterState(this.sem);
+  SharedPreferences prf;
+  String _username;
+  @override
+  void initState() {
+    user != null ? _username = user : setUser();
+    super.initState();
+  }
+  void setUser() async {
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+    //Fluttertoast.showToast(msg: prf.get("Username"));
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CommonAppBar("Parents QnA Semester: "+sem.toString()),
+      body: Parents_QnA(),
+    );
+  }
+  TextEditingController _msg = new TextEditingController();
+  int _type;
+  var _image;
+
+  Widget Parents_QnA(){
+    var msgItems;
+    return sem != null
+        ? ListView(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.76,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("parents")
+                      .collection(sem.toString())
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : senderUsername,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
+                                        },
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) =>
+                                          new Icon(Icons.error),
+                                        ),
+                                      ),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
+                                ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      controller: _msg,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
+        : Center(child: CircularProgressIndicator());
+  }
+
+  var _uploadedFileURL;
+  void sendImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = null;
+      _image = image;
+      _type = 1;
+    });
+    if (_image != null) {
+      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      await CompressImage.compress(
+          imageSrc: _image.path,
+          desiredQuality: 50); //desiredQuality ranges from 0 to 100
+      print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
+      print(_image.path);
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('QnA Images/${Path.basename(_image.path)}}');
+      StorageUploadTask uploadTask = storageReference.putFile(_image);
+
+      await uploadTask.onComplete;
+      print('File Uploaded');
+      await storageReference.getDownloadURL().then((fileURL) {
+        print(fileURL);
+        if (fileURL == null) {
+          throw Exception("URL Null");
+        }
+        _uploadedFileURL = fileURL;
+      });
+      if (_uploadedFileURL == null) {
+        throw Exception("URL Null..");
+      }
+      print("URL: " + _uploadedFileURL);
+      await Firestore.instance
+          .collection('QnA')
+          .document('parents')
+          .collection(sem)
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': _uploadedFileURL,
+        'timestamp': DateTime.now(),
+        'date': DateTime.now().day.toString() +
+            "/" +
+            DateTime.now().month.toString() +
+            "/" +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
+            ":" +
+            DateTime.now().minute.toString() +
+            ":" +
+            DateTime.now().second.toString(),
+        'type': _type
+      });
+    }
+  }
+
+  void sendMessage(String msg) async {
+    if (msg.isNotEmpty) {
+      await Firestore.instance
+          .collection('QnA')
+          .document('parents')
+          .collection(sem.toString())
+          .document(DateTime.now().toString())
+          .setData({
+        'userid': _username,
+        'message': msg,
+        'timestamp': DateTime.now(),
+        'date': DateTime.now().day.toString() +
+            "/" +
+            DateTime.now().month.toString() +
+            "/" +
+            DateTime.now().year.toString(),
+        'time': DateTime.now().hour.toString() +
+            ":" +
+            DateTime.now().minute.toString() +
+            ":" +
+            DateTime.now().second.toString(),
+        'type': _type
+      });
+    } else {
+      Fluttertoast.showToast(
+          msg: "Nothing To Send", gravity: ToastGravity.CENTER);
+    }
+  }
+}
+
+
 
 class NavigationItem {
   final Icon icon;
