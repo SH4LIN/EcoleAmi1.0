@@ -34,7 +34,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   String _current;
   String _role;
   String errorMessage;
-
+  String errorMessage2;
 
   @override
   void initState() {
@@ -75,20 +75,21 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new CommonAppBar("Change Password"),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       body: new Container(
         child: new ListView(
           children: <Widget>[
             new Container(
-              padding:
-                  const EdgeInsets.only(left: 24.0, right: 25.0, top: 50.0),
+              padding: const EdgeInsets.only(top: 200, left: 15.0, right: 15.0),
               child: new Form(
                   child: new Card(
                 elevation: 30.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
                 child: Container(
-                  padding: const EdgeInsets.all(5.0),
+                  /*width: (MediaQuery.of(context).size.width),
+                  height: (MediaQuery.of(context).size.height),*/
+                  padding: const EdgeInsets.all(15.0),
                   child: new Column(
                     children: <Widget>[
                       new TextField(
@@ -124,10 +125,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                             )),
                       ),
                       new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-
                       new TextField(
                         onChanged: (value) {
-                          // ignore: unnecessary_statements
                           validateStructure(value);
                         },
                         controller: _pass,
@@ -172,9 +171,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         cursorWidth: 3.0,
                         decoration: new InputDecoration(
                             hintText: "Confirm Password",
-                            errorText: _cPassValidate
-                                ? 'This field can not be empty'
-                                : null,
+                            errorText: _cPassValidate ? errorMessage2 : null,
                             hintStyle: new TextStyle(
                               fontSize: 15.0,
                               color: Colors.grey,
@@ -202,7 +199,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           new RaisedButton(
                             onPressed: () => {},
                             splashColor: Colors.redAccent,
-                            color: Colors.red,
+                            color: Colors.redAccent,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             child: new Text(
@@ -216,7 +213,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                               ),
                             ),
                           ),
-                          new Padding(padding: const EdgeInsets.only(left: 30.0)),
+                          new Padding(
+                              padding: const EdgeInsets.only(left: 30.0)),
                           new RaisedButton(
                             color: Colors.redAccent,
                             shape: RoundedRectangleBorder(
@@ -233,56 +231,57 @@ class _ChangePasswordState extends State<ChangePassword> {
                                     if (_pass.text.isEmpty) {
                                       _passValidate = true;
                                       errorMessage =
-                                      'This field can not be empty';
+                                          'This field can not be empty';
                                     } else {
                                       _passValidate = false;
                                     }
                                     if (_confirmPass.text.isEmpty) {
                                       _cPassValidate = true;
+                                      errorMessage2 = "Password does not match";
                                     } else {
                                       _cPassValidate = false;
                                     }
-                                    print(_passValidate);
                                     if (_passValidate == false &&
                                         _cPassValidate == false) {
-                                      if (_pass.text.compareTo(
-                                          _confirmPass.text) !=
+                                      if (_pass.text
+                                              .compareTo(_confirmPass.text) !=
                                           0) {
-                                        _passValidate = true;
+                                        _cPassValidate = true;
                                         _confirmPass.clear();
-                                        _pass.clear();
-                                        errorMessage =
-                                        "Password does not match";
-                                      } else
-                                      if (_pass.text.compareTo(_current) ==
+                                        errorMessage2 =
+                                            "Password does not match";
+                                      } else if (_pass.text
+                                              .compareTo(_current) ==
                                           0) {
                                         showGeneralDialog(
                                             barrierColor:
-                                            Colors.black.withOpacity(0.5),
+                                                Colors.black.withOpacity(0.5),
                                             transitionBuilder:
                                                 (context, a1, a2, widget) {
                                               final curvedValue = Curves
-                                                  .easeInOutBack
-                                                  .transform(a1.value) -
+                                                      .easeInOutBack
+                                                      .transform(a1.value) -
                                                   1.0;
                                               return Transform(
-                                                transform: Matrix4
-                                                    .translationValues(
-                                                    0.0, curvedValue * 200,
-                                                    0.0),
+                                                transform:
+                                                    Matrix4.translationValues(
+                                                        0.0,
+                                                        curvedValue * 200,
+                                                        0.0),
                                                 child: Opacity(
                                                   opacity: a1.value,
                                                   child: AlertDialog(
                                                     shape: OutlineInputBorder(
                                                         borderRadius:
-                                                        BorderRadius.circular(
-                                                            16.0)),
+                                                            BorderRadius
+                                                                .circular(
+                                                                    16.0)),
                                                     title: Text(
                                                       'Error!',
                                                       style: TextStyle(
                                                           color: Colors.red,
-                                                          fontWeight: FontWeight
-                                                              .bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           fontSize: 25),
                                                     ),
                                                     content: Text(
@@ -294,7 +293,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                                                 .clear();
                                                             _pass.clear();
                                                             Navigator.of(
-                                                                context)
+                                                                    context)
                                                                 .pop();
                                                           },
                                                           child: new Text(
@@ -308,15 +307,17 @@ class _ChangePasswordState extends State<ChangePassword> {
                                               );
                                             },
                                             transitionDuration:
-                                            Duration(milliseconds: 200),
+                                                Duration(milliseconds: 200),
                                             barrierDismissible: true,
                                             barrierLabel: '',
                                             context: context,
                                             pageBuilder:
-                                            // ignore: missing_return
+                                                // ignore: missing_return
                                                 (context, animation1,
-                                                animation2) {});
+                                                    animation2) {});
                                       } else {
+                                        _passValidate = false;
+                                        _cPassValidate = false;
                                         savePassword();
                                       }
                                     }
@@ -339,16 +340,17 @@ class _ChangePasswordState extends State<ChangePassword> {
     );
   }
 
-  bool validateStructure(String value){
-    String  pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+  bool validateStructure(String value) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
     RegExp regExp = new RegExp(pattern);
     setState(() {
-      regExp.hasMatch(value) ? _passValidate = false : _passValidate = true; errorMessage = "Please enter Strong Password";
+      regExp.hasMatch(value) ? _passValidate = false : _passValidate = true;
+      errorMessage = "Please set a Strong Password";
       print(_passValidate);
     });
     return regExp.hasMatch(value);
   }
-
 
   void _checkUser(String pass) async {
     if (_current.compareTo(pass) == 0) {

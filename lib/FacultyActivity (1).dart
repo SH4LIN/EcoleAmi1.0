@@ -1,104 +1,139 @@
+import 'dart:async';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
-import 'package:ecoleami1_0/MainScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path/path.dart' as Path;
 import 'AddEvent.dart';
 import 'ChangePassword.dart';
+import 'MainScreen.dart';
 import 'ManageVerification.dart';
 import 'ShowImage.dart';
 import 'SplashScreen.dart';
+//import 'TakeAttendance.dart';
 
-class Home extends StatelessWidget {
+Widget buildError(BuildContext context, FlutterErrorDetails error) {
+  return Scaffold(
+      body: Center(
+        child: Text(
+          "Error appeared.",
+        ),
+      ));
+}
+
+
+class FacultyActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: new HomePage(),
+      body: new FacultyActivityPage(),
+      /*builder: (BuildContext context, Widget widget) {
+        ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          return buildError(context, errorDetails);
+        };
+        return widget;
+      },*/
     );
   }
 }
 
-class HomePage extends StatefulWidget {
+class FacultyActivityPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _FacultyActivityPageState createState() => _FacultyActivityPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _FacultyActivityPageState extends State<FacultyActivityPage>
+    with TickerProviderStateMixin {
   SharedPreferences prf;
   String _username;
-  Color backgroundColor;
+  int selectedIndex = 0;
+  int id;
+  List<NavigationItem> items = [
+    NavigationItem(Icon(Icons.home), Text("Home"), Colors.deepPurpleAccent),
+    NavigationItem(
+        Icon(Icons.account_circle), Text("Profile"), Colors.purpleAccent),
+    NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
+    NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
+  ];
   TextEditingController _fName = new TextEditingController();
+  TextEditingController _lName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
+
+
   bool _fValidate = false;
+  bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
-
-  void initState() {
-    super.initState();
-    user != null ? _username = user : setUser();
-  }
-
-  void setUser() async {
-    prf = await SharedPreferences.getInstance();
-    _username = prf.get("Username");
-    //Fluttertoast.showToast(msg: prf.get("Username"));
-  }
+  Color backgroundColor;
+  bool showEmoji;
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: CommonAppBar("EcoleAmi"),
+      appBar: CommonAppBar("Ecoleami"),
       drawer: new Drawer(
         elevation: 100.0,
         child: new ListView(
           padding: EdgeInsets.only(top: 25.0),
           children: <Widget>[
             new UserAccountsDrawerHeader(
-              margin: EdgeInsets.only(bottom: 20.0),
               decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: Colors.black45,
                   borderRadius: BorderRadius.circular(5.0)),
+              margin: EdgeInsets.only(bottom: 20.0),
               accountName: StreamBuilder(
                 stream: Firestore.instance
-                    .collection("admin_details")
+                    .collection("faculty_details")
                     .document(_username)
                     .snapshots(),
                 // ignore: missing_return
                 builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.none) {
+                    return Text("Loading...");
+                  }
                   if (snapshot.hasData) {
+                    while (_username == null || snapshot.data == null) {
+                      Future.delayed(Duration(seconds: 1));
+                      print(_username);
+                    }
                     var username = snapshot.data;
-                    return Text(
-                        username['first_name'] + " " + username['last_name']);
+                    return Text(username['first_name'] +
+                        " " +
+                        username['last_name']);
                   }
-                  else{
-                    return CircularProgressIndicator();
-                  }
+                  return Text("Loading...");
                 },
               ),
               accountEmail: StreamBuilder(
                 stream: Firestore.instance
-                    .collection("admin_details")
+                    .collection("faculty_details")
                     .document(_username)
                     .snapshots(),
                 // ignore: missing_return
                 builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.none) {
+                    setUser();
+                    return CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                    );
+                  }
                   if (snapshot.hasData) {
+                    while (_username == null) {
+                      Future.delayed(Duration(seconds: 1));
+                    }
                     var username = snapshot.data;
                     return Text(username['email']);
                   }
-                  else{
-                    return Text("Loading");
-                  }
+                  return CircularProgressIndicator();
                 },
               ),
               currentAccountPicture: CircleAvatar(
@@ -107,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                     ? Colors.blue
                     : Colors.white,
                 child: Text(
-                  "A",
+                  "F",
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),
@@ -128,31 +163,28 @@ class _HomePageState extends State<HomePage> {
             ),
             new ListTile(
               title: new Text(
-                "Manage Faculty",
+                "Attendance",
                 style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.account_circle),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                    new ManageVerification("Faculty")));
+              trailing: new Icon(Icons.arrow_forward_ios),
+              onTap: (){
+//                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => TakeAttendance()));
               },
             ),
             new ListTile(
               title: new Text(
-                "Generate Detain List",
+                "Dummy 2",
                 style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.access_time),
+              trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
             new ListTile(
               title: new Text(
-                "Enter Examination Marks",
+                "Dummy 3",
                 style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.transit_enterexit),
+              trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
             ),
           ],
@@ -170,21 +202,38 @@ class _HomePageState extends State<HomePage> {
           : null,
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.white
+          ? Colors.grey
           : selectedIndex == 1
           ? Colors.red
-          : selectedIndex == 3 ? Colors.black : Colors.white,
+          : selectedIndex == 2
+          ? Colors.white
+          : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
 
-  int selectedIndex = 0;
-  List<NavigationItem> items = [
-    NavigationItem(Icon(Icons.home), Text("Home"), Colors.deepPurpleAccent),
-    NavigationItem(
-        Icon(Icons.account_circle), Text("Profile"), Colors.purpleAccent),
-    NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
-    NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
-  ];
+  void _onItemTapped1() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Under Construction!"),
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
+            content: new Text(
+                "This Part of Application is Still Under Construction"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text("Close"))
+            ],
+          );
+        });
+  }
+
+  // ignore: non_constant_identifier_names
   Widget BottomNavBar() {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -255,40 +304,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List _setCarouselImages(int len) {
-    List data = new List<Widget>();
-    for (int i = 0; i < len; i++) {
-      if (notice_board_data[i]["expiry_date"]
-          .toDate()
-          .toString()
-          .compareTo(DateTime.now().toString()) <
-          1) {
-        continue;
-      }
-      data.add(CachedNetworkImage(
-          imageUrl: notice_board_data[i]["url"],
-          placeholder: (context, url) =>
-              Center(child: CircularProgressIndicator()),
-          fit: BoxFit.fill,
-          errorWidget: (context, url, error) => new Icon(Icons.error)));
-    }
-    if (data.isEmpty) {
-      for (int i = 0; i < len; i++) {
-        data.add(CachedNetworkImage(
-            imageUrl: notice_board_data[i]["url"],
-            placeholder: (context, url) =>
-                Center(child: CircularProgressIndicator()),
-            fit: BoxFit.fill,
-            errorWidget: (context, url, error) => new Icon(Icons.error)));
-      }
-      return data;
-    } else {
-      return data;
-    }
-  }
-
-  bool isEmpty = false;
-  var notice_board_data;
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
@@ -298,44 +313,37 @@ class _HomePageState extends State<HomePage> {
           height: 180.0,
           width: 300.0,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
-          child: StreamBuilder(
-              stream: Firestore.instance
-                  .collection("e-notice-board")
-                  .orderBy("timestamp", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot != null && snapshot.hasData) {
-                  notice_board_data = snapshot.data.documents;
-                  int length = notice_board_data.length == 1
-                      ? notice_board_data.length
-                      : (notice_board_data.length / 2).toInt();
-                  print(length);
-                  return Container(
-                    child: Carousel(
-                      dotColor: Colors.grey,
-                      borderRadius: true,
-                      radius: Radius.circular(20.0),
-                      autoplayDuration: Duration(seconds: 5),
-                      autoplay: true,
-                      animationCurve: Curves.easeIn,
-                      animationDuration: Duration(milliseconds: 1000),
-                      dotSize: 6.0,
-                      dotIncreasedColor: Colors.purple,
-                      dotBgColor: Colors.transparent,
-                      dotPosition: DotPosition.bottomCenter,
-                      dotVerticalPadding: 10.0,
-                      showIndicator: true,
-                      indicatorBgPadding: 7.0,
-                      onImageTap: (index) {
-                        print(index);
-                      },
-                      images: _setCarouselImages(length),
-                    ),
-                  );
-                } else {
-                  return CircularProgressIndicator();
-                }
-              }),
+          child: Carousel(
+            dotColor: Colors.grey,
+            borderRadius: true,
+            radius: Radius.circular(50.0),
+            autoplayDuration: Duration(seconds: 5),
+            autoplay: true,
+            animationCurve: Curves.easeIn,
+            animationDuration: Duration(milliseconds: 1000),
+            dotSize: 6.0,
+            dotIncreasedColor: Colors.purple,
+            dotBgColor: Colors.transparent,
+            dotPosition: DotPosition.bottomCenter,
+            dotVerticalPadding: 10.0,
+            showIndicator: true,
+            indicatorBgPadding: 7.0,
+            onImageTap: (index) {
+              print(index);
+            },
+            images: [
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                  "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
+            ],
+          ),
         ),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -351,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   "Events",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -360,75 +368,38 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List events_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"].compareTo("Event") == 0) {
-                            if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            }else {
-                              events_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return events_notice.isEmpty
-                            ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
-                            : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: events_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: events_notice[index]
-                                      ['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        events_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -447,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   "College Schedule",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -456,78 +427,38 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List schedule_notice = new List<DocumentSnapshot>();
-
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                              .compareTo("College Schedule") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            }else {
-                              schedule_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return schedule_notice.isEmpty
-                            ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
-                            : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: schedule_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: schedule_notice[index]
-                                      ['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        schedule_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -546,7 +477,7 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   "Fee Payment",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -555,76 +486,38 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List fee_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                              .compareTo("Fee Payment") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            }else {
-                              fee_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return fee_notice.isEmpty
-                            ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
-                            : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: fee_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: fee_notice[index]['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        fee_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                              'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -633,101 +526,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void setProfile() async {
+    Firestore.instance
+        .collection("faculty_details")
+        .document(_username)
+        .get()
+        .then((document) {
+      _fName.text = document['first_name'];
+      _lName.text = document['last_name'];
+      _eMail.text = document['email'];
+      _phone.text = document['phone_number'];
+    });
+  }
 
-  /*Widget _buildBodyProfile() {
-    return SingleChildScrollView(
-      child: Container(
-        margin: EdgeInsets.only(top: 20.0),
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(100.0),
-              child: FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
-              child: Column(
-                children: <Widget>[
-                  TextFormField(
-                    enabled: false,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Name",
-                        *//* errorText: _emailValidate
-                            ? 'Please enter Email Address'
-                            : null,*//*
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.email),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  TextFormField(
-                    enabled: false,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Email Address",
-                        *//* errorText: _emailValidate
-                            ? 'Please enter Email Address'
-                            : null,*//*
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.email),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  TextFormField(
-                    //controller: _eMail,
-                    enabled: false,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Phone Number",
-                        *//* errorText: _emailValidate
-                            ? 'Please enter Email Address'
-                            : null,*//*
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white70,
-                        ),
-                        prefixIcon: new Icon(Icons.email),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }*/
   Widget _buildBodyProfile() {
     return SingleChildScrollView(
       child: Container(
@@ -752,7 +563,7 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("admin_details")
+                          .collection("faculty_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -761,7 +572,7 @@ class _HomePageState extends State<HomePage> {
                         }
                         if (snapshot.hasData) {
                           var document = snapshot.data;
-                          _fName.text = document['first_name']+" "+document['last_name'];
+                          _fName.text = document['first_name'];
                         }
                         return new TextField(
                           controller: _fName,
@@ -787,7 +598,42 @@ class _HomePageState extends State<HomePage> {
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("admin_details")
+                          .collection("faculty_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _lName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _lName.text = document['last_name'];
+                        }
+                        return new TextField(
+                          controller: _lName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                              _lValidate ? 'Please enter Last Name' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("faculty_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -823,7 +669,7 @@ class _HomePageState extends State<HomePage> {
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("admin_details")
+                          .collection("faculty_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -841,6 +687,7 @@ class _HomePageState extends State<HomePage> {
                           cursorRadius: Radius.circular(50.0),
                           cursorWidth: 3.0,
                           enabled: false,
+                          maxLength: 10,
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText: _phoneValidate
@@ -864,7 +711,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Widget _buildBodySettings() {
     return Container(
@@ -922,41 +768,31 @@ class _HomePageState extends State<HomePage> {
                 showGeneralDialog(
                     barrierColor: Colors.black.withOpacity(0.5),
                     transitionBuilder: (context, a1, a2, widget) {
-                      final curvedValue = Curves.easeInOutBack.transform(
-                          a1.value) - 1.0;
+                      final curvedValue = Curves.easeInOutBack.transform(a1.value) -   1.0;
                       return Transform(
-                        transform: Matrix4.translationValues(
-                            0.0, curvedValue * 200, 0.0),
+                        transform: Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
                         child: Opacity(
                           opacity: a1.value,
                           child: AlertDialog(
                             shape: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16.0)),
-                            title: Text('Caution!', style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25),),
+                            title: Text('Caution!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 25),),
                             content: Text('Are You Sure You Want To Logout?'),
                             actions: <Widget>[
                               new FlatButton(
-                                  onPressed: () {
+                                  onPressed:  () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: new Text(
-                                    "Cancel", style: TextStyle(fontSize: 18),)),
+                                  child: new Text("Cancel", style: TextStyle(fontSize: 18),)),
                               new FlatButton(
                                   onPressed: () async {
-                                    SharedPreferences prf = await SharedPreferences
-                                        .getInstance();
+                                    SharedPreferences prf = await SharedPreferences.getInstance();
                                     prf.setBool("isLoggedIn", false);
                                     Navigator.of(context).pop();
-                                    Navigator.of(context).pushReplacement(
-                                        new MaterialPageRoute(
-                                            builder: (
-                                                BuildContext context) => new MainScreen()));
+                                    Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                                        builder: (BuildContext context) => new MainScreen()));
                                   },
-                                  child: new Text("Logout", style: TextStyle(
-                                      color: Colors.red, fontSize: 18),))
+                                  child: new Text("Logout", style: TextStyle(color: Colors.red, fontSize: 18),))
                             ],
                           ),
                         ),
@@ -966,12 +802,15 @@ class _HomePageState extends State<HomePage> {
                     barrierDismissible: true,
                     barrierLabel: '',
                     context: context,
+                    // ignore: missing_return
                     pageBuilder: (context, animation1, animation2) {});
               })
         ],
       ),
     );
   }
+
+  // ignore: missing_return
   Widget callPage(index) {
     switch (index) {
       case 0:
@@ -989,27 +828,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _onItemTapped1() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Under Construction!"),
-            elevation: 20.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            content: new Text(
-                "This Part of Application is Still Under Construction"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text("Close"))
-            ],
-          );
-        });
+  @override
+  void initState() {
+    super.initState();
+    user != null ? _username = user : setUser();
+    setProfile();
+    showEmoji = false;
   }
+
+  void setUser() async {
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+  }
+
 }
 
 class _buildBodyQnA extends StatefulWidget {
@@ -1019,9 +850,9 @@ class _buildBodyQnA extends StatefulWidget {
 
 class __buildBodyQnAState extends State<_buildBodyQnA>
     with SingleTickerProviderStateMixin {
+
   TabController _tabController;
   var _image;
-  var userDocument;
   int index;
   String fullName;
   var msgItems;
@@ -1040,9 +871,7 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
   }
 
   Future _setProfile() async {
-    Firestore.instance
-        .collection("admin_details")
-        .document(_username)
+    Firestore.instance.collection("faculty_details").document(_username)
         .get()
         .then((document) {
       print(document['first_name'] + " " + document['last_name']);
@@ -1061,6 +890,14 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
           labelColor: Colors.redAccent,
           unselectedLabelColor: Colors.white,
           indicatorSize: TabBarIndicatorSize.tab,
+         /* indicator: ShapeDecoration(
+            color: Colors.white,
+            shape: BeveledRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(
+                  color: Colors.redAccent,
+                )),
+          ),*/
           indicator: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: Colors.white),
@@ -1099,10 +936,7 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                 _showBottom(index.toString(), "student");
               },
             ),
-            title: Text(
-              "Semester " + index.toString(),
-              style: TextStyle(fontSize: 17),
-            ),
+            title: Text("Semester " + index.toString()),
             subtitle: StreamBuilder(
                 stream: Firestore.instance
                     .collection('QnA')
@@ -1113,9 +947,6 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                 builder: (context, snapshot) {
                   if (snapshot != null && snapshot.hasData) {
                     msgItems = snapshot.data.documents;
-                  }
-                  while(snapshot == null){
-
                   }
                   String name = msgItems[0]['full_name'] == fullName ? "" : msgItems[0]['full_name'] + ": ";
                   String message = msgItems[0]['message'];
@@ -1296,7 +1127,8 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       await uploadTask.onComplete;
       print('File Uploaded');
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => Student_Semester(sem)));
+          builder: (BuildContext context) =>
+              Student_Semester(sem)));
       await storageReference.getDownloadURL().then((fileURL) {
         print(fileURL);
         if (fileURL == null) {
@@ -1318,16 +1150,34 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
         'userid': _username,
         'message': _uploadedFileURL,
         'timestamp': DateTime.now(),
-        'date': DateTime.now().day.toString() +
+        'date': DateTime
+            .now()
+            .day
+            .toString() +
             "/" +
-            DateTime.now().month.toString() +
+            DateTime
+                .now()
+                .month
+                .toString() +
             "/" +
-            DateTime.now().year.toString(),
-        'time': DateTime.now().hour.toString() +
+            DateTime
+                .now()
+                .year
+                .toString(),
+        'time': DateTime
+            .now()
+            .hour
+            .toString() +
             ":" +
-            DateTime.now().minute.toString() +
+            DateTime
+                .now()
+                .minute
+                .toString() +
             ":" +
-            DateTime.now().second.toString(),
+            DateTime
+                .now()
+                .second
+                .toString(),
         'type': _type
       });
     }
@@ -1343,6 +1193,7 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       });
     });
     if (_image != null) {
+
       print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
@@ -1357,10 +1208,12 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       print('File Uploaded');
       if (role == "student") {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => Student_Semester(sem)));
+            builder: (BuildContext context) =>
+                Student_Semester(sem)));
       } else if (role == "parents") {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => Parents_Semester(sem)));
+            builder: (BuildContext context) =>
+                Parents_Semester(sem)));
       }
       await storageReference.getDownloadURL().then((fileURL) {
         print(fileURL);
@@ -1398,6 +1251,7 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
     }
   }
 }
+
 
 class Student_Semester extends StatefulWidget {
   final String sem;
@@ -1425,9 +1279,7 @@ class _Student_SemesterState extends State<Student_Semester> {
   }
 
   Future _setProfile() async {
-    Firestore.instance
-        .collection("admin_details")
-        .document(_username)
+    Firestore.instance.collection("faculty_details").document(_username)
         .get()
         .then((document) {
       print(document['first_name'] + " " + document['last_name']);
@@ -1480,8 +1332,7 @@ class _Student_SemesterState extends State<Student_Semester> {
                     return ListView.builder(
                       itemBuilder: (context, index) {
                         String senderUsername = msgItems[index]['userid'];
-                        String senderFullName =
-                        msgItems[index]['full_name'];
+                        String senderFullName = msgItems[index]['full_name'];
                         int type = msgItems[index]['type'];
                         return Column(
                           crossAxisAlignment:
@@ -1603,6 +1454,7 @@ class _Student_SemesterState extends State<Student_Semester> {
                                 SizedBox(width: 16),
                                 Expanded(
                                     child: TextFormField(
+                                      autofocus: true,
                                       onChanged: (value) {
                                         if (value.toString().isEmpty) {
                                           setState(() {
@@ -1636,7 +1488,7 @@ class _Student_SemesterState extends State<Student_Semester> {
                                       ),
                                     )),
                                 GestureDetector(
-                                  onTap: () => sendCameraImage(),
+                                  onTap: ()=> sendCameraImage(),
                                   child: Icon(Icons.camera_alt,
                                       color: Theme.of(context).hintColor),
                                 ),
@@ -1658,7 +1510,7 @@ class _Student_SemesterState extends State<Student_Semester> {
                       width: 5.0,
                     ),
                     AnimatedContainer(
-                      duration: Duration(seconds: 1),
+                      duration:  Duration(seconds: 1),
                       curve: Curves.fastOutSlowIn,
                       margin: EdgeInsets.only(top: 15),
                       child: GestureDetector(
@@ -1669,6 +1521,7 @@ class _Student_SemesterState extends State<Student_Semester> {
                             _msg.clear();
                           });
                         },
+
                         child: msgEmpty
                             ? Container()
                             : CircleAvatar(
@@ -1743,6 +1596,7 @@ class _Student_SemesterState extends State<Student_Semester> {
       });
     }
   }
+
 
   void sendImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -1857,21 +1711,19 @@ class _Parents_SemesterState extends State<Parents_Semester> {
     super.initState();
   }
 
-  void setUser() async {
-    prf = await SharedPreferences.getInstance();
-    _username = prf.get("Username");
-    //Fluttertoast.showToast(msg: prf.get("Username"));
-  }
-
   Future _setProfile() async {
-    Firestore.instance
-        .collection("admin_details")
-        .document(_username)
+    Firestore.instance.collection("faculty_details").document(_username)
         .get()
         .then((document) {
       print(document['first_name'] + " " + document['last_name']);
       fullName = document['first_name'] + " " + document['last_name'];
     });
+  }
+
+  void setUser() async {
+    prf = await SharedPreferences.getInstance();
+    _username = prf.get("Username");
+    //Fluttertoast.showToast(msg: prf.get("Username"));
   }
 
   @override
@@ -1884,7 +1736,6 @@ class _Parents_SemesterState extends State<Parents_Semester> {
   }
 
   TextEditingController _msg = new TextEditingController();
-
   int _type;
   var _image;
   bool msgEmpty = true;
@@ -1914,8 +1765,7 @@ class _Parents_SemesterState extends State<Parents_Semester> {
                     return ListView.builder(
                       itemBuilder: (context, index) {
                         String senderUsername = msgItems[index]['userid'];
-                        String senderFullName =
-                        msgItems[index]['full_name'];
+                        String senderFullName = msgItems[index]['full_name'];
                         int type = msgItems[index]['type'];
                         return Column(
                           crossAxisAlignment:
@@ -2090,7 +1940,7 @@ class _Parents_SemesterState extends State<Parents_Semester> {
                       width: 5.0,
                     ),
                     AnimatedContainer(
-                      duration: Duration(seconds: 1),
+                      duration:  Duration(seconds: 1),
                       curve: Curves.fastOutSlowIn,
                       margin: EdgeInsets.only(top: 15),
                       child: GestureDetector(
@@ -2101,6 +1951,7 @@ class _Parents_SemesterState extends State<Parents_Semester> {
                             _msg.clear();
                           });
                         },
+
                         child: msgEmpty
                             ? Container()
                             : CircleAvatar(
@@ -2175,6 +2026,7 @@ class _Parents_SemesterState extends State<Parents_Semester> {
       });
     }
   }
+
 
   void sendImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);

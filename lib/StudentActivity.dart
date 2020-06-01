@@ -189,12 +189,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.grey
+          ? Colors.white
           : selectedIndex == 1
               ? Colors.red
               : selectedIndex == 2
                   ? Colors.greenAccent
-                  : selectedIndex == 3 ? Colors.black : Colors.grey,
+                  : selectedIndex == 3 ? Colors.black : Colors.white,
     );
   }
 
@@ -290,6 +290,40 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
+  List _setCarouselImages(int len) {
+    List data = new List<Widget>();
+    for (int i = 0; i < len; i++) {
+      if (notice_board_data[i]["expiry_date"]
+          .toDate()
+          .toString()
+          .compareTo(DateTime.now().toString()) <
+          1) {
+        continue;
+      }
+      data.add(CachedNetworkImage(
+          imageUrl: notice_board_data[i]["url"],
+          placeholder: (context, url) =>
+              Center(child: CircularProgressIndicator()),
+          fit: BoxFit.fill,
+          errorWidget: (context, url, error) => new Icon(Icons.error)));
+    }
+    if (data.isEmpty) {
+      for (int i = 0; i < len; i++) {
+        data.add(CachedNetworkImage(
+            imageUrl: notice_board_data[i]["url"],
+            placeholder: (context, url) =>
+                Center(child: CircularProgressIndicator()),
+            fit: BoxFit.fill,
+            errorWidget: (context, url, error) => new Icon(Icons.error)));
+      }
+      return data;
+    } else {
+      return data;
+    }
+  }
+
+  bool isEmpty = false;
+  var notice_board_data;
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
@@ -299,37 +333,44 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           height: 180.0,
           width: 300.0,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
-          child: Carousel(
-            dotColor: Colors.grey,
-            borderRadius: true,
-            radius: Radius.circular(50.0),
-            autoplayDuration: Duration(seconds: 5),
-            autoplay: true,
-            animationCurve: Curves.easeIn,
-            animationDuration: Duration(milliseconds: 1000),
-            dotSize: 6.0,
-            dotIncreasedColor: Colors.purple,
-            dotBgColor: Colors.transparent,
-            dotPosition: DotPosition.bottomCenter,
-            dotVerticalPadding: 10.0,
-            showIndicator: true,
-            indicatorBgPadding: 7.0,
-            onImageTap: (index) {
-              print(index);
-            },
-            images: [
-              FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  fit: BoxFit.fill,
-                  image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-              FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  fit: BoxFit.fill,
-                  image:
-                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
-            ],
-          ),
+          child: StreamBuilder(
+              stream: Firestore.instance
+                  .collection("e-notice-board")
+                  .orderBy("timestamp", descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot != null && snapshot.hasData) {
+                  notice_board_data = snapshot.data.documents;
+                  int length = notice_board_data.length == 1
+                      ? notice_board_data.length
+                      : (notice_board_data.length / 2).toInt();
+                  print(length);
+                  return Container(
+                    child: Carousel(
+                      dotColor: Colors.grey,
+                      borderRadius: true,
+                      radius: Radius.circular(20.0),
+                      autoplayDuration: Duration(seconds: 5),
+                      autoplay: true,
+                      animationCurve: Curves.easeIn,
+                      animationDuration: Duration(milliseconds: 1000),
+                      dotSize: 6.0,
+                      dotIncreasedColor: Colors.purple,
+                      dotBgColor: Colors.transparent,
+                      dotPosition: DotPosition.bottomCenter,
+                      dotVerticalPadding: 10.0,
+                      showIndicator: true,
+                      indicatorBgPadding: 7.0,
+                      onImageTap: (index) {
+                        print(index);
+                      },
+                      images: _setCarouselImages(length),
+                    ),
+                  );
+                } else {
+                  return CircularProgressIndicator();
+                }
+              }),
         ),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -345,7 +386,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Events",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -354,38 +395,75 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              image:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: Firestore.instance
+                        .collection("e-notice-board")
+                        .orderBy("timestamp", descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot != null && snapshot.hasData) {
+                        var notice_board = snapshot.data.documents;
+                        List events_notice = new List<DocumentSnapshot>();
+                        for (int i = 0; i < notice_board.length; i++) {
+                          if (notice_board[i]["type"].compareTo("Event") == 0) {
+                            if (notice_board[i]["expiry_date"]
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
+                                1) {
+                              continue;
+                            }else {
+                              events_notice.add(notice_board[i]);
+                            }
+                          }
+                        }
+                        return events_notice.isEmpty
+                            ? Center(
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
+                            : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: events_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Card(
+                              color: Colors.transparent,
+                              clipBehavior: Clip.antiAlias,
+                              semanticContainer: true,
+                              borderOnForeground: true,
+                              child: Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: <Widget>[
+                                  CachedNetworkImage(
+                                      placeholder: (context, url) => Center(
+                                          child:
+                                          CircularProgressIndicator()),
+                                      width: 170.0,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      imageUrl: events_notice[index]
+                                      ['url']),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text(
+                                        events_notice[index]['title'],
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14.0,
+                                            letterSpacing: 3.0)),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    }),
               ),
             ],
           ),
@@ -404,7 +482,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "College Schedule",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -413,39 +491,78 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Center(child: CircularProgressIndicator()),
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              imageUrl:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: Firestore.instance
+                        .collection("e-notice-board")
+                        .orderBy("timestamp", descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot != null && snapshot.hasData) {
+                        var notice_board = snapshot.data.documents;
+                        List schedule_notice = new List<DocumentSnapshot>();
+
+                        for (int i = 0; i < notice_board.length; i++) {
+                          if (notice_board[i]["type"]
+                              .compareTo("College Schedule") ==
+                              0) {
+                            if (notice_board[i]["expiry_date"]
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
+                                1) {
+                              continue;
+                            }else {
+                              schedule_notice.add(notice_board[i]);
+                            }
+                          }
+                        }
+                        return schedule_notice.isEmpty
+                            ? Center(
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
+                            : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: schedule_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Card(
+                              color: Colors.transparent,
+                              clipBehavior: Clip.antiAlias,
+                              semanticContainer: true,
+                              borderOnForeground: true,
+                              child: Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: <Widget>[
+                                  CachedNetworkImage(
+                                      placeholder: (context, url) => Center(
+                                          child:
+                                          CircularProgressIndicator()),
+                                      width: 170.0,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      imageUrl: schedule_notice[index]
+                                      ['url']),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text(
+                                        schedule_notice[index]['title'],
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14.0,
+                                            letterSpacing: 3.0)),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    }),
               ),
             ],
           ),
@@ -464,7 +581,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Fee Payment",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -473,38 +590,76 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              image:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: Firestore.instance
+                        .collection("e-notice-board")
+                        .orderBy("timestamp", descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot != null && snapshot.hasData) {
+                        var notice_board = snapshot.data.documents;
+                        List fee_notice = new List<DocumentSnapshot>();
+                        for (int i = 0; i < notice_board.length; i++) {
+                          if (notice_board[i]["type"]
+                              .compareTo("Fee Payment") ==
+                              0) {
+                            if (notice_board[i]["expiry_date"]
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
+                                1) {
+                              continue;
+                            }else {
+                              fee_notice.add(notice_board[i]);
+                            }
+                          }
+                        }
+                        return fee_notice.isEmpty
+                            ? Center(
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
+                            : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: fee_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Card(
+                              color: Colors.transparent,
+                              clipBehavior: Clip.antiAlias,
+                              semanticContainer: true,
+                              borderOnForeground: true,
+                              child: Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: <Widget>[
+                                  CachedNetworkImage(
+                                      placeholder: (context, url) => Center(
+                                          child:
+                                          CircularProgressIndicator()),
+                                      width: 170.0,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      imageUrl: fee_notice[index]['url']),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text(
+                                        fee_notice[index]['title'],
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14.0,
+                                            letterSpacing: 3.0)),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    }),
               ),
             ],
           ),
@@ -512,6 +667,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       ],
     );
   }
+
 
   void setProfile() async {
     Firestore.instance

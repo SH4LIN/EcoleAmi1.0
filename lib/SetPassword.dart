@@ -15,7 +15,6 @@ class SetPassword extends StatefulWidget {
 }
 
 class _SetPasswordState extends State<SetPassword> {
-
   SharedPreferences prf;
 
   TextEditingController _pass = new TextEditingController();
@@ -25,6 +24,7 @@ class _SetPasswordState extends State<SetPassword> {
   TextEditingController _enroll = new TextEditingController();
 
   bool _obscureText = true;
+  bool _obscureText1 = true;
   bool _passValidate = false;
   bool _cPassValidate = false;
 
@@ -33,13 +33,13 @@ class _SetPasswordState extends State<SetPassword> {
   String _checkPass;
   String _role;
   String _enrCheck = '------------';
+  String errorMessage;
+  String errorMessage2;
 
   @override
   void initState() {
     super.initState();
     myFocusNode = FocusNode();
-   /* print("UserRole: " + userRole);
-    print("UserName: " + registeredUser);*/
     registeredUser != null ? _username = registeredUser : setUser();
     userRole != null ? _role = userRole : setUser();
     print(_role);
@@ -64,7 +64,7 @@ class _SetPasswordState extends State<SetPassword> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.white,
       appBar: CommonAppBar("Set Password"),
       body: new Container(
         child: new Center(
@@ -72,7 +72,7 @@ class _SetPasswordState extends State<SetPassword> {
             children: <Widget>[
               new Container(
                 padding:
-                    const EdgeInsets.only(left: 24.0, right: 25.0, top: 25.0),
+                    const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
                 child: new Form(
                     child: Card(
                   elevation: 30.0,
@@ -98,8 +98,11 @@ class _SetPasswordState extends State<SetPassword> {
                                   }
                                   if (snapshot.hasData) {
                                     var document = snapshot.data;
-                                    _fullName.text =
-                                        document['first_name'] + " " + document['middle_name'] + " " + document['last_name'];
+                                    _fullName.text = document['first_name'] +
+                                        " " +
+                                        document['middle_name'] +
+                                        " " +
+                                        document['last_name'];
                                   }
                                   return new TextField(
                                     controller: _fullName,
@@ -113,12 +116,11 @@ class _SetPasswordState extends State<SetPassword> {
                                           fontSize: 15.0,
                                           color: Colors.white70,
                                         ),
-                                        prefixIcon:
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom: 15.0),
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 15.0),
                                           child: Icon(Icons.person),
-                                        )
-                                        ),
+                                        )),
                                   );
                                 }),
                             new Padding(
@@ -135,27 +137,25 @@ class _SetPasswordState extends State<SetPassword> {
                                   }
                                   if (snapshot.hasData) {
                                     var document = snapshot.data;
-                                    _email.text =
-                                        document['email'];
+                                    _email.text = document['email'];
                                   }
                                   return new TextField(
                                     controller: _email,
                                     enabled: false,
                                     decoration: new InputDecoration(
                                         contentPadding:
-                                        const EdgeInsets.symmetric(
-                                            vertical: 5.0),
+                                            const EdgeInsets.symmetric(
+                                                vertical: 5.0),
                                         hintText: "Email",
                                         hintStyle: new TextStyle(
                                           fontSize: 15.0,
                                           color: Colors.white70,
                                         ),
-                                        prefixIcon:
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom: 15.0),
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 15.0),
                                           child: Icon(Icons.email),
-                                        )
-                                        ),
+                                        )),
                                   );
                                 }),
                             new Padding(
@@ -192,12 +192,11 @@ class _SetPasswordState extends State<SetPassword> {
                                                 fontSize: 15.0,
                                                 color: Colors.white70,
                                               ),
-                                              prefixIcon:
-                                                  Padding(
-                                                      padding: const EdgeInsets.only(bottom: 15.0),
-                                                      child: Icon(Icons.person),
-                                                  )
-                                              ),
+                                              prefixIcon: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 15.0),
+                                                child: Icon(Icons.person),
+                                              )),
                                         );
                                 }),
                             /*: new Container();*/
@@ -209,8 +208,7 @@ class _SetPasswordState extends State<SetPassword> {
                 )),
               ),
               new Container(
-                  padding: const EdgeInsets.only(
-                      left: 24.0, right: 25.0, top: 50.0),
+                  padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
                   child: new Form(
                       child: new Card(
                           elevation: 30.0,
@@ -220,6 +218,9 @@ class _SetPasswordState extends State<SetPassword> {
                               padding: const EdgeInsets.all(15.0),
                               child: new Column(children: <Widget>[
                                 new TextField(
+                                    onChanged: (value) {
+                                      validateStructure(value);
+                                    },
                                   controller: _pass,
                                   obscureText: _obscureText,
                                   focusNode: myFocusNode,
@@ -230,7 +231,7 @@ class _SetPasswordState extends State<SetPassword> {
                                   decoration: new InputDecoration(
                                       hintText: "Set Password",
                                       errorText: _passValidate
-                                          ? 'This field can not be empty'
+                                          ? errorMessage
                                           : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
@@ -258,13 +259,13 @@ class _SetPasswordState extends State<SetPassword> {
                                 new TextField(
                                   controller: _confirmPass,
                                   cursorColor: Colors.purple,
-                                  obscureText: _obscureText,
+                                  obscureText: _obscureText1,
                                   cursorRadius: Radius.circular(50.0),
                                   cursorWidth: 3.0,
                                   decoration: new InputDecoration(
                                       hintText: "Confirm Password",
                                       errorText: _cPassValidate
-                                          ? 'This field can not be empty'
+                                          ? errorMessage2
                                           : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
@@ -272,12 +273,12 @@ class _SetPasswordState extends State<SetPassword> {
                                       ),
                                       prefixIcon: new Icon(Icons.lock),
                                       suffixIcon: new IconButton(
-                                        icon: new Icon(_obscureText
+                                        icon: new Icon(_obscureText1
                                             ? Icons.visibility_off
                                             : Icons.visibility),
                                         onPressed: () {
                                           setState(() {
-                                            _obscureText = !_obscureText;
+                                            _obscureText1 = !_obscureText1;
                                           });
                                         },
                                       ),
@@ -301,26 +302,34 @@ class _SetPasswordState extends State<SetPassword> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      if (_pass.text.isEmpty) {
-                                        _passValidate = true;
-                                      } else {
-                                        _passValidate = false;
-                                      }
-                                      if (_confirmPass.text.isEmpty) {
-                                        _cPassValidate = true;
-                                      } else {
-                                        _cPassValidate = false;
-                                      }
-                                      if (_passValidate == false &&
-                                          _cPassValidate == false) {
-                                        if (_pass.text != _confirmPass.text) {
-                                          Fluttertoast.showToast(
-                                              msg: "Password does not match",
-                                              gravity: ToastGravity.CENTER,
-                                              backgroundColor: Colors.black);
-                                          myFocusNode.requestFocus();
+                                      if (_passValidate == false) {
+                                        print(_passValidate);
+                                        if (_pass.text.isEmpty) {
+                                          _passValidate = true;
+                                          errorMessage = "Password can not be empty";
                                         } else {
-                                          savePassword();
+                                          _passValidate = false;
+                                        }
+                                        if (_confirmPass.text.isEmpty) {
+                                          _cPassValidate = true;
+                                          errorMessage2 = "Password does not match";
+                                        } else {
+                                          _cPassValidate = false;
+                                        }
+                                        if (_passValidate == false &&
+                                            _cPassValidate == false) {
+                                          if (_pass.text
+                                              .compareTo(_confirmPass.text) !=
+                                              0 ) {
+                                            _cPassValidate = true;
+                                            _confirmPass.clear();
+                                            errorMessage2 =
+                                            "Password does not match";
+                                          } else {
+                                            _passValidate = false;
+                                            _cPassValidate = false;
+                                            savePassword();
+                                          }
                                         }
                                       }
                                     });
@@ -335,6 +344,18 @@ class _SetPasswordState extends State<SetPassword> {
     );
   }
 
+  bool validateStructure(String value) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regExp = new RegExp(pattern);
+    setState(() {
+      regExp.hasMatch(value) ? _passValidate = false : _passValidate = true;
+      errorMessage = "Please set a Strong Password";
+      print(_passValidate);
+    });
+    return regExp.hasMatch(value);
+  }
+
   Future<void> savePassword() async {
     try {
       Firestore.instance
@@ -344,7 +365,7 @@ class _SetPasswordState extends State<SetPassword> {
         'password': _pass.text,
       });
       SharedPreferences prf = await SharedPreferences.getInstance();
-      prf.setString("rUsername", "");
+      prf.setString("Username", "");
       Fluttertoast.showToast(
           msg: "Password saved",
           gravity: ToastGravity.CENTER,

@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart'; // For Image Picker
 import 'package:path/path.dart' as Path;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class AddEvent extends StatefulWidget {
   @override
@@ -28,10 +29,12 @@ class _AddEventState extends State<AddEvent> {
 
   TextEditingController _title = new TextEditingController();
   TextEditingController _description = new TextEditingController();
+  TextEditingController _date = new TextEditingController();
 
   bool _titleValidate = false;
   bool _desValidate = false;
   bool _dateValidate = false;
+  bool _eventTypeValidate = false;
 
   void dispose() {
     super.dispose();
@@ -51,17 +54,13 @@ class _AddEventState extends State<AddEvent> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: CommonAppBar("Add Event"),
-      backgroundColor: Colors.grey,
       body: new Container(
         child: new Center(
           child: new ListView(
             children: <Widget>[
               new Container(
                 child: new Form(
-                  child: new Card(
-                    elevation: 30.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
+
                     child: Container(
                       padding: const EdgeInsets.all(15.0),
                       child: new Column(
@@ -75,9 +74,9 @@ class _AddEventState extends State<AddEvent> {
                             decoration: new InputDecoration(
                                 prefixIcon: new Icon(Icons.title),
                                 labelText: "Title",
-                                /*errorText: _titleValidate
+                                errorText: _titleValidate
                                     ? 'Please Enter Title'
-                                    : null,*/
+                                    : null,
                                 border: new OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
@@ -97,16 +96,16 @@ class _AddEventState extends State<AddEvent> {
                             cursorRadius: Radius.circular(50.0),
                             cursorWidth: 3.0,
                             decoration: new InputDecoration(
-                              /*prefixIcon: Padding(
+                                /*prefixIcon: Padding(
                                   padding: const EdgeInsetsDirectional.only(
                                       bottom: 43.0),
                                   child: new Icon(Icons.description),
                                 ),*/
                                 prefixIcon: new Icon(Icons.description),
                                 labelText: "Description",
-                                /*errorText: _desValidate
+                                errorText: _desValidate
                                     ? 'Please Enter Description'
-                                    : null,*/
+                                    : null,
                                 border: new OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
@@ -118,7 +117,9 @@ class _AddEventState extends State<AddEvent> {
                           new Padding(
                               padding: const EdgeInsets.only(bottom: 15.0)),
                           DateTimePickerFormField(
+                            controller: _date,
                             initialDate: now,
+                            enabled: true,
                             firstDate: now,
                             lastDate: now.add(new Duration(days: 60)),
                             inputType: InputType.both,
@@ -127,8 +128,8 @@ class _AddEventState extends State<AddEvent> {
                             decoration: InputDecoration(
                                 prefixIcon: new Icon(Icons.date_range),
                                 labelText: 'Expiry Date',
-                                /*errorText:
-                                    _dateValidate ? 'Please Select Date' : null,*/
+                                errorText:
+                                    _dateValidate ? 'Please Select Date' : null,
                                 border: new OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
@@ -165,168 +166,232 @@ class _AddEventState extends State<AddEvent> {
                                 });
                               },
                               value: _selectedType,
-                              isExpanded: false,
+                              isExpanded: true,
                             ),
                           ),
+                          new Padding(
+                              padding: const EdgeInsets.only(bottom: 5.0)),
+                          _eventTypeValidate
+                              ? new Text("    Please select event type",
+                                  style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400))
+                              : Container(),
                           new Padding(
                               padding: const EdgeInsets.only(bottom: 15.0)),
                           _image != null
                               ? Center(
-                            child: Column(
-                              children: <Widget>[
-                                Stack(
-                                  alignment: Alignment.topRight,
-                                  children: <Widget>[
-                                    /*Image.asset(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Stack(
+                                        alignment: Alignment.topRight,
+                                        children: <Widget>[
+                                          /*Image.asset(
                                             _image.path,
                                             height: 150,
                                             fit: BoxFit.fitWidth,
                                             alignment: Alignment.center,
                                           ),*/
-                                    Image.file(_image, height: 150,
-                                      fit: BoxFit.cover,
-                                      alignment: Alignment.center,
-                                    ),
-                                    IconButton(
-                                        icon: Icon(
-                                          Icons.cancel,
-                                          color: Colors.tealAccent,
+                                          Image.file(
+                                            _image,
+                                            height: 150,
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.center,
+                                          ),
+                                          IconButton(
+                                              icon: Icon(
+                                                Icons.cancel,
+                                                color: Colors.tealAccent,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _image = null;
+                                                });
+                                              })
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      RaisedButton(
+                                        onPressed: _showBottom,
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.add_photo_alternate,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ),
+                                              SizedBox(
+                                                width: 8,
+                                              ),
+                                              Text(
+                                                "Change Image",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )
+                                            ],
+                                          ),
                                         ),
+                                        color: Colors.redAccent,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        padding: EdgeInsets.only(
+                                            left: 40,
+                                            right: 40,
+                                            top: 10,
+                                            bottom: 10),
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      RaisedButton(
                                         onPressed: () {
                                           setState(() {
-                                            _image = null;
+                                            if (_title.text.isEmpty) {
+                                              _titleValidate = true;
+                                              print(_titleValidate);
+                                            } else {
+                                              _titleValidate = false;
+                                            }
+                                            if (_description.text.isEmpty) {
+                                              _desValidate = true;
+                                            } else {
+                                              _desValidate = false;
+                                            }
+                                            if (_date.text.isEmpty) {
+                                              _dateValidate = true;
+                                            } else {
+                                              _dateValidate = false;
+                                            }
+                                            if (_selectedType == null) {
+                                              _eventTypeValidate = true;
+                                            } else {
+                                              _eventTypeValidate = false;
+                                            }
+                                            if (_titleValidate == false &&
+                                                _desValidate == false &&
+                                                _dateValidate == false &&
+                                                _eventTypeValidate == false) {
+                                              _uploadFile();
+                                            }
                                           });
-                                        })
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                RaisedButton(
-                                  onPressed: _showBottom,
-                                  child: Container(
-                                    width:
-                                    MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.add_photo_alternate,
+                                        },
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        color: Colors.redAccent,
+                                        child: Text(
+                                          "Add",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : Column(
+                                  children: <Widget>[
+                                    RaisedButton(
+                                      onPressed: _showBottom,
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: Icon(
+                                          Icons.add_a_photo,
                                           color: Colors.white,
                                           size: 30,
                                         ),
-                                        SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text(
-                                          "Change Image",
-                                          style: TextStyle(
-                                              color: Colors.white),
-                                        )
-                                      ],
+                                      ),
+                                      color: Colors.redAccent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      padding: EdgeInsets.only(
+                                          left: 40,
+                                          right: 40,
+                                          top: 10,
+                                          bottom: 10),
                                     ),
-                                  ),
-                                  color: Colors.redAccent,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(20)),
-                                  padding: EdgeInsets.only(
-                                      left: 40,
-                                      right: 40,
-                                      top: 10,
-                                      bottom: 10),
-                                ),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                RaisedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (_title.text.isEmpty) {
-                                        _titleValidate = true;
-                                      } else {
-                                        _titleValidate = false;
-                                      }
-                                      if (_description.text.isEmpty) {
-                                        _desValidate = true;
-                                      } else {
-                                        _desValidate = false;
-                                      }
-                                      if (date1.toString() == null) {
-                                        _dateValidate = true;
-                                      } else {
-                                        _dateValidate = false;
-                                      }
-                                      if (_titleValidate == false &&
-                                          _desValidate == false &&
-                                          _dateValidate == false) {
-                                        _uploadFile();
-                                      }
-                                    });
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(20)),
-                                  color: Colors.redAccent,
-                                  child: Text(
-                                    "Add",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    RaisedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (_title.text.isEmpty) {
+                                            _titleValidate = true;
+                                          } else {
+                                            _titleValidate = false;
+                                          }
+                                          if (_description.text.isEmpty) {
+                                            _desValidate = true;
+                                          } else {
+                                            _desValidate = false;
+                                          }
+                                          if (_date.text.isEmpty) {
+                                            _dateValidate = true;
+                                          } else {
+                                            _dateValidate = false;
+                                          }
+                                          print(_selectedType);
+                                          /*if (_selectedType == "Event" || _selectedType == "College Schedule" || _selectedType == "Fee Payment") {
+                                            _eventTypeValidate = false;
+                                          }
+                                          if (_selectedType != "Event" || _selectedType != "College Schedule" || _selectedType != "Fee Payment") {
+                                            _eventTypeValidate = true;
+                                          }*/
+                                          if (_selectedType == null) {
+                                            _eventTypeValidate = true;
+                                          } else {
+                                            _eventTypeValidate = false;
+                                          }
+                                          print(_eventTypeValidate);
+                                          if (_titleValidate == false &&
+                                              _desValidate == false &&
+                                              _dateValidate == false &&
+                                              _eventTypeValidate == false) {
+                                            if (_image == null) {
+                                              Fluttertoast.showToast(
+                                                msg:
+                                                    "Please select an image first",
+                                                gravity: ToastGravity.CENTER,
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                backgroundColor: Colors.white,
+                                              );
+                                              _showBottom();
+                                            }
+                                          }
+                                          if (_titleValidate == false &&
+                                              _desValidate == false &&
+                                              _dateValidate == false &&
+                                              _eventTypeValidate == false &&
+                                              _image != null) {
+                                            _uploadFile();
+                                          }
+                                        });
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      color: Colors.redAccent,
+                                      child: Text(
+                                        "Add",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )
+                                  ],
                                 )
-                              ],
-                            ),
-                          )
-                              : Column(
-                            children: <Widget>[
-                              RaisedButton(
-                                onPressed: _showBottom,
-                                child: Container(
-                                  width:
-                                  MediaQuery
-                                      .of(context)
-                                      .size
-                                      .width,
-                                  child: Icon(
-                                    Icons.add_a_photo,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                ),
-                                color: Colors.redAccent,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(20)),
-                                padding: EdgeInsets.only(
-                                    left: 40,
-                                    right: 40,
-                                    top: 10,
-                                    bottom: 10),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              RaisedButton(
-                                onPressed: _uploadFile,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(20)),
-                                color: Colors.redAccent,
-                                child: Text(
-                                  "Add",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              )
-                            ],
-                          )
                         ],
                       ),
                     ),
                   ),
-                ),
               )
             ],
           ),
@@ -342,7 +407,7 @@ class _AddEventState extends State<AddEvent> {
           return new Container(
             padding: const EdgeInsets.all(15.0),
             color: Colors.grey,
-            height: 150,
+            height: 200,
             child: new Center(
               child: new ListView(
                 children: <Widget>[
@@ -373,6 +438,18 @@ class _AddEventState extends State<AddEvent> {
                       Navigator.pop(context);
                       _chooseFileFromCamera();
                     },
+                  ),
+                  new RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    color: Colors.blueGrey,
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   )
                 ],
               ),
@@ -400,39 +477,66 @@ class _AddEventState extends State<AddEvent> {
   }
 
   Future _uploadFile() async {
+    ProgressDialog pr = new ProgressDialog(context,type: ProgressDialogType.Normal,showLogs: true,isDismissible: false);
+    pr.style(
+        borderRadius: 20.0,
+        elevation: 20.0,
+        message: "Please Wait...",
+        insetAnimCurve: Curves.easeIn,
+        backgroundColor: Colors.black,
+        messageTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+          wordSpacing: 2.0,
+        )
+    );
+    await pr.show();
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('e-board Images/${Path.basename(_image.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
-    print('File Uploaded');
-    storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
+    if(uploadTask.isSuccessful) {
+      print('File Uploaded');
+      storageReference.getDownloadURL().then((fileURL) {
+        setState(() {
+          _uploadedFileURL = fileURL;
+        });
       });
-    });
-
-    final snapShot = await Firestore.instance
-        .collection("e-notice-board")
-        .document(now.toString())
-        .get();
-    if (snapShot == null || !snapShot.exists) {
-      await databaseReference
-          .collection("e-notice-board")
-          .document(now.toString())
-          .setData({
-        'title': _title.text,
-        'type': _selectedType,
-        'description': _description.text,
-        'expiry_date': date1,
-        'url': _uploadedFileURL,
-      });
-
-      Fluttertoast.showToast(
-          msg: "Event Uploaded",
-          gravity: ToastGravity.BOTTOM,
-          toastLength: Toast.LENGTH_LONG);
-      Navigator.pop(context);
+      if (_uploadedFileURL == null) {
+        pr.hide();
+        Fluttertoast.showToast(
+            msg: "There Is Some Error Uploading Image Please Try Again");
+      } else {
+        final snapShot = await Firestore.instance
+            .collection("e-notice-board")
+            .document(now.toString())
+            .get();
+        if (snapShot == null || !snapShot.exists) {
+          await databaseReference
+              .collection("e-notice-board")
+              .document(now.toString())
+              .setData({
+            'title': _title.text,
+            'type': _selectedType,
+            'description': _description.text,
+            'expiry_date': date1,
+            'url': _uploadedFileURL,
+            'timestamp': DateTime.now()
+          });
+          pr.hide();
+          Fluttertoast.showToast(
+              msg: "Event Uploaded",
+              gravity: ToastGravity.BOTTOM,
+              toastLength: Toast.LENGTH_LONG);
+          Navigator.pop(context);
+        }
+      }
     }
+    else{
+      pr.hide();
+      Fluttertoast.showToast(msg: "There Is Some Error Uploading Image Please Try Again");
+    }
+
   }
 }

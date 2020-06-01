@@ -25,9 +25,13 @@ class _SetParentDetailsState extends State<SetParentDetails> {
 
   String _username;
   String _enrCheck;
+  String errorMessage;
+  String errorMessage2;
+
   SharedPreferences prf;
 
   bool _obscureText = true;
+  bool _obscureText1 = true;
   bool _fullNameValidate = false;
   bool _passValidate = false;
   bool _cPassValidate = false;
@@ -56,14 +60,14 @@ class _SetParentDetailsState extends State<SetParentDetails> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.white,
       appBar: CommonAppBar("Register"),
       body: new Container(
         child: new ListView(
           children: <Widget>[
             new Container(
               padding:
-                  const EdgeInsets.only(left: 24.0, right: 25.0, top: 25.0),
+                  const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
               child: new Form(
                   child: new Card(
                 elevation: 30.0,
@@ -104,12 +108,11 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                                         fontSize: 15.0,
                                         color: Colors.white70,
                                       ),
-                                      prefixIcon:
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 15.0),
+                                      prefixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 15.0),
                                         child: Icon(Icons.person),
-                                      )
-                                      ),
+                                      )),
                                 );
                               }),
                           new Padding(
@@ -145,12 +148,11 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                                               fontSize: 15.0,
                                               color: Colors.white70,
                                             ),
-                                            prefixIcon:
-                                            Padding(
-                                              padding: const EdgeInsets.only(bottom: 15.0),
+                                            prefixIcon: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 15.0),
                                               child: Icon(Icons.person),
-                                            )
-                                           ),
+                                            )),
                                       );
                               }),
                         ],
@@ -161,8 +163,7 @@ class _SetParentDetailsState extends State<SetParentDetails> {
               )),
             ),
             new Container(
-              padding:
-                  const EdgeInsets.only(left: 24.0, right: 25.0, top: 30.0),
+              padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
               child: new Form(
                   child: new Card(
                 elevation: 30.0,
@@ -183,8 +184,8 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                         decoration: new InputDecoration(
                             hintText: "Full Name",
                             errorText: _fullNameValidate
-                                    ? 'Please enter Full Name'
-                                    : null,
+                                ? 'Please enter Full Name'
+                                : null,
                             hintStyle: new TextStyle(
                               fontSize: 15.0,
                               color: Colors.grey,
@@ -196,6 +197,9 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                       ),
                       new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                       new TextField(
+                        onChanged: (value) {
+                          validateStructure(value);
+                        },
                         controller: _pass,
                         obscureText: _obscureText,
                         autofocus: true,
@@ -204,9 +208,7 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                         cursorWidth: 3.0,
                         decoration: new InputDecoration(
                             hintText: "Set Password",
-                            errorText: _passValidate
-                                ? 'This field can not be empty'
-                                : null,
+                            errorText: _passValidate ? errorMessage : null,
                             hintStyle: new TextStyle(
                               fontSize: 15.0,
                               color: Colors.grey,
@@ -230,26 +232,24 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                       new TextField(
                         controller: _confirmPass,
                         cursorColor: Colors.purple,
-                        obscureText: _obscureText,
+                        obscureText: _obscureText1,
                         cursorRadius: Radius.circular(50.0),
                         cursorWidth: 3.0,
                         decoration: new InputDecoration(
                             hintText: "Confirm Password",
-                            errorText: _cPassValidate
-                                ? 'This field can not be empty'
-                                : null,
+                            errorText: _cPassValidate ? errorMessage2 : null,
                             hintStyle: new TextStyle(
                               fontSize: 15.0,
                               color: Colors.grey,
                             ),
                             prefixIcon: new Icon(Icons.lock),
                             suffixIcon: new IconButton(
-                              icon: new Icon(_obscureText
+                              icon: new Icon(_obscureText1
                                   ? Icons.visibility_off
                                   : Icons.visibility),
                               onPressed: () {
                                 setState(() {
-                                  _obscureText = !_obscureText;
+                                  _obscureText1 = !_obscureText1;
                                 });
                               },
                             ),
@@ -269,31 +269,34 @@ class _SetParentDetailsState extends State<SetParentDetails> {
                         ),
                         onPressed: () {
                           setState(() {
-                            if (_fullName.text.isEmpty) {
-                              _fullNameValidate = true;
-                            } else {
-                              _fullNameValidate = false;
-                            }
-                            if (_pass.text.isEmpty) {
-                              _passValidate = true;
-                            } else {
-                              _passValidate = false;
-                            }
-                            if (_confirmPass.text.isEmpty) {
-                              _cPassValidate = true;
-                            } else {
-                              _cPassValidate = false;
-                            }
-                            if (_pass.text != _confirmPass.text) {
-                              Fluttertoast.showToast(
-                                  msg: "Password does not match",
-                                  gravity: ToastGravity.CENTER,
-                                  backgroundColor: Colors.black);
-                            }
-                            if (_fullNameValidate == false &&
-                                _passValidate == false &&
-                                _cPassValidate == false) {
-                                  saveDetails();
+                            if (_passValidate == false) {
+                              if (_fullName.text.isEmpty) {
+                                _fullNameValidate = true;
+                              } else {
+                                _fullNameValidate = false;
+                              }
+                              if (_pass.text.isEmpty) {
+                                _passValidate = true;
+                              } else {
+                                _passValidate = false;
+                              }
+                              if (_confirmPass.text.isEmpty) {
+                                _cPassValidate = true;
+                                errorMessage2 = "Password does not match";
+                              } else {
+                                _cPassValidate = false;
+                              }
+                              if (_pass.text.compareTo(_confirmPass.text) !=
+                                  0) {
+                                _cPassValidate = true;
+                                _confirmPass.clear();
+                                errorMessage2 = "Password does not match";
+                              }
+                              if (_fullNameValidate == false &&
+                                  _passValidate == false &&
+                                  _cPassValidate == false) {
+                                saveDetails();
+                              }
                             }
                           });
                         },
@@ -310,34 +313,43 @@ class _SetParentDetailsState extends State<SetParentDetails> {
     );
   }
 
+  bool validateStructure(String value) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regExp = new RegExp(pattern);
+    setState(() {
+      regExp.hasMatch(value) ? _passValidate = false : _passValidate = true;
+      errorMessage = "Please set a Strong Password";
+      print(_passValidate);
+    });
+    return regExp.hasMatch(value);
+  }
+
   Future<void> saveDetails() async {
     try {
       Firestore.instance
           .collection("login_details")
           .document(_username)
           .updateData({
-        'password' : _pass.text,
+        'password': _pass.text,
       });
       Firestore.instance
           .collection("parent_details")
           .document(_username)
           .updateData({
-        'full_name' : _fullName.text,
+        'full_name': _fullName.text,
       });
       SharedPreferences prf = await SharedPreferences.getInstance();
       prf.setString("rUsername", "");
       Fluttertoast.showToast(
           msg: "Details Saved",
           gravity: ToastGravity.CENTER,
-          backgroundColor: Colors.black
-      );
+          backgroundColor: Colors.black);
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacement(new MaterialPageRoute(
           builder: (BuildContext context) => new MainScreen()));
-
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
-
   }
 }
