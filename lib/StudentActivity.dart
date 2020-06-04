@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,10 +7,13 @@ import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ChangePassword.dart';
 import 'MainScreen.dart';
@@ -161,16 +165,30 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             ),
             new ListTile(
               title: new Text(
-                "Dummy 1",
-                style: Theme.of(context).textTheme.subhead,
+                "Assignment",
+                style: Theme.of(context).textTheme.subtitle1,
               ),
-              trailing: new Icon(Icons.cancel),
-              onTap: _onItemTapped1,
+              trailing: new Icon(Icons.assignment),
+              onTap: () async {
+                print(_username);
+                await Firestore.instance
+                    .collection('student_details')
+                    .document(_username)
+                    .get()
+                    .then((value) {
+                  if (value != null) {
+                    var semesterForAssignment = value["semester"];
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            Student_Assignment(semesterForAssignment)));
+                  }
+                });
+              },
             ),
             new ListTile(
               title: new Text(
                 "Dummy 2",
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
@@ -178,7 +196,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             new ListTile(
               title: new Text(
                 "Dummy 3",
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
@@ -294,9 +312,9 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     List data = new List<Widget>();
     for (int i = 0; i < len; i++) {
       if (notice_board_data[i]["expiry_date"]
-          .toDate()
-          .toString()
-          .compareTo(DateTime.now().toString()) <
+              .toDate()
+              .toString()
+              .compareTo(DateTime.now().toString()) <
           1) {
         continue;
       }
@@ -407,59 +425,59 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"].compareTo("Event") == 0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               events_notice.add(notice_board[i]);
                             }
                           }
                         }
                         return events_notice.isEmpty
                             ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
+                                child: Text(
+                                  "No Events Available",
+                                  style: TextStyle(color: Colors.black45),
+                                ),
+                              )
                             : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: events_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: events_notice[index]
-                                      ['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        events_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
+                                scrollDirection: Axis.horizontal,
+                                itemCount: events_notice.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Card(
+                                    color: Colors.transparent,
+                                    clipBehavior: Clip.antiAlias,
+                                    semanticContainer: true,
+                                    borderOnForeground: true,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        CachedNetworkImage(
+                                            placeholder: (context, url) => Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                            width: 170.0,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            imageUrl: events_notice[index]
+                                                ['url']),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 2.0),
+                                          child: Text(
+                                              events_notice[index]['title'],
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 3.0)),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
                       } else {
                         return CircularProgressIndicator();
                       }
@@ -503,64 +521,64 @@ class _StudentActivityPageState extends State<StudentActivityPage>
 
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"]
-                              .compareTo("College Schedule") ==
+                                  .compareTo("College Schedule") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               schedule_notice.add(notice_board[i]);
                             }
                           }
                         }
                         return schedule_notice.isEmpty
                             ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
+                                child: Text(
+                                  "No Events Available",
+                                  style: TextStyle(color: Colors.black45),
+                                ),
+                              )
                             : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: schedule_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: schedule_notice[index]
-                                      ['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        schedule_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
+                                scrollDirection: Axis.horizontal,
+                                itemCount: schedule_notice.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Card(
+                                    color: Colors.transparent,
+                                    clipBehavior: Clip.antiAlias,
+                                    semanticContainer: true,
+                                    borderOnForeground: true,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        CachedNetworkImage(
+                                            placeholder: (context, url) => Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                            width: 170.0,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            imageUrl: schedule_notice[index]
+                                                ['url']),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 2.0),
+                                          child: Text(
+                                              schedule_notice[index]['title'],
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 3.0)),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
                       } else {
-                        return CircularProgressIndicator();
+                        return Text("Please Wait..");
                       }
                     }),
               ),
@@ -601,61 +619,61 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         List fee_notice = new List<DocumentSnapshot>();
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"]
-                              .compareTo("Fee Payment") ==
+                                  .compareTo("Fee Payment") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               fee_notice.add(notice_board[i]);
                             }
                           }
                         }
                         return fee_notice.isEmpty
                             ? Center(
-                          child: Text(
-                            "No Events Available",
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
+                                child: Text(
+                                  "No Events Available",
+                                  style: TextStyle(color: Colors.black45),
+                                ),
+                              )
                             : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: fee_notice.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              semanticContainer: true,
-                              borderOnForeground: true,
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: <Widget>[
-                                  CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                          child:
-                                          CircularProgressIndicator()),
-                                      width: 170.0,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      imageUrl: fee_notice[index]['url']),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                        fee_notice[index]['title'],
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.0,
-                                            letterSpacing: 3.0)),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
+                                scrollDirection: Axis.horizontal,
+                                itemCount: fee_notice.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Card(
+                                    color: Colors.transparent,
+                                    clipBehavior: Clip.antiAlias,
+                                    semanticContainer: true,
+                                    borderOnForeground: true,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        CachedNetworkImage(
+                                            placeholder: (context, url) => Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                            width: 170.0,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            imageUrl: fee_notice[index]['url']),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 2.0),
+                                          child: Text(
+                                              fee_notice[index]['title'],
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 3.0)),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
                       } else {
                         return CircularProgressIndicator();
                       }
@@ -668,22 +686,26 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-
   void setProfile() async {
-    Firestore.instance
-        .collection("student_details")
-        .document(_username)
-        .get()
-        .then((document) {
-      _enrCheck = document['enrollment'];
-      _finalEnr.text = document['enrollment'];
-      _fName.text = document['first_name'];
-      _mName.text = document['middle_name'];
-      _lName.text = document['last_name'];
-      _eMail.text = document['email'];
-      _phone.text = document['phone_number'];
-      _sem.text = document['semester'];
-    });
+    StreamBuilder(
+        stream: Firestore.instance
+            .collection("student_details")
+            .document(_username)
+            .snapshots(),
+        // ignore: missing_return
+        builder: (context, snapshot) {
+          if (snapshot != null && snapshot.hasData) {
+            var document = snapshot.data;
+            _enrCheck = document['enrollment'];
+            _finalEnr.text = document['enrollment'];
+            _fName.text = document['first_name'];
+            _mName.text = document['middle_name'];
+            _lName.text = document['last_name'];
+            _eMail.text = document['email'];
+            _phone.text = document['phone_number'];
+            _sem.text = document['semester'];
+          }
+        });
   }
 
   Widget _buildBodyProfile() {
@@ -1398,10 +1420,9 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               ),
               trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
               onTap: () {
-                Navigator.of(context).push (new MaterialPageRoute(
+                Navigator.of(context).push(new MaterialPageRoute(
                     builder: (BuildContext context) => new ChangePassword()));
-              }
-          ),
+              }),
           ListTile(
             leading: Icon(
               Icons.info_outline,
@@ -1562,4 +1583,197 @@ class NavigationItem {
   final Color color;
 
   NavigationItem(this.icon, this.title, this.color);
+}
+
+class Student_Assignment extends StatelessWidget {
+  final sem;
+  Student_Assignment(this.sem);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CommonAppBar("Assignments Semester: $sem "),
+      body: Student_Assignment_Home(sem),
+    );
+  }
+}
+
+class Student_Assignment_Home extends StatefulWidget {
+  final sem;
+  Student_Assignment_Home(this.sem);
+  @override
+  _Student_Assignment_HomeState createState() =>
+      _Student_Assignment_HomeState(sem);
+}
+
+class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
+  final sem;
+  var totalData = -1;
+  _Student_Assignment_HomeState(this.sem);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance
+              .collection("assignments")
+              .where("semester", isEqualTo: sem)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot != null && snapshot.hasData) {
+              QuerySnapshot data = snapshot.data;
+              var allData = data.documents;
+              if (data.documents.length != null) {
+                totalData = data.documents.length;
+                print("Data $totalData");
+              }
+              if (totalData == -1) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (totalData == 0) {
+                return Center(
+                  child: Text("No Assignments Are Given"),
+                );
+              } else {
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    print("Index $index");
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                      child: GestureDetector(
+                        onTap: () {
+                          String fileUrl;
+                          downloadPdf(allData[index]["url"],
+                                  allData[index]['assignment name'])
+                              .then((String url) {
+                            fileUrl = url;
+                            if (fileUrl == '') {
+                              Fluttertoast.showToast(
+                                  msg: "File Could Not be Downloaded");
+                            } else {
+                              OpenFile.open(fileUrl, type: 'pdf');
+                            }
+                          });
+                        },
+                        child: Card(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Icon(Icons.picture_as_pdf),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.cloud_download,
+                                color: Colors.black,
+                              ),
+                              onPressed: () {
+                                String fileUrl;
+                                downloadPdf(allData[index]["url"],
+                                        allData[index]['assignment name'])
+                                    .then((String url) {
+                                  fileUrl = url;
+                                  if (fileUrl == '') {
+                                    Fluttertoast.showToast(
+                                        msg: "File Could Not be Downloaded");
+                                  } else {
+                                    OpenFile.open(fileUrl);
+                                  }
+                                });
+                              },
+                            ),
+                            title: Text(allData[index]['assignment name']),
+                            subtitle: Text(
+                              allData[index]['subject'],
+                              style: TextStyle(fontSize: 10),
+                            ),
+                          ),
+                        ),
+                        onLongPress: () {
+                          showGeneralDialog(
+                              barrierColor: Colors.black.withOpacity(0.5),
+                              transitionBuilder: (context, a1, a2, widget) {
+                                final curvedValue =
+                                    Curves.easeInOutBack.transform(a1.value) -
+                                        1.0;
+                                return Transform(
+                                  transform: Matrix4.translationValues(
+                                      0.0, curvedValue * 200, 0.0),
+                                  child: Opacity(
+                                    opacity: a1.value,
+                                    child: AlertDialog(
+                                      shape: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16.0)),
+                                      title: Text(
+                                        'Warning!',
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 25),
+                                      ),
+                                      content: Text(
+                                          'Are You Sure You Want To Delete This Assignment?'),
+                                      actions: <Widget>[
+                                        new FlatButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: new Text(
+                                              "No",
+                                              style: TextStyle(fontSize: 18),
+                                            )),
+                                        new FlatButton(
+                                            onPressed: () async {
+                                              var documentid =
+                                                  allData[index].documentID;
+                                              Firestore.instance
+                                                  .collection("assignments")
+                                                  .document(documentid)
+                                                  .delete();
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: new Text(
+                                              "Yes",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 18),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              transitionDuration: Duration(milliseconds: 200),
+                              barrierDismissible: true,
+                              barrierLabel: '',
+                              context: context,
+                              // ignore: missing_return
+                              pageBuilder:
+                                  (context, animation1, animation2) {});
+                        },
+                      ),
+                    );
+                  },
+                  itemCount: totalData,
+                );
+              }
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
+    );
+  }
+
+  Future<String> downloadPdf(String url, String name) async {
+    var directory = await getApplicationDocumentsDirectory();
+    var filepath = '${directory.path}/' + name;
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var file = File(filepath);
+      print(filepath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filepath;
+    }
+    return '';
+  }
 }

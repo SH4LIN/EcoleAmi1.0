@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ecoleami1_0/Assignment.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -148,7 +149,7 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
             new ListTile(
               title: new Text(
                 "Manage Student",
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               trailing: new Icon(Icons.account_circle),
               onTap: () {
@@ -161,7 +162,7 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
             new ListTile(
               title: new Text(
                 "Attendance",
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               trailing: new Icon(Icons.arrow_forward_ios),
               onTap: () {
@@ -171,16 +172,19 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
             ),
             new ListTile(
               title: new Text(
-                "Dummy 2",
-                style: Theme.of(context).textTheme.subhead,
+                "Assignments",
+                style: Theme.of(context).textTheme.subtitle1,
               ),
-              trailing: new Icon(Icons.cancel),
-              onTap: _onItemTapped1,
+              trailing: new Icon(Icons.assignment),
+              onTap: () {
+                Navigator.of(context).push(
+                    new MaterialPageRoute(builder: (context) => Assignment()));
+              },
             ),
             new ListTile(
               title: new Text(
                 "Dummy 3",
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               trailing: new Icon(Icons.cancel),
               onTap: _onItemTapped1,
@@ -417,12 +421,12 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"].compareTo("Event") == 0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               events_notice.add(notice_board[i]);
                             }
                           }
@@ -516,12 +520,12 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
                                   .compareTo("College Schedule") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               schedule_notice.add(notice_board[i]);
                             }
                           }
@@ -614,12 +618,12 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
                                   .compareTo("Fee Payment") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                .toDate()
-                                .toString()
-                                .compareTo(DateTime.now().toString()) <
+                                    .toDate()
+                                    .toString()
+                                    .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
-                            }else {
+                            } else {
                               fee_notice.add(notice_board[i]);
                             }
                           }
@@ -667,7 +671,7 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
                                 },
                               );
                       } else {
-                        return CircularProgressIndicator();
+                        return Text("Please Wait..");
                       }
                     }),
               ),
@@ -1144,7 +1148,7 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                             ),
                           );
                   } else {
-                    return CircularProgressIndicator();
+                    return Text("Please Wait..");
                   }
                 }),
             onTap: () {
