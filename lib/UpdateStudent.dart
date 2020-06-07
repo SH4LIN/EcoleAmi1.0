@@ -10,7 +10,9 @@ import 'CommonAppBar.dart';
 // ignore: must_be_immutable
 class UpdateStudent extends StatelessWidget {
   int id;
+
   UpdateStudent(this.id);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,28 +35,36 @@ class UpdateStudentData extends StatefulWidget {
 
 class _UpdateStudentState extends State<UpdateStudentData> {
   int id;
+
   _UpdateStudentState(this.id);
+
   bool _obscureText = true;
+
   final databaseReference = Firestore.instance;
+
   List<String> _semesterList = ['1', '2', '3', '4', '5', '6'];
-  String _selectedSemester = "1";
+  String _selectedSemester;
   List<String> _divisionList = [
-    'A1',
-    'A2',
-    'A3',
-    'B1',
-    'B2',
-    'B3',
-    'C1',
-    'C2',
-    'C3'
+    'A',
+    'B',
+    'C',
   ];
-  String _selectedDivision = "A1";
+  String _selectedDivision;
+  List<String> _batchList = [
+    '1',
+    '2',
+    '3',
+  ];
+  String _selectedBatch;
+
   bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
+  bool _semValidate = false;
+  bool _divValidate = false;
+  bool _batchValidate = false;
   bool _parentValidate = false;
 
   void dispose() {
@@ -86,6 +96,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
     _phone.text = itemsStudent[id]['phone_number'];
     _selectedSemester = itemsStudent[id]['semester'];
     _selectedDivision = itemsStudent[id]['division'];
+    _selectedBatch = itemsStudent[id]['batch'];
     _parentPhone.text = itemsStudent[id]['parent_phone_number'];
 //    _sem.text = itemsStudent[id]['semester'];
 
@@ -109,6 +120,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
     return new ListView(
       children: <Widget>[
         new Container(
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             child: new Card(
               elevation: 30.0,
@@ -146,7 +158,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       decoration: new InputDecoration(
                           hintText: "First Name",
                           errorText:
-                          _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? 'Please enter First Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -166,7 +178,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       decoration: new InputDecoration(
                           hintText: "Middle Name",
                           errorText:
-                          _mValidate ? 'Please enter Middle Name' : null,
+                              _mValidate ? 'Please enter Middle Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -186,7 +198,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       decoration: new InputDecoration(
                           hintText: "Last Name",
                           errorText:
-                          _lValidate ? 'Please enter Last Name' : null,
+                              _lValidate ? 'Please enter Last Name' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -241,7 +253,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
-                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+                      padding: const EdgeInsets.only(left: 30.0),
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
@@ -253,7 +265,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       child: DropdownButton<String>(
 /*                      iconEnabledColor: Colors.white,
                       iconDisabledColor: Colors.white,*/
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: Icon(Icons.format_list_numbered),
                         underline: SizedBox(),
                         items: _semesterList.map((String val) {
                           return new DropdownMenuItem<String>(
@@ -272,9 +284,19 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                         isExpanded: true,
                       ),
                     ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 5.0)),
+                    _semValidate == false
+                        ? Container()
+                        : new Align(
+                        alignment: Alignment.centerLeft,
+                        child: new Text("    Please select Semester",
+                            style: TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
-                      padding: const EdgeInsets.only(left: 30.0,right: 30),
+                      padding: const EdgeInsets.only(left: 30.0),
 //                      alignment: Alignment.center,
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
@@ -285,7 +307,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       child: DropdownButton<String>(
                         /*iconEnabledColor: Colors.white,
                         iconDisabledColor: Colors.white,*/
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: Icon(Icons.format_list_numbered),
                         underline: SizedBox(),
                         items: _divisionList.map((String val) {
                           return new DropdownMenuItem<String>(
@@ -303,6 +325,56 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                         isExpanded: true,
                       ),
                     ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 5.0)),
+                    _divValidate == false
+                        ? Container()
+                        : new Align(
+                        alignment: Alignment.centerLeft,
+                        child: new Text("    Please select Division",
+                            style: TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400))),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    Container(
+                      padding: const EdgeInsets.only(left: 30.0),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(
+                        border:
+                        Border.all(style: BorderStyle.solid, width: 0.80),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: DropdownButton<String>(
+                        /*iconEnabledColor: Colors.white,
+                        iconDisabledColor: Colors.white,*/
+                        icon: Icon(Icons.format_list_numbered),
+                        underline: SizedBox(),
+                        items: _batchList.map((String val) {
+                          return new DropdownMenuItem<String>(
+                            value: val,
+                            child: new Text(val),
+                          );
+                        }).toList(),
+                        hint: Text("Batch"),
+                        onChanged: (String newVal) {
+                          setState(() {
+                            this._selectedBatch = newVal;
+                          });
+                        },
+                        value: _selectedBatch,
+                        isExpanded: true,
+                      ),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 5.0)),
+                    _batchValidate == false
+                        ? Container()
+                        : new Align(
+                        alignment: Alignment.centerLeft,
+                        child: new Text("    Please select Batch",
+                            style: TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _parentPhone,
@@ -364,7 +436,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       child: new Text(
                         "Update",
                         style:
-                        new TextStyle(color: Colors.white, fontSize: 15.0),
+                            new TextStyle(color: Colors.white, fontSize: 15.0),
                       ),
                       onPressed: () {
                         setState(() {
@@ -383,7 +455,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                           } else {
                             _lValidate = false;
                           }
-                          if (_eMail.text.isEmpty) {
+                          if (_eMail.text.isEmpty ) {
                             _emailValidate = true;
                           } else {
                             _emailValidate = false;
@@ -469,8 +541,8 @@ class _UpdateStudentState extends State<UpdateStudentData> {
       });
       await Firestore.instance
           .collection("parent_details")
-          .document(_parentPhone.text)
-          .updateData({
+      .document(_parentPhone.text)
+      .updateData({
         'student_division': _selectedDivision,
         'student_email': _eMail.text,
         'student_name': _fName.text + " " + _mName.text + " " + _lName.text,

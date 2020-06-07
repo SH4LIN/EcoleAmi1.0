@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ecoleami1_0/Register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:crypto/crypto.dart';
+import 'package:convert/convert.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'FacultyActivity.dart';
@@ -31,19 +35,24 @@ class _ListState extends State<List> {
     _pass.dispose();
     super.dispose();
   }
-  void saveState() async{
+
+  void saveState() async {
+    print(_pass.text);
+    print(_passwordHash.toString());
     prf = await SharedPreferences.getInstance();
     prf.setBool("isLoggedIn", true);
     prf.setString("Username", _userName.text);
-    prf.setString("Password", _pass.text);
+    prf.setString("Password", _passwordHash.toString());
     prf.setString("Role", role);
     user = _userName.text;
   }
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
     //checkState();
   }
+
   @override
   Widget build(BuildContext context) {
     return new ListView(
@@ -59,15 +68,12 @@ class _ListState extends State<List> {
             child: new Card(
               elevation: 30.0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-              ),
+                  borderRadius: BorderRadius.circular(10.0)),
               child: Container(
                 padding: const EdgeInsets.all(15.0),
                 child: new Column(
                   children: <Widget>[
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                     new TextField(
                       controller: _userName,
                       keyboardType: TextInputType.text,
@@ -76,7 +82,8 @@ class _ListState extends State<List> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Username",
-                          errorText: _userValidate ? 'Please enter Username' : null,
+                          errorText:
+                              _userValidate ? 'Please enter Username' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -84,13 +91,9 @@ class _ListState extends State<List> {
                           prefixIcon: new Icon(Icons.account_circle),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
-
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _pass,
                       keyboardType: TextInputType.text,
@@ -100,7 +103,8 @@ class _ListState extends State<List> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Password",
-                          errorText: _passValidate ? 'Please enter Password' : null,
+                          errorText:
+                              _passValidate ? 'Please enter Password' : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -118,27 +122,23 @@ class _ListState extends State<List> {
                           ),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
                     new RaisedButton(
                       color: Colors.redAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)
-                      ),
+                          borderRadius: BorderRadius.circular(10.0)),
                       child: new Text(
                         "Login",
                         style: new TextStyle(
-                            color: Colors.white,
-                            fontSize: 15.0,
+                          color: Colors.white,
+                          fontSize: 15.0,
                           wordSpacing: 2.0,
                           letterSpacing: 0.3,
                         ),
                       ),
-                      onPressed: ()  {
+                      onPressed: () {
                         setState(() {
                           if (_userName.text.isEmpty) {
                             _userValidate = true;
@@ -146,12 +146,13 @@ class _ListState extends State<List> {
                             _userValidate = false;
                           }
 
-                          if (_pass.text.isEmpty){
+                          if (_pass.text.isEmpty) {
                             _passValidate = true;
                           } else {
                             _passValidate = false;
                           }
-                          if (_userName.text.isNotEmpty && _pass.text.isNotEmpty) {
+                          if (_userName.text.isNotEmpty &&
+                              _pass.text.isNotEmpty) {
                             _onClick();
                           }
                         });
@@ -165,20 +166,20 @@ class _ListState extends State<List> {
                       children: <Widget>[
                         new OutlineButton(
                           onPressed: () => {
-                            Navigator.of(context).push(
-                              new MaterialPageRoute(builder: (BuildContext context) => new Register()))
+                            Navigator.of(context).push(new MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    new Register()))
                           },
                           splashColor: Colors.redAccent,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)
-                          ),
+                              borderRadius: BorderRadius.circular(10.0)),
                           child: new Text(
                             "Register  ",
                             textAlign: TextAlign.center,
                             style: new TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.0,
-                                color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
+                              color: Colors.red,
                               wordSpacing: 2.0,
                               letterSpacing: 0.2,
                             ),
@@ -189,17 +190,15 @@ class _ListState extends State<List> {
                           splashColor: Colors.redAccent,
                           color: Colors.red,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)
-                          ),
+                              borderRadius: BorderRadius.circular(10.0)),
                           child: new Text(
                             "Forgot password?",
                             style: new TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.0,
-                                color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
+                              color: Colors.white,
                               wordSpacing: 2.0,
                               letterSpacing: 0.2,
-
                             ),
                           ),
                         ),
@@ -213,26 +212,31 @@ class _ListState extends State<List> {
         ),
       ],
     );
-
   }
+
+  var _passwordHash;
 
   void _onClick() {
     showProgressbar();
-    Firestore.instance.collection("login_details").document(_userName.text.trim()).get().then((document){
-      if(!document.exists){
+    Firestore.instance
+        .collection("login_details")
+        .document(_userName.text.trim())
+        .get()
+        .then((document) {
+      if (!document.exists) {
         Fluttertoast.showToast(
             msg: "Username Does Not Exist",
             gravity: ToastGravity.BOTTOM,
-            toastLength: Toast.LENGTH_LONG
-        );
+            toastLength: Toast.LENGTH_LONG);
         pr.hide();
-      }
-      else{
+      } else {
         role = document['role'];
         _password = document['password'];
-        if(_pass.text.compareTo(_password) == 0){
+        print(_password);
+        _passwordHash = md5.convert(utf8.encode(_pass.text));
+        if (_passwordHash.toString().compareTo(_password) == 0) {
           saveState();
-          switch(role){
+          switch (role) {
             case "student":
               Fluttertoast.showToast(
                 msg: "Login successfully",
@@ -240,11 +244,8 @@ class _ListState extends State<List> {
                 toastLength: Toast.LENGTH_SHORT,
               );
               pr.hide();
-              Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new StudentActivity()
-                )
-              );
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new StudentActivity()));
               break;
             case "admin":
               Fluttertoast.showToast(
@@ -253,11 +254,8 @@ class _ListState extends State<List> {
                 toastLength: Toast.LENGTH_SHORT,
               );
               pr.hide();
-              Navigator.of(context).pushReplacement(
-                  new MaterialPageRoute(
-                      builder: (BuildContext context) => new Home()
-                  )
-              );
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Home()));
               break;
             case "faculty":
               Fluttertoast.showToast(
@@ -265,11 +263,8 @@ class _ListState extends State<List> {
                 gravity: ToastGravity.BOTTOM,
                 toastLength: Toast.LENGTH_SHORT,
               );
-              Navigator.of(context).pushReplacement(
-                  new MaterialPageRoute(
-                      builder: (BuildContext context) => new FacultyActivity()
-                  )
-              );
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new FacultyActivity()));
               pr.hide();
               break;
             case "parent":
@@ -281,19 +276,21 @@ class _ListState extends State<List> {
               pr.hide();
               break;
           }
-        }
-        else{
+        } else {
           pr.hide();
           Fluttertoast.showToast(
             msg: "Invalid Password",
             gravity: ToastGravity.BOTTOM,
-            toastLength: Toast.LENGTH_SHORT,);
+            toastLength: Toast.LENGTH_SHORT,
+          );
         }
       }
     });
   }
+
   void showProgressbar() async {
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
     pr.style(
         borderRadius: 20.0,
         elevation: 20.0,
@@ -304,8 +301,7 @@ class _ListState extends State<List> {
           color: Colors.white,
           fontSize: 19.0,
           wordSpacing: 2.0,
-        )
-    );
+        ));
     await pr.show();
   }
 }

@@ -60,253 +60,181 @@ class _AddEventState extends State<AddEvent> {
             children: <Widget>[
               new Container(
                 child: new Form(
-
-                    child: Container(
-                      padding: const EdgeInsets.all(15.0),
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          new TextField(
-                            controller: _title,
-                            cursorColor: Colors.purple,
-                            cursorRadius: Radius.circular(50.0),
-                            cursorWidth: 3.0,
-                            decoration: new InputDecoration(
-                                prefixIcon: new Icon(Icons.title),
-                                labelText: "Title",
-                                errorText: _titleValidate
-                                    ? 'Please Enter Title'
-                                    : null,
-                                border: new OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                hintStyle: new TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey,
-                                )),
-                          ),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0)),
-                          new TextField(
-                            controller: _description,
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 3,
-                            maxLength: 100,
-                            cursorColor: Colors.purple,
-                            cursorRadius: Radius.circular(50.0),
-                            cursorWidth: 3.0,
-                            decoration: new InputDecoration(
-                                /*prefixIcon: Padding(
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    child: new Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        new TextField(
+                          controller: _title,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              prefixIcon: new Icon(Icons.title),
+                              labelText: "Title",
+                              errorText:
+                                  _titleValidate ? 'Please Enter Title' : null,
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.grey,
+                              )),
+                        ),
+                        new Padding(
+                            padding: const EdgeInsets.only(bottom: 15.0)),
+                        new TextField(
+                          controller: _description,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 3,
+                          maxLength: 100,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              /*prefixIcon: Padding(
                                   padding: const EdgeInsetsDirectional.only(
                                       bottom: 43.0),
                                   child: new Icon(Icons.description),
                                 ),*/
-                                prefixIcon: new Icon(Icons.description),
-                                labelText: "Description",
-                                errorText: _desValidate
-                                    ? 'Please Enter Description'
-                                    : null,
-                                border: new OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                hintStyle: new TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey,
-                                )),
+                              prefixIcon: new Icon(Icons.description),
+                              labelText: "Description",
+                              errorText: _desValidate
+                                  ? 'Please Enter Description'
+                                  : null,
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.grey,
+                              )),
+                        ),
+                        new Padding(
+                            padding: const EdgeInsets.only(bottom: 15.0)),
+                        DateTimePickerFormField(
+                          controller: _date,
+                          initialDate: now,
+                          enabled: true,
+                          firstDate: now,
+                          lastDate: now.add(new Duration(days: 60)),
+                          inputType: InputType.both,
+                          format: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
+                          editable: false,
+                          decoration: InputDecoration(
+                              prefixIcon: new Icon(Icons.date_range),
+                              labelText: 'Expiry Date',
+                              errorText:
+                                  _dateValidate ? 'Please Select Date' : null,
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.grey,
+                              )),
+                          onChanged: (dt) {
+                            setState(() => date1 = dt);
+                            print('Selected date: $date1');
+                          },
+                        ),
+                        new Padding(
+                            padding: const EdgeInsets.only(bottom: 15.0)),
+                        Container(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          decoration: new BoxDecoration(
+                            border: Border.all(
+                                style: BorderStyle.solid, width: 0.80),
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0)),
-                          DateTimePickerFormField(
-                            controller: _date,
-                            initialDate: now,
-                            enabled: true,
-                            firstDate: now,
-                            lastDate: now.add(new Duration(days: 60)),
-                            inputType: InputType.both,
-                            format: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
-                            editable: false,
-                            decoration: InputDecoration(
-                                prefixIcon: new Icon(Icons.date_range),
-                                labelText: 'Expiry Date',
-                                errorText:
-                                    _dateValidate ? 'Please Select Date' : null,
-                                border: new OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                hintStyle: new TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey,
-                                )),
-                            onChanged: (dt) {
-                              setState(() => date1 = dt);
-                              print('Selected date: $date1');
+                          child: DropdownButton<String>(
+                            underline: SizedBox(),
+                            items: _typelist.map((String val) {
+                              return new DropdownMenuItem<String>(
+                                value: val,
+                                child: new Text(val),
+                              );
+                            }).toList(),
+                            hint: Text("Event Type"),
+                            onChanged: (String newVal) {
+                              setState(() {
+                                this._selectedType = newVal;
+                              });
                             },
+                            value: _selectedType,
+                            isExpanded: true,
                           ),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0)),
-                          Container(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            decoration: new BoxDecoration(
-                              border: Border.all(
-                                  style: BorderStyle.solid, width: 0.80),
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: DropdownButton<String>(
-                              underline: SizedBox(),
-                              items: _typelist.map((String val) {
-                                return new DropdownMenuItem<String>(
-                                  value: val,
-                                  child: new Text(val),
-                                );
-                              }).toList(),
-                              hint: Text("Event Type"),
-                              onChanged: (String newVal) {
-                                setState(() {
-                                  this._selectedType = newVal;
-                                });
-                              },
-                              value: _selectedType,
-                              isExpanded: true,
-                            ),
-                          ),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 5.0)),
-                          _eventTypeValidate
-                              ? new Text("    Please select event type",
-                                  style: TextStyle(
-                                      color: Colors.redAccent,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400))
-                              : Container(),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0)),
-                          _image != null
-                              ? Center(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Stack(
-                                        alignment: Alignment.topRight,
-                                        children: <Widget>[
-                                          /*Image.asset(
+                        ),
+                        new Padding(
+                            padding: const EdgeInsets.only(bottom: 5.0)),
+                        _eventTypeValidate
+                            ? new Text("    Please select event type",
+                                style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400))
+                            : Container(),
+                        new Padding(
+                            padding: const EdgeInsets.only(bottom: 15.0)),
+                        _image != null
+                            ? Center(
+                                child: Column(
+                                  children: <Widget>[
+                                    Stack(
+                                      alignment: Alignment.topRight,
+                                      children: <Widget>[
+                                        /*Image.asset(
                                             _image.path,
                                             height: 150,
                                             fit: BoxFit.fitWidth,
                                             alignment: Alignment.center,
                                           ),*/
-                                          Image.file(
-                                            _image,
-                                            height: 150,
-                                            fit: BoxFit.cover,
-                                            alignment: Alignment.center,
-                                          ),
-                                          IconButton(
-                                              icon: Icon(
-                                                Icons.cancel,
-                                                color: Colors.tealAccent,
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _image = null;
-                                                });
-                                              })
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      RaisedButton(
-                                        onPressed: _showBottom,
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.add_photo_alternate,
-                                                color: Colors.white,
-                                                size: 30,
-                                              ),
-                                              SizedBox(
-                                                width: 8,
-                                              ),
-                                              Text(
-                                                "Change Image",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              )
-                                            ],
-                                          ),
+                                        Image.file(
+                                          _image,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.center,
                                         ),
-                                        color: Colors.redAccent,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        padding: EdgeInsets.only(
-                                            left: 40,
-                                            right: 40,
-                                            top: 10,
-                                            bottom: 10),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      RaisedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            if (_title.text.isEmpty) {
-                                              _titleValidate = true;
-                                              print(_titleValidate);
-                                            } else {
-                                              _titleValidate = false;
-                                            }
-                                            if (_description.text.isEmpty) {
-                                              _desValidate = true;
-                                            } else {
-                                              _desValidate = false;
-                                            }
-                                            if (_date.text.isEmpty) {
-                                              _dateValidate = true;
-                                            } else {
-                                              _dateValidate = false;
-                                            }
-                                            if (_selectedType == null) {
-                                              _eventTypeValidate = true;
-                                            } else {
-                                              _eventTypeValidate = false;
-                                            }
-                                            if (_titleValidate == false &&
-                                                _desValidate == false &&
-                                                _dateValidate == false &&
-                                                _eventTypeValidate == false) {
-                                              _uploadFile();
-                                            }
-                                          });
-                                        },
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        color: Colors.redAccent,
-                                        child: Text(
-                                          "Add",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              : Column(
-                                  children: <Widget>[
+                                        IconButton(
+                                            icon: Icon(
+                                              Icons.cancel,
+                                              color: Colors.tealAccent,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _image = null;
+                                              });
+                                            })
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
                                     RaisedButton(
                                       onPressed: _showBottom,
                                       child: Container(
                                         width:
                                             MediaQuery.of(context).size.width,
-                                        child: Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.white,
-                                          size: 30,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.add_photo_alternate,
+                                              color: Colors.white,
+                                              size: 30,
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                              "Change Image",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          ],
                                         ),
                                       ),
                                       color: Colors.redAccent,
@@ -327,6 +255,7 @@ class _AddEventState extends State<AddEvent> {
                                         setState(() {
                                           if (_title.text.isEmpty) {
                                             _titleValidate = true;
+                                            print(_titleValidate);
                                           } else {
                                             _titleValidate = false;
                                           }
@@ -340,39 +269,15 @@ class _AddEventState extends State<AddEvent> {
                                           } else {
                                             _dateValidate = false;
                                           }
-                                          print(_selectedType);
-                                          /*if (_selectedType == "Event" || _selectedType == "College Schedule" || _selectedType == "Fee Payment") {
-                                            _eventTypeValidate = false;
-                                          }
-                                          if (_selectedType != "Event" || _selectedType != "College Schedule" || _selectedType != "Fee Payment") {
-                                            _eventTypeValidate = true;
-                                          }*/
                                           if (_selectedType == null) {
                                             _eventTypeValidate = true;
                                           } else {
                                             _eventTypeValidate = false;
                                           }
-                                          print(_eventTypeValidate);
                                           if (_titleValidate == false &&
                                               _desValidate == false &&
                                               _dateValidate == false &&
                                               _eventTypeValidate == false) {
-                                            if (_image == null) {
-                                              Fluttertoast.showToast(
-                                                msg:
-                                                    "Please select an image first",
-                                                gravity: ToastGravity.CENTER,
-                                                toastLength: Toast.LENGTH_SHORT,
-                                                backgroundColor: Colors.white,
-                                              );
-                                              _showBottom();
-                                            }
-                                          }
-                                          if (_titleValidate == false &&
-                                              _desValidate == false &&
-                                              _dateValidate == false &&
-                                              _eventTypeValidate == false &&
-                                              _image != null) {
                                             _uploadFile();
                                           }
                                         });
@@ -387,11 +292,103 @@ class _AddEventState extends State<AddEvent> {
                                       ),
                                     )
                                   ],
-                                )
-                        ],
-                      ),
+                                ),
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  RaisedButton(
+                                    onPressed: _showBottom,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                    ),
+                                    color: Colors.redAccent,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: EdgeInsets.only(
+                                        left: 40,
+                                        right: 40,
+                                        top: 10,
+                                        bottom: 10),
+                                  ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                  RaisedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_title.text.isEmpty) {
+                                          _titleValidate = true;
+                                        } else {
+                                          _titleValidate = false;
+                                        }
+                                        if (_description.text.isEmpty) {
+                                          _desValidate = true;
+                                        } else {
+                                          _desValidate = false;
+                                        }
+                                        if (_date.text.isEmpty) {
+                                          _dateValidate = true;
+                                        } else {
+                                          _dateValidate = false;
+                                        }
+                                        print(_selectedType);
+                                        /*if (_selectedType == "Event" || _selectedType == "College Schedule" || _selectedType == "Fee Payment") {
+                                            _eventTypeValidate = false;
+                                          }
+                                          if (_selectedType != "Event" || _selectedType != "College Schedule" || _selectedType != "Fee Payment") {
+                                            _eventTypeValidate = true;
+                                          }*/
+                                        if (_selectedType == null) {
+                                          _eventTypeValidate = true;
+                                        } else {
+                                          _eventTypeValidate = false;
+                                        }
+                                        print(_eventTypeValidate);
+                                        if (_titleValidate == false &&
+                                            _desValidate == false &&
+                                            _dateValidate == false &&
+                                            _eventTypeValidate == false) {
+                                          if (_image == null) {
+                                            Fluttertoast.showToast(
+                                              msg:
+                                                  "Please select an image first",
+                                              gravity: ToastGravity.CENTER,
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              backgroundColor: Colors.white,
+                                            );
+                                            _showBottom();
+                                          }
+                                        }
+                                        if (_titleValidate == false &&
+                                            _desValidate == false &&
+                                            _dateValidate == false &&
+                                            _eventTypeValidate == false &&
+                                            _image != null) {
+                                          _uploadFile();
+                                        }
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    color: Colors.redAccent,
+                                    child: Text(
+                                      "Add",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              )
+                      ],
                     ),
                   ),
+                ),
               )
             ],
           ),
@@ -477,7 +474,8 @@ class _AddEventState extends State<AddEvent> {
   }
 
   Future _uploadFile() async {
-    ProgressDialog pr = new ProgressDialog(context,type: ProgressDialogType.Normal,showLogs: true,isDismissible: false);
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, showLogs: true, isDismissible: false);
     pr.style(
         borderRadius: 20.0,
         elevation: 20.0,
@@ -488,15 +486,14 @@ class _AddEventState extends State<AddEvent> {
           color: Colors.white,
           fontSize: 19.0,
           wordSpacing: 2.0,
-        )
-    );
+        ));
     await pr.show();
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('e-board Images/${Path.basename(_image.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
-    if(uploadTask.isSuccessful) {
+    if (uploadTask.isSuccessful) {
       print('File Uploaded');
       storageReference.getDownloadURL().then((fileURL) {
         setState(() {
@@ -532,11 +529,10 @@ class _AddEventState extends State<AddEvent> {
           Navigator.pop(context);
         }
       }
-    }
-    else{
+    } else {
       pr.hide();
-      Fluttertoast.showToast(msg: "There Is Some Error Uploading Image Please Try Again");
+      Fluttertoast.showToast(
+          msg: "There Is Some Error Uploading Image Please Try Again");
     }
-
   }
 }

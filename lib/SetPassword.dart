@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:ecoleami1_0/SplashScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -208,7 +211,8 @@ class _SetPasswordState extends State<SetPassword> {
                 )),
               ),
               new Container(
-                  padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
+                  padding:
+                      const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
                   child: new Form(
                       child: new Card(
                           elevation: 30.0,
@@ -218,9 +222,9 @@ class _SetPasswordState extends State<SetPassword> {
                               padding: const EdgeInsets.all(15.0),
                               child: new Column(children: <Widget>[
                                 new TextField(
-                                    onChanged: (value) {
-                                      validateStructure(value);
-                                    },
+                                  onChanged: (value) {
+                                    validateStructure(value);
+                                  },
                                   controller: _pass,
                                   obscureText: _obscureText,
                                   focusNode: myFocusNode,
@@ -230,9 +234,8 @@ class _SetPasswordState extends State<SetPassword> {
                                   cursorWidth: 3.0,
                                   decoration: new InputDecoration(
                                       hintText: "Set Password",
-                                      errorText: _passValidate
-                                          ? errorMessage
-                                          : null,
+                                      errorText:
+                                          _passValidate ? errorMessage : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
                                         color: Colors.grey,
@@ -264,9 +267,8 @@ class _SetPasswordState extends State<SetPassword> {
                                   cursorWidth: 3.0,
                                   decoration: new InputDecoration(
                                       hintText: "Confirm Password",
-                                      errorText: _cPassValidate
-                                          ? errorMessage2
-                                          : null,
+                                      errorText:
+                                          _cPassValidate ? errorMessage2 : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
                                         color: Colors.grey,
@@ -306,25 +308,27 @@ class _SetPasswordState extends State<SetPassword> {
                                         print(_passValidate);
                                         if (_pass.text.isEmpty) {
                                           _passValidate = true;
-                                          errorMessage = "Password can not be empty";
+                                          errorMessage =
+                                              "Password can not be empty";
                                         } else {
                                           _passValidate = false;
                                         }
                                         if (_confirmPass.text.isEmpty) {
                                           _cPassValidate = true;
-                                          errorMessage2 = "Password does not match";
+                                          errorMessage2 =
+                                              "Password does not match";
                                         } else {
                                           _cPassValidate = false;
                                         }
                                         if (_passValidate == false &&
                                             _cPassValidate == false) {
-                                          if (_pass.text
-                                              .compareTo(_confirmPass.text) !=
-                                              0 ) {
+                                          if (_pass.text.compareTo(
+                                                  _confirmPass.text) !=
+                                              0) {
                                             _cPassValidate = true;
                                             _confirmPass.clear();
                                             errorMessage2 =
-                                            "Password does not match";
+                                                "Password does not match";
                                           } else {
                                             _passValidate = false;
                                             _cPassValidate = false;
@@ -357,12 +361,13 @@ class _SetPasswordState extends State<SetPassword> {
   }
 
   Future<void> savePassword() async {
+    var _passwordHash = md5.convert(utf8.encode(_pass.text));
     try {
       Firestore.instance
           .collection("login_details")
           .document(_username)
           .updateData({
-        'password': _pass.text,
+        'password': _passwordHash.toString(),
       });
       SharedPreferences prf = await SharedPreferences.getInstance();
       prf.setString("Username", "");

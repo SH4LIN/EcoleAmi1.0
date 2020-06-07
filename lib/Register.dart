@@ -138,66 +138,65 @@ class __RegisterPageState extends State<_RegisterPage> {
                         borderRadius: BorderRadius.circular(20.0),
                       )),
                 ),
-                new Padding(
-                    padding: const EdgeInsets.only(bottom: 40.0, left: 150)),
-                new RaisedButton(
-                    color: Colors.redAccent,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: new Text(
-                      "Verify",
-                      style: new TextStyle(
-                        color: Colors.white,
-                        fontSize: 15.0,
-                        wordSpacing: 2.0,
-                        letterSpacing: 0.3,
+                Center(
+                  child: new RaisedButton(
+                      color: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      child: new Text(
+                        "Verify",
+                        style: new TextStyle(
+                          color: Colors.white,
+                          fontSize: 15.0,
+                          wordSpacing: 2.0,
+                          letterSpacing: 0.3,
+                        ),
                       ),
-                    ),
-                    splashColor: Colors.red,
-                    onPressed: () async {
-                      if (_otp.text.length < 6) {
-                        setState(() {
-                          _otpValidate = true;
-                          errorMessage = "Invalid OTP";
-                        });
-                      } else {
-                        setState(() {
-                          _otpValidate = false;
-                        });
-                        try {
-                          AuthCredential credential =
-                              PhoneAuthProvider.getCredential(
-                                  verificationId: verificationId,
-                                  smsCode: _otp.text.trim());
-                          AuthResult result =
-                              await _auth.signInWithCredential(credential);
-                          FirebaseUser user = result.user;
-                          print(user);
-                          if (user != null) {
-                            Navigator.of(context).pop();
-                            if (role == "parent") {
-                              Navigator.of(context).pushReplacement(
-                                  new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          new SetParentDetails()));
+                      splashColor: Colors.red,
+                      onPressed: () async {
+                        if (_otp.text.length < 6) {
+                          setState(() {
+                            _otpValidate = true;
+                            errorMessage = "Invalid OTP";
+                          });
+                        } else {
+                          setState(() {
+                            _otpValidate = false;
+                          });
+                          try {
+                            AuthCredential credential =
+                                PhoneAuthProvider.getCredential(
+                                    verificationId: verificationId,
+                                    smsCode: _otp.text.trim());
+                            AuthResult result =
+                                await _auth.signInWithCredential(credential);
+                            FirebaseUser user = result.user;
+                            print(user);
+                            if (user != null) {
+                              Navigator.of(context).pop();
+                              if (role == "parent") {
+                                Navigator.of(context).pushReplacement(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            new SetParentDetails()));
+                              } else {
+                                Navigator.of(context).pushReplacement(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            new SetPassword()));
+                              }
                             } else {
-                              Navigator.of(context).pushReplacement(
-                                  new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          new SetPassword()));
+                              print("Error");
                             }
-                          } else {
-                            print("Error");
+                          } catch (e) {
+                            handleError(e);
                           }
-                        } catch (e) {
-                          handleError(e);
                         }
-                      }
-                    })
+                      }),
+                )
               ],
             ),
           );
-
         });
   }
 

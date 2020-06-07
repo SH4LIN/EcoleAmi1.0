@@ -5,6 +5,8 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/GenrateAttendance.dart';
+import 'package:ecoleami1_0/NotifyStudent.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
@@ -19,7 +21,6 @@ import 'MainScreen.dart';
 import 'ManageVerification.dart';
 import 'ShowImage.dart';
 import 'SplashScreen.dart';
-import 'TakeAttendance.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -167,7 +168,7 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
               trailing: new Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (BuildContext context) => TakeAttendance()));
+                    builder: (BuildContext context) => GenerateAttendance()));
               },
             ),
             new ListTile(
@@ -183,11 +184,14 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
             ),
             new ListTile(
               title: new Text(
-                "Dummy 3",
+                "Notify Student",
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-              trailing: new Icon(Icons.cancel),
-              onTap: _onItemTapped1,
+              trailing: new Icon(Icons.notification_important),
+              onTap: () {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (context) => NotifyStudent()));
+              },
             ),
           ],
         ),
@@ -703,16 +707,30 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(100.0),
-              child: FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-            ),
+            StreamBuilder<DocumentSnapshot>(
+                stream: Firestore.instance
+                    .collection("faculty_details")
+                    .document(_username)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot != null && snapshot.hasData) {
+                    var doc = snapshot.data;
+                    var name = doc['first_name'];
+                    return CircleAvatar(
+                      maxRadius: 40,
+                      backgroundColor:
+                          Theme.of(context).platform == TargetPlatform.iOS
+                              ? Colors.blue
+                              : Colors.cyanAccent,
+                      child: Text(
+                        '${name[0]}',
+                        style: TextStyle(fontSize: 40.0),
+                      ),
+                    );
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                }),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
               child: Column(

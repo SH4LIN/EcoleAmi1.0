@@ -1,29 +1,25 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecoleami1_0/ChangePassword.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
-import 'package:ecoleami1_0/StudentNotify.dart';
-import 'package:ecoleami1_0/TakeAttendance.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
 import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'ChangePassword.dart';
 import 'MainScreen.dart';
 import 'package:path/path.dart' as Path;
 import 'package:carousel_pro/carousel_pro.dart';
 import 'ShowImage.dart';
 import 'SplashScreen.dart';
+import 'TakeAttendance.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -56,14 +52,13 @@ class StudentActivityPage extends StatefulWidget {
 
 class _StudentActivityPageState extends State<StudentActivityPage>
     with SingleTickerProviderStateMixin {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      new FlutterLocalNotificationsPlugin();
+  var _image;
   SharedPreferences prf;
   String _username;
-  var _image;
   int selectedIndex = 0;
   String _enrCheck;
   int id;
+
   List<NavigationItem> items = [
     NavigationItem(Icon(Icons.home), Text("Home"), Colors.deepPurpleAccent),
     NavigationItem(
@@ -71,23 +66,21 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
     NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
   ];
-
+  TextEditingController _fName = new TextEditingController();
   TextEditingController _mName = new TextEditingController();
   TextEditingController _lName = new TextEditingController();
-  TextEditingController _fName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
   TextEditingController _sem = new TextEditingController();
-  TextEditingController _enr = new TextEditingController();
   TextEditingController _div = new TextEditingController();
   TextEditingController _parent_phone = new TextEditingController();
+  TextEditingController _enr = new TextEditingController();
   TextEditingController _finalEnr = new TextEditingController();
 
   bool _enrValidate = false;
-
+  bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
-  bool _fValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
   bool _semValidate = false;
@@ -169,47 +162,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             ),
             new ListTile(
               title: new Text(
-                "Assignment",
-                style: Theme.of(context).textTheme.subtitle1,
+                "Attendance",
+                style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.assignment),
-              onTap: () async {
-                print(_username);
-                await Firestore.instance
-                    .collection('student_details')
-                    .document(_username)
-                    .get()
-                    .then((value) {
-                  if (value != null) {
-                    var semesterForAssignment = value["semester"];
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            Student_Assignment(semesterForAssignment)));
-                  }
-                });
+              trailing: new Icon(Icons.settings_overscan),
+              onTap: () {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) => new TakeAttendance()));
               },
             ),
             new ListTile(
               title: new Text(
-                "Attendance",
-                style: Theme.of(context).textTheme.subtitle1,
+                "Dummy 1",
+                style: Theme.of(context).textTheme.subhead,
               ),
               trailing: new Icon(Icons.cancel),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => TakeAttendance()));
-              },
+              onTap: _onItemTapped1,
             ),
             new ListTile(
               title: new Text(
-                "Change of Schedule",
-                style: Theme.of(context).textTheme.subtitle1,
+                "Dummy 2",
+                style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.schedule),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => StudentNotify()));
-              },
+              trailing: new Icon(Icons.cancel),
+              onTap: _onItemTapped1,
+            ),
+            new ListTile(
+              title: new Text(
+                "Dummy 3",
+                style: Theme.of(context).textTheme.subhead,
+              ),
+              trailing: new Icon(Icons.cancel),
+              onTap: _onItemTapped1,
             ),
           ],
         ),
@@ -217,12 +201,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.white
+          ? Colors.grey
           : selectedIndex == 1
-              ? Colors.red
+              ? Colors.white
               : selectedIndex == 2
                   ? Colors.greenAccent
-                  : selectedIndex == 3 ? Colors.black : Colors.white,
+                  : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
 
@@ -318,38 +302,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-  List _setCarouselImages(int len) {
-    List data = new List<Widget>();
-    for (int i = 0; i < len; i++) {
-      if (notice_board_data[i]["expiry_date"]
-              .toDate()
-              .toString()
-              .compareTo(DateTime.now().toString()) <
-          1) {
-        continue;
-      }
-      data.add(CachedNetworkImage(
-          imageUrl: notice_board_data[i]["url"],
-          placeholder: (context, url) =>
-              Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => new Icon(Icons.error)));
-    }
-    if (data.isEmpty) {
-      for (int i = 0; i < len; i++) {
-        data.add(CachedNetworkImage(
-            imageUrl: notice_board_data[i]["url"],
-            placeholder: (context, url) =>
-                Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => new Icon(Icons.error)));
-      }
-      return data;
-    } else {
-      return data;
-    }
-  }
-
-  bool isEmpty = false;
-  var notice_board_data;
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
@@ -359,46 +311,37 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           height: 180.0,
           width: 300.0,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
-          child: StreamBuilder(
-              stream: Firestore.instance
-                  .collection("e-notice-board")
-                  .orderBy("timestamp", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot != null && snapshot.hasData) {
-                  notice_board_data = snapshot.data.documents;
-                  int length = notice_board_data.length == 1
-                      ? notice_board_data.length
-                      : (notice_board_data.length / 2).toInt();
-                  print(length);
-                  return Container(
-                    color: Colors.black,
-                    margin: EdgeInsets.only(top: 10),
-                    child: Carousel(
-                      dotColor: Colors.grey,
-                      borderRadius: true,
-                      radius: Radius.circular(20.0),
-                      autoplayDuration: Duration(seconds: 5),
-                      autoplay: true,
-                      animationCurve: Curves.easeIn,
-                      animationDuration: Duration(milliseconds: 1000),
-                      dotSize: 6.0,
-                      dotIncreasedColor: Colors.purple,
-                      dotBgColor: Colors.transparent,
-                      dotPosition: DotPosition.bottomCenter,
-                      dotVerticalPadding: 10.0,
-                      showIndicator: true,
-                      indicatorBgPadding: 7.0,
-                      onImageTap: (index) {
-                        print(index);
-                      },
-                      images: _setCarouselImages(length),
-                    ),
-                  );
-                } else {
-                  return CircularProgressIndicator();
-                }
-              }),
+          child: Carousel(
+            dotColor: Colors.grey,
+            borderRadius: true,
+            radius: Radius.circular(50.0),
+            autoplayDuration: Duration(seconds: 5),
+            autoplay: true,
+            animationCurve: Curves.easeIn,
+            animationDuration: Duration(milliseconds: 1000),
+            dotSize: 6.0,
+            dotIncreasedColor: Colors.purple,
+            dotBgColor: Colors.transparent,
+            dotPosition: DotPosition.bottomCenter,
+            dotVerticalPadding: 10.0,
+            showIndicator: true,
+            indicatorBgPadding: 7.0,
+            onImageTap: (index) {
+              print(index);
+            },
+            images: [
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
+            ],
+          ),
         ),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -414,7 +357,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Events",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -423,75 +366,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List events_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"].compareTo("Event") == 0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              events_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return events_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: events_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: events_notice[index]
-                                                ['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              events_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -510,7 +416,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "College Schedule",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -519,78 +425,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List schedule_notice = new List<DocumentSnapshot>();
-
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                                  .compareTo("College Schedule") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              schedule_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return schedule_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: schedule_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: schedule_notice[index]
-                                                ['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              schedule_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return Text("Please Wait..");
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -609,7 +475,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Fee Payment",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -618,76 +484,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List fee_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                                  .compareTo("Fee Payment") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              fee_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return fee_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: fee_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: fee_notice[index]['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              fee_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -697,25 +525,49 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   }
 
   void setProfile() async {
-    StreamBuilder(
-        stream: Firestore.instance
-            .collection("student_details")
-            .document(_username)
-            .snapshots(),
-        // ignore: missing_return
-        builder: (context, snapshot) {
-          if (snapshot != null && snapshot.hasData) {
-            var document = snapshot.data;
-            _enrCheck = document['enrollment'];
-            _finalEnr.text = document['enrollment'];
-            _fName.text = document['first_name'];
-            _mName.text = document['middle_name'];
-            _lName.text = document['last_name'];
-            _eMail.text = document['email'];
-            _phone.text = document['phone_number'];
-            _sem.text = document['semester'];
+    Firestore.instance
+        .collection("student_details")
+        .document(_username)
+        .get()
+        .then((document) {
+      _enrCheck = document['enrollment'];
+      _finalEnr.text = document['enrollment'];
+      _fName.text = document['first_name'];
+      _mName.text = document['middle_name'];
+      _lName.text = document['last_name'];
+      _eMail.text = document['email'];
+      _phone.text = document['phone_number'];
+      _sem.text = document['semester'];
+      _div.text = document['division'];
+//      _currentSem = document['semester'] + " " + document['division'];
+    });
+    /*StreamBuilder(
+      stream: Firestore.instance
+          .collection("student_details")
+          .document(_username)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return Text("Loading...");
+        }
+        if (snapshot.hasData) {
+          while (_username == null || snapshot.data == null) {
+            Future.delayed(Duration(seconds: 1));
+            print(_username);
           }
-        });
+          var document = snapshot.data;
+          _enrCheck = document['enrollment'];
+          _finalEnr.text = document['enrollment'];
+          _fName.text = document['first_name'];
+          _mName.text = document['middle_name'];
+          _lName.text = document['last_name'];
+          _eMail.text = document['email'];
+          _phone.text = document['phone_number'];
+          _sem.text = document['semester'];
+        }
+        return Text("Loading...");
+      },
+    );*/
   }
 
   Widget _buildBodyProfile() {
@@ -1175,192 +1027,192 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     });
     return _semester != null
         ? ListView(
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.65,
-                    child: StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('QnA')
-                            .document("student")
-                            .collection(_semester)
-                            .orderBy('timestamp', descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot != null && snapshot.hasData) {
-                            msgItems = snapshot.data.documents;
-                          }
-                          return ListView.builder(
-                            itemBuilder: (context, index) {
-                              String senderUsername = msgItems[index]['userid'];
-                              int type = msgItems[index]['type'];
-                              return Column(
-                                crossAxisAlignment:
-                                    (senderUsername.compareTo(_username)) == 0
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    alignment:
-                                        (senderUsername.compareTo(_username)) ==
-                                                0
-                                            ? Alignment.topRight
-                                            : Alignment.topLeft,
-                                    child: Wrap(children: <Widget>[
-                                      Bubble(
-                                        padding: BubbleEdges.only(left: 8),
-                                        elevation: 10.0,
-                                        shadowColor: Colors.white,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              (senderUsername.compareTo(
-                                                          _username)) ==
-                                                      0
-                                                  ? "You"
-                                                  : senderUsername,
-                                              style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                  fontSize: 12),
-                                            ),
-                                            SizedBox(height: 8),
-                                            type == 0
-                                                ? Text(
-                                                    msgItems[index]['message'],
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black),
-                                                  )
-                                                : GestureDetector(
-                                                    onTap: () {
-                                                      print(index);
-                                                      Navigator.of(context).push(
-                                                          new MaterialPageRoute(
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  ShowImage(msgItems[
-                                                                          index]
-                                                                      [
-                                                                      'message'])));
-                                                    },
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: msgItems[index]
-                                                          ['message'],
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Center(
-                                                              child:
-                                                                  CircularProgressIndicator()),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          new Icon(Icons.error),
-                                                    ),
-                                                  ),
-                                            SizedBox(height: 3),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(
-                                                  msgItems[index]['time'],
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 10),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        nip: (senderUsername
-                                                    .compareTo(_username)) ==
-                                                0
-                                            ? BubbleNip.rightTop
-                                            : BubbleNip.leftTop,
-                                      ),
-                                    ]),
-                                    padding:
-                                        EdgeInsets.only(top: 10.0, left: 8),
-                                    margin: EdgeInsets.only(bottom: 8),
-                                  ),
-                                ],
-                              );
-                            },
-                            reverse: true,
-                            itemCount: msgItems != null ? msgItems.length : 0,
-                          );
-                        }),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(top: 15),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(26),
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Row(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.65,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("student")
+                      .collection(_semester)
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      SizedBox(width: 16),
-                                      Expanded(
-                                          child: TextFormField(
-                                        controller: _msg,
-                                        keyboardType: TextInputType.multiline,
-                                        minLines: 1,
-                                        maxLines: 100,
-                                        decoration: InputDecoration(
-                                          hintText: 'Type a message',
-                                          border: InputBorder.none,
-                                          alignLabelWithHint: true,
-                                        ),
-                                      )),
-                                      GestureDetector(
-                                        onTap: () => sendImage(),
-                                        child: Icon(Icons.image,
-                                            color: Theme.of(context).hintColor),
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : senderUsername,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
                                       ),
-                                      SizedBox(width: 8.0),
-                                      SizedBox(width: 8.0),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
+                                        },
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) =>
+                                          new Icon(Icons.error),
+                                        ),
+                                      ),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
                                 ),
-                              ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      controller: _msg,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 15),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _type = 0;
-                                  sendMessage(_msg.text);
-                                  _msg.clear();
-                                });
-                              },
-                              child: CircleAvatar(
-                                child: Icon(Icons.send),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
-            ],
-          )
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
         : Center(child: CircularProgressIndicator());
   }
 
@@ -1456,20 +1308,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       child: ListView(
         children: <Widget>[
           ListTile(
-              leading: Icon(
-                Icons.lock,
-                color: Colors.white,
-              ),
-              title: Text(
-                "Change Password",
-                style: TextStyle(color: Colors.white),
-              ),
-              trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-              onTap: () {
-                Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (BuildContext context) => new ChangePassword()));
-              }),
-          ListTile(
             leading: Icon(
               Icons.info_outline,
               color: Colors.white,
@@ -1491,6 +1329,20 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             ),
             trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
           ),
+          ListTile(
+              leading: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              title: Text(
+                "Change Password",
+                style: TextStyle(color: Colors.white),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+              onTap: () {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) => new ChangePassword()));
+              }),
           ListTile(
               title: new Text(
                 "Logout",
@@ -1557,6 +1409,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     barrierDismissible: true,
                     barrierLabel: '',
                     context: context,
+                    // ignore: missing_return
                     pageBuilder: (context, animation1, animation2) {});
               })
         ],
@@ -1586,62 +1439,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     super.initState();
     user != null ? _username = user : setUser();
     setProfile();
-    /*var initializeAndroidSettings =
-        AndroidInitializationSettings('images/ecoleami.png');
-    var inititalizeIosSettings = IOSInitializationSettings();
-    var initializeSettings = InitializationSettings(
-        initializeAndroidSettings, inititalizeIosSettings);
-    flutterLocalNotificationsPlugin.initialize(initializeSettings,
-        onSelectNotification: onSelectNotification);*/
-    /*Firestore.instance
-        .collection("student_details")
-        .document(_username)
-        .get()
-        .then((value) {*/
-    /*var tempdata = StreamBuilder<QuerySnapshot>(
-      builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot != null) {
-          var documents = snapshot.data;
-          var data = documents.documents;
-          print("Length: $data.length");
-          return data;
-          //_showNotification(data);
-        } else {
-          return null;
-          print("else");
-        }
-      },
-      stream: Firestore.instance
-          .collection("Notify_student")
-          .document("6")
-          .collection("B")
-          .orderBy('timestamp', descending: true)
-          .snapshots(),
-    );
-    print(tempdata);
-    //});*/
   }
-
-  /* Future _showNotification(data) async {
-    var androidPlatformSpecific = AndroidNotificationDetails(
-        "Ecoleami Notification",
-        "Ecoleami Notification",
-        "Ecoleami Notification",
-        importance: Importance.Max,
-        enableVibration: true,
-        priority: Priority.High);
-    var IOSPlatformSpecific = IOSNotificationDetails();
-    var platformChannelSpecifics =
-        new NotificationDetails(androidPlatformSpecific, IOSPlatformSpecific);
-    await flutterLocalNotificationsPlugin.show(0, data[0]['full_name'],
-        data['0']['description'], platformChannelSpecifics,
-        payload: data[0]['description'].toString());
-  }
-
-  Future onSelectNotification(String payload) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => StudentNotify()));
-  }*/
 
   void setUser() async {
     prf = await SharedPreferences.getInstance();
@@ -1683,197 +1481,4 @@ class NavigationItem {
   final Color color;
 
   NavigationItem(this.icon, this.title, this.color);
-}
-
-class Student_Assignment extends StatelessWidget {
-  final sem;
-  Student_Assignment(this.sem);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CommonAppBar("Assignments Semester: $sem "),
-      body: Student_Assignment_Home(sem),
-    );
-  }
-}
-
-class Student_Assignment_Home extends StatefulWidget {
-  final sem;
-  Student_Assignment_Home(this.sem);
-  @override
-  _Student_Assignment_HomeState createState() =>
-      _Student_Assignment_HomeState(sem);
-}
-
-class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
-  final sem;
-  var totalData = -1;
-  _Student_Assignment_HomeState(this.sem);
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection("assignments")
-              .where("semester", isEqualTo: sem)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot != null && snapshot.hasData) {
-              QuerySnapshot data = snapshot.data;
-              var allData = data.documents;
-              if (data.documents.length != null) {
-                totalData = data.documents.length;
-                print("Data $totalData");
-              }
-              if (totalData == -1) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (totalData == 0) {
-                return Center(
-                  child: Text("No Assignments Are Given"),
-                );
-              } else {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    print("Index $index");
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-                      child: GestureDetector(
-                        onTap: () {
-                          String fileUrl;
-                          downloadPdf(allData[index]["url"],
-                                  allData[index]['assignment name'])
-                              .then((String url) {
-                            fileUrl = url;
-                            if (fileUrl == '') {
-                              Fluttertoast.showToast(
-                                  msg: "File Could Not be Downloaded");
-                            } else {
-                              OpenFile.open(fileUrl, type: 'pdf');
-                            }
-                          });
-                        },
-                        child: Card(
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              child: Icon(Icons.picture_as_pdf),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                Icons.cloud_download,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                String fileUrl;
-                                downloadPdf(allData[index]["url"],
-                                        allData[index]['assignment name'])
-                                    .then((String url) {
-                                  fileUrl = url;
-                                  if (fileUrl == '') {
-                                    Fluttertoast.showToast(
-                                        msg: "File Could Not be Downloaded");
-                                  } else {
-                                    OpenFile.open(fileUrl);
-                                  }
-                                });
-                              },
-                            ),
-                            title: Text(allData[index]['assignment name']),
-                            subtitle: Text(
-                              allData[index]['subject'],
-                              style: TextStyle(fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        onLongPress: () {
-                          showGeneralDialog(
-                              barrierColor: Colors.black.withOpacity(0.5),
-                              transitionBuilder: (context, a1, a2, widget) {
-                                final curvedValue =
-                                    Curves.easeInOutBack.transform(a1.value) -
-                                        1.0;
-                                return Transform(
-                                  transform: Matrix4.translationValues(
-                                      0.0, curvedValue * 200, 0.0),
-                                  child: Opacity(
-                                    opacity: a1.value,
-                                    child: AlertDialog(
-                                      shape: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16.0)),
-                                      title: Text(
-                                        'Warning!',
-                                        style: TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 25),
-                                      ),
-                                      content: Text(
-                                          'Are You Sure You Want To Delete This Assignment?'),
-                                      actions: <Widget>[
-                                        new FlatButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: new Text(
-                                              "No",
-                                              style: TextStyle(fontSize: 18),
-                                            )),
-                                        new FlatButton(
-                                            onPressed: () async {
-                                              var documentid =
-                                                  allData[index].documentID;
-                                              Firestore.instance
-                                                  .collection("assignments")
-                                                  .document(documentid)
-                                                  .delete();
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: new Text(
-                                              "Yes",
-                                              style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontSize: 18),
-                                            ))
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              transitionDuration: Duration(milliseconds: 200),
-                              barrierDismissible: true,
-                              barrierLabel: '',
-                              context: context,
-                              // ignore: missing_return
-                              pageBuilder:
-                                  (context, animation1, animation2) {});
-                        },
-                      ),
-                    );
-                  },
-                  itemCount: totalData,
-                );
-              }
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          }),
-    );
-  }
-
-  Future<String> downloadPdf(String url, String name) async {
-    var directory = await getApplicationDocumentsDirectory();
-    var filepath = '${directory.path}/' + name;
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      var file = File(filepath);
-      print(filepath);
-      await file.writeAsBytes(response.bodyBytes);
-      return filepath;
-    }
-    return '';
-  }
 }

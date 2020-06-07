@@ -49,29 +49,79 @@ class _ManageInformationState extends State<ManageInformation> {
     super.initState();
   }
 
+  TextEditingController _search = new TextEditingController();
+  bool isSearching = false;
   @override
   Widget build(BuildContext context) {
+    _search.addListener(() {
+      if (_search.text.length > 0) {
+        setState(() {
+          isSearching = true;
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
+    });
     return new Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       appBar: CommonAppBar("Manage Student Details"),
       body: new Container(
         padding: EdgeInsets.all(5.0),
         child: new Column(
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: TextField(
+                controller: _search,
+                onTap: () {
+                  FocusScopeNode focusscopenode = FocusScope.of(context);
+                  if (!focusscopenode.hasPrimaryFocus) {
+                    focusscopenode.unfocus();
+                  }
+                },
+                keyboardType: TextInputType.text,
+                cursorColor: Colors.purple,
+                cursorRadius: Radius.circular(50.0),
+                cursorWidth: 3.0,
+                decoration: new InputDecoration(
+                    labelText: "Enrollment Search",
+                    prefixIcon: new Icon(Icons.person),
+                    border: new OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    )),
+              ),
+            ),
             new Flexible(
-              child: StreamBuilder(
-                  stream: Firestore.instance
-                      .collection("student_details")
-                      .snapshots(),
-                  builder: (context, snap) {
-                    len = snap.data.documents.length;
-                    return ListView.builder(
-                      itemBuilder: _getListItemTile,
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: len,
-                    );
-                  }),
+              child: !isSearching
+                  ? StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .snapshots(),
+                      builder: (context, snap) {
+                        len = snap.data.documents.length;
+                        return ListView.builder(
+                          itemBuilder: _getListItemTile,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: len,
+                        );
+                      })
+                  : StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("student_details")
+                          .where("enrollment", isEqualTo: _search.text)
+                          .snapshots(),
+                      builder: (context, snap) {
+                        len = snap.data.documents.length;
+                        return ListView.builder(
+                          itemBuilder: _getSearchedListItemTile,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: len,
+                        );
+                      }),
             ),
           ],
         ),
@@ -94,7 +144,7 @@ class _ManageInformationState extends State<ManageInformation> {
       margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       borderOnForeground: true,
       child: new Container(
-        padding: EdgeInsets.only(top: 15.0,bottom: 15.0),
+        padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
         child: new Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -182,7 +232,103 @@ class _ManageInformationState extends State<ManageInformation> {
     );
   }
 
-  void studentRemove(int id) async{
+  Widget _getSearchedListItemTile(BuildContext context, int index) {
+    return new Card(
+      elevation: 10.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      borderOnForeground: true,
+      child: new Container(
+        padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  width: 100.0,
+                  height: 90.0,
+                  margin: EdgeInsets.only(left: 10.0, right: 7.0),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: AssetImage('images/dummyimg.png')),
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    color: Colors.redAccent,
+                  ),
+                ),
+              ],
+            ),
+            new Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("student_details")
+                        .where("enrollment", isEqualTo: _search.text)
+                        .snapshots(),
+                    builder: (context, snap) {
+                      itemsStudent = snap.data.documents;
+                      /*print(items.runtimeType);
+                      print(items[index].documentID);
+                      print(snap.data.runtimeType);*/
+                      return Text(
+                        "Name : " +
+                            itemsStudent[index]['first_name'] +
+                            " " +
+                            itemsStudent[index]['middle_name'] +
+                            " " +
+                            itemsStudent[index]['last_name'],
+                        style: new TextStyle(
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
+                      );
+                    }),
+                new Padding(padding: EdgeInsets.only(bottom: 5.0)),
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("student_details")
+                        .snapshots(),
+                    builder: (context, snap) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        "Enrollment : " + itemsStudent[index]['enrollment'],
+                        style: new TextStyle(
+                            fontSize: 8.0, fontWeight: FontWeight.bold),
+                      );
+                    }),
+                new Padding(padding: EdgeInsets.only(bottom: 21.0)),
+                new Row(
+                  children: <Widget>[
+                    new OutlineButton(
+                      onPressed: () => {
+                        Navigator.push(context,
+                            new MaterialPageRoute(builder: (context) {
+                          return new UpdateStudent(index);
+                        }))
+                      },
+                      child: new Text("Update",
+                          style: new TextStyle(color: Colors.green)),
+                    ),
+                    new Padding(
+                      padding: EdgeInsets.only(right: 20.0),
+                    ),
+                    new OutlineButton(
+                      onPressed: () => studentRemove(index),
+                      child: new Text("Remove",
+                          style: new TextStyle(color: Colors.red)),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void studentRemove(int id) async {
     var _document = itemsStudent[id].documentID;
     var _parentDocument;
     await Firestore.instance
