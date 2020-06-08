@@ -4,6 +4,7 @@ import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/Contactus.dart';
 import 'package:ecoleami1_0/StudentNotify.dart';
 import 'package:ecoleami1_0/TakeAttendance.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -194,7 +195,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 "Attendance",
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-              trailing: new Icon(Icons.cancel),
+              trailing: new Icon(Icons.add),
               onTap: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => TakeAttendance()));
@@ -396,7 +397,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     ),
                   );
                 } else {
-                  return CircularProgressIndicator();
+                  return Text(
+                    "Loading...",
+                    style: TextStyle(color: Colors.white),
+                  );
                 }
               }),
         ),
@@ -727,16 +731,30 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(100.0),
-              child: FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-            ),
+            StreamBuilder<DocumentSnapshot>(
+                stream: Firestore.instance
+                    .collection("student_details")
+                    .document(_username)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot != null && snapshot.hasData) {
+                    var doc = snapshot.data;
+                    var name = doc['first_name'];
+                    return CircleAvatar(
+                      maxRadius: 40,
+                      backgroundColor:
+                          Theme.of(context).platform == TargetPlatform.iOS
+                              ? Colors.blue
+                              : Colors.cyanAccent,
+                      child: Text(
+                        '${name[0]}',
+                        style: TextStyle(fontSize: 40.0),
+                      ),
+                    );
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                }),
             Container(
               margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
               child: Column(
@@ -1485,6 +1503,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Icons.call,
               color: Colors.white,
             ),
+            onTap: () {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Contactus()));
+            },
             title: Text(
               "Contact Us",
               style: TextStyle(color: Colors.white),

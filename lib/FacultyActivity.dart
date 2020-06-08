@@ -5,6 +5,7 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/Contactus.dart';
 import 'package:ecoleami1_0/GenrateAttendance.dart';
 import 'package:ecoleami1_0/NotifyStudent.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -925,6 +926,10 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
               "Contact Us",
               style: TextStyle(color: Colors.white),
             ),
+            onTap: () {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Contactus()));
+            },
             trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
           ),
           ListTile(

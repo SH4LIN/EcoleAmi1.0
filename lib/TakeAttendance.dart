@@ -103,7 +103,8 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                               new List<DocumentSnapshot>();
                           data.forEach((element) {
                             if (element["type"].compareTo("Theory") == 0) {
-                              if (element["batch"].compareTo(_div) == 0) {
+                              if (element["batch"].compareTo(_div) == 0 &&
+                                  element['status'] == 1) {
                                 myTheoryData.add(element);
                               }
                             }
@@ -139,14 +140,11 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                               List<Color> _colors = [Colors.red, Colors.green];
                               Map<String, double> pieData =
                                   new HashMap<String, double>();
-                              /*print(
-                                  "Index: $index ${attendedPracticalSubjects[i[index]]} And ${j[index] - attendedPracticalSubjects[i[index]]} And ${i[index]}");*/
-                              pieData["Absent"] = j[index] -
-                                  attendedPracticalSubjects[i[index]]
+                              pieData["Absent"] =
+                                  (j[index] - attendedTheorySubjects[i[index]])
                                       .toDouble();
                               pieData["Present"] =
-                                  attendedPracticalSubjects[i[index]]
-                                      .toDouble();
+                                  attendedTheorySubjects[i[index]].toDouble();
                               return Container(
                                 height: 90,
                                 width: 300,
@@ -224,7 +222,8 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                           data.forEach((element) {
                             if (element["type"].compareTo("Practical") == 0) {
                               if (element["batch"].compareTo(_div + _batch) ==
-                                  0) {
+                                      0 &&
+                                  element['status'] == 1) {
                                 myPracticalData.add(element);
                               }
                             }
