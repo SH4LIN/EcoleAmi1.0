@@ -100,13 +100,17 @@ class _ManageInformationState extends State<ManageInformation> {
                           .collection("student_details")
                           .snapshots(),
                       builder: (context, snap) {
-                        len = snap.data.documents.length;
-                        return ListView.builder(
-                          itemBuilder: _getListItemTile,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: len,
-                        );
+                        if (snap.hasData && snap != null) {
+                          len = snap.data.documents.length;
+                          return ListView.builder(
+                            itemBuilder: _getListItemTile,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: len,
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
                       })
                   : StreamBuilder(
                       stream: Firestore.instance
@@ -114,13 +118,17 @@ class _ManageInformationState extends State<ManageInformation> {
                           .where("enrollment", isEqualTo: _search.text)
                           .snapshots(),
                       builder: (context, snap) {
-                        len = snap.data.documents.length;
-                        return ListView.builder(
-                          itemBuilder: _getSearchedListItemTile,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: len,
-                        );
+                        if (snap.hasData && snap != null) {
+                          len = snap.data.documents.length;
+                          return ListView.builder(
+                            itemBuilder: _getSearchedListItemTile,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: len,
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
                       }),
             ),
           ],
@@ -173,20 +181,24 @@ class _ManageInformationState extends State<ManageInformation> {
                         .collection("student_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      itemsStudent = snap.data.documents;
-                      /*print(items.runtimeType);
+                      if (snap.hasData && snap != null) {
+                        itemsStudent = snap.data.documents;
+                        /*print(items.runtimeType);
                       print(items[index].documentID);
                       print(snap.data.runtimeType);*/
-                      return Text(
-                        "Name : " +
-                            itemsStudent[index]['first_name'] +
-                            " " +
-                            itemsStudent[index]['middle_name'] +
-                            " " +
-                            itemsStudent[index]['last_name'],
-                        style: new TextStyle(
-                            fontSize: 10.0, fontWeight: FontWeight.bold),
-                      );
+                        return Text(
+                          "Name : " +
+                              itemsStudent[index]['first_name'] +
+                              " " +
+                              itemsStudent[index]['middle_name'] +
+                              " " +
+                              itemsStudent[index]['last_name'],
+                          style: new TextStyle(
+                              fontSize: 10.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
                 StreamBuilder(
@@ -194,12 +206,16 @@ class _ManageInformationState extends State<ManageInformation> {
                         .collection("student_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      itemsStudent = snap.data.documents;
-                      return Text(
-                        "Enrollment : " + itemsStudent[index]['enrollment'],
-                        style: new TextStyle(
-                            fontSize: 8.0, fontWeight: FontWeight.bold),
-                      );
+                      if (snap.hasData && snap != null) {
+                        itemsStudent = snap.data.documents;
+                        return Text(
+                          "Enrollment : " + itemsStudent[index]['enrollment'],
+                          style: new TextStyle(
+                              fontSize: 8.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 21.0)),
                 new Row(
@@ -269,33 +285,42 @@ class _ManageInformationState extends State<ManageInformation> {
                         .where("enrollment", isEqualTo: _search.text)
                         .snapshots(),
                     builder: (context, snap) {
-                      itemsStudent = snap.data.documents;
-                      /*print(items.runtimeType);
+                      if (snap.hasData && snap != null) {
+                        itemsStudent = snap.data.documents;
+                        /*print(items.runtimeType);
                       print(items[index].documentID);
                       print(snap.data.runtimeType);*/
-                      return Text(
-                        "Name : " +
-                            itemsStudent[index]['first_name'] +
-                            " " +
-                            itemsStudent[index]['middle_name'] +
-                            " " +
-                            itemsStudent[index]['last_name'],
-                        style: new TextStyle(
-                            fontSize: 10.0, fontWeight: FontWeight.bold),
-                      );
+                        return Text(
+                          "Name : " +
+                              itemsStudent[index]['first_name'] +
+                              " " +
+                              itemsStudent[index]['middle_name'] +
+                              " " +
+                              itemsStudent[index]['last_name'],
+                          style: new TextStyle(
+                              fontSize: 10.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
                 StreamBuilder(
                     stream: Firestore.instance
                         .collection("student_details")
+                        .where("enrollment", isEqualTo: _search.text)
                         .snapshots(),
                     builder: (context, snap) {
-                      itemsStudent = snap.data.documents;
-                      return Text(
-                        "Enrollment : " + itemsStudent[index]['enrollment'],
-                        style: new TextStyle(
-                            fontSize: 8.0, fontWeight: FontWeight.bold),
-                      );
+                      if (snap.hasData && snap != null) {
+                        itemsStudent = snap.data.documents;
+                        return Text(
+                          "Enrollment : " + itemsStudent[index]['enrollment'],
+                          style: new TextStyle(
+                              fontSize: 8.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
                     }),
                 new Padding(padding: EdgeInsets.only(bottom: 21.0)),
                 new Row(

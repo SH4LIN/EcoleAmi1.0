@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'FacultyActivity.dart';
 import 'Home.dart';
+import 'package:ecoleami1_0/ParentActivity.dart';
 import 'MainScreen.dart';
 import 'StudentActivity.dart';
+
 var user;
+
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -13,67 +17,57 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   SharedPreferences prf;
-  void checkState() async{
+  void checkState() async {
     print("Check State");
     prf = await SharedPreferences.getInstance();
-    if(prf != null){
+    if (prf != null) {
       print("IF1");
       print(prf.getBool("isLoggedIn").toString());
-      if(prf.get("isLoggedIn")!=null && prf.getBool("isLoggedIn")){
+      if (prf.get("isLoggedIn") != null && prf.getBool("isLoggedIn")) {
         print("IF2");
         user = prf.get("Username");
-        switch(prf.get("Role")){
+        switch (prf.get("Role")) {
           case "student":
-            Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new StudentActivity()
-                )
-            );
+            Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                builder: (BuildContext context) => new StudentActivity()));
             break;
           case "admin":
-            Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new Home()
-                )
-            );
+            Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                builder: (BuildContext context) => new Home()));
             break;
           case "faculty":
-            Navigator.of(context).pushReplacement(
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new FacultyActivity()
-                )
-            );
+            Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                builder: (BuildContext context) => new FacultyActivity()));
             break;
           case "parent":
+            Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                builder: (BuildContext context) => new ParentActivity()));
             break;
         }
-      }
-      else{
+      } else {
         print("Else1");
-        Navigator.of(context).pushReplacement(
-            new MaterialPageRoute(
-                builder: (BuildContext context) => new MainScreen()
-            )
-        );
+        Navigator.of(context).pushReplacement(new MaterialPageRoute(
+            builder: (BuildContext context) => new MainScreen()));
       }
-    }
-    else {
+    } else {
       print("Else2");
-      Navigator.of(context).pushReplacement(
-          new MaterialPageRoute(
-              builder: (BuildContext context) => new MainScreen()
-          )
-      );
+      Navigator.of(context).pushReplacement(new MaterialPageRoute(
+          builder: (BuildContext context) => new MainScreen()));
     }
   }
+
   @override
   void initState() {
-    // TODO: implement initState
+    initialize();
     super.initState();
-    Timer(
-        Duration(seconds: 5),
-        () => checkState()
-            );
+    Timer(Duration(seconds: 5), () => checkState());
+  }
+
+  Future<void> initialize() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(
+        debug: true // optional: set false to disable printing logs to console
+        );
   }
 
   @override
@@ -83,14 +77,14 @@ class _SplashScreenState extends State<SplashScreen> {
         height: double.infinity,
         width: double.infinity,
         foregroundDecoration: BoxDecoration(
-          backgroundBlendMode: BlendMode.colorBurn,
-          gradient: LinearGradient(
+            //backgroundBlendMode: BlendMode.colorBurn,
+            /*gradient: LinearGradient(
             colors: const [
               Colors.grey,
               Colors.black,
             ],
-          ),
-        ),
+          ),*/
+            ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

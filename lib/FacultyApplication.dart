@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +74,7 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                               alignment: Alignment.center,
                               child: new Text(
                                 "No Application yet!",
-                                style: TextStyle(fontSize: 25),
+                                style: TextStyle(fontSize: 14),
                               ),
                             );
                     }))
@@ -103,12 +105,16 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['parent_name'],
-                      style: new TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['parent_name'],
+                        style: new TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -118,12 +124,16 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['student_name'],
-                      style: new TextStyle(
-                          fontSize: 12.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['student_name'],
+                        style: new TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -133,12 +143,16 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['student_enrollment'],
-                      style: new TextStyle(
-                          fontSize: 12.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['student_enrollment'],
+                        style: new TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -148,12 +162,16 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['semester'],
-                      style: new TextStyle(
-                          fontSize: 12.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['semester'],
+                        style: new TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -163,20 +181,24 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return new Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      alignment: Alignment.centerLeft,
-                      child: new Column(
-                        children: <Widget>[
-                          new Text(
-                            itemsStudent[index]['description'],
-                            style: new TextStyle(
-                                fontSize: 10.0, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return new Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        alignment: Alignment.centerLeft,
+                        child: new Column(
+                          children: <Widget>[
+                            new Text(
+                              itemsStudent[index]['description'],
+                              style: new TextStyle(
+                                  fontSize: 10.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 15.0)),
@@ -186,63 +208,69 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    int action = itemsStudent[index]['action'];
-                    String facName = itemsStudent[index]['faculty_name'];
-                    int type = itemsStudent[index]['type'];
-                    return action == 0
-                        ? new Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(right: 20.0),
-                              ),
-                              new OutlineButton(
-                                onPressed: () => _accept(index),
-                                child: new Text("Accept",
-                                    style: new TextStyle(color: Colors.green)),
-                              ),
-                              new Padding(
-                                padding: EdgeInsets.only(right: 20.0),
-                              ),
-                              new OutlineButton(
-                                onPressed: () => {
-                                  type == 0
-                                      ? Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowLeave(
-                                                      itemsStudent[index]
-                                                          ['url'])))
-                                      : null
-                                },
-                                child: new Text("View",
-                                    style: new TextStyle(color: Colors.cyan)),
-                              ),
-                              new Padding(
-                                padding: EdgeInsets.only(right: 20.0),
-                              ),
-                              new OutlineButton(
-                                onPressed: () => _decline(index),
-                                child: new Text("Decline",
-                                    style: new TextStyle(color: Colors.red)),
-                              )
-                            ],
-                          )
-                        : (action == 1
-                            ? new Text(
-                                "Leave Report accepted by " + facName,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : new Text(
-                                "Leave Report Rejected " + facName,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold),
-                              ));
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      int action = itemsStudent[index]['action'];
+                      String facName = itemsStudent[index]['faculty_name'];
+                      int type = itemsStudent[index]['type'];
+                      return action == 0
+                          ? new Row(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                ),
+                                new OutlineButton(
+                                  onPressed: () => _accept(index),
+                                  child: new Text("Accept",
+                                      style:
+                                          new TextStyle(color: Colors.green)),
+                                ),
+                                new Padding(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                ),
+                                new OutlineButton(
+                                  onPressed: () => {
+                                    type == 0
+                                        ? Navigator.of(context).push(
+                                            new MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        new ShowLeave(
+                                                            itemsStudent[index]
+                                                                ['url'])))
+                                        : null
+                                  },
+                                  child: new Text("View",
+                                      style: new TextStyle(color: Colors.cyan)),
+                                ),
+                                new Padding(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                ),
+                                new OutlineButton(
+                                  onPressed: () => _decline(index),
+                                  child: new Text("Decline",
+                                      style: new TextStyle(color: Colors.red)),
+                                )
+                              ],
+                            )
+                          : (action == 1
+                              ? new Text(
+                                  "Leave Report accepted by " + facName,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : new Text(
+                                  "Leave Report Rejected " + facName,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 10)),
@@ -252,17 +280,24 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    String date = itemsStudent[index]['date'];
-                    return new Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      alignment: Alignment.centerRight,
-                      child: new Column(
-                        children: <Widget>[
-                          new Text(date, style: TextStyle(fontSize: 13),),
-                        ],
-                      ),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      String date = itemsStudent[index]['date'];
+                      return new Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        alignment: Alignment.centerRight,
+                        child: new Column(
+                          children: <Widget>[
+                            new Text(
+                              date,
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
               ],

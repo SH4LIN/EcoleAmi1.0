@@ -1,35 +1,30 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
+import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecoleami1_0/Assignment.dart';
+import 'package:ecoleami1_0/ChangePassword.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/Contactus.dart';
-import 'package:ecoleami1_0/StudentNotify.dart';
-import 'package:ecoleami1_0/TakeAttendance.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-//import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
 import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'ChangePassword.dart';
+import 'FacultyApplication.dart';
+import 'LeaveApplication.dart';
 import 'MainScreen.dart';
 import 'package:path/path.dart' as Path;
 import 'package:carousel_pro/carousel_pro.dart';
 import 'ShowImage.dart';
-import 'ShowNotice.dart';
 import 'SplashScreen.dart';
+import 'TakeAttendance.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'Contactus.dart';
 
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
@@ -40,11 +35,11 @@ Widget buildError(BuildContext context, FlutterErrorDetails error) {
   ));
 }
 
-class StudentActivity extends StatelessWidget {
+class ParentActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: new StudentActivityPage(),
+      body: new ParentActivityPage(),
       /*builder: (BuildContext context, Widget widget) {
         ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
           return buildError(context, errorDetails);
@@ -55,22 +50,20 @@ class StudentActivity extends StatelessWidget {
   }
 }
 
-class StudentActivityPage extends StatefulWidget {
+class ParentActivityPage extends StatefulWidget {
   @override
-  _StudentActivityPageState createState() => _StudentActivityPageState();
+  _ParentActivityPageState createState() => _ParentActivityPageState();
 }
 
-class _StudentActivityPageState extends State<StudentActivityPage>
+class _ParentActivityPageState extends State<ParentActivityPage>
     with SingleTickerProviderStateMixin {
-  /*FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  new FlutterLocalNotificationsPlugin();*/
+  var _image;
   SharedPreferences prf;
   String _username;
-  var _image;
   int selectedIndex = 0;
   String _enrCheck;
   int id;
-  String _fullName;
+
   List<NavigationItem> items = [
     NavigationItem(Icon(Icons.home), Text("Home"), Colors.deepPurpleAccent),
     NavigationItem(
@@ -78,22 +71,14 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     NavigationItem(Icon(Icons.chat), Text("QnA"), Colors.greenAccent),
     NavigationItem(Icon(Icons.settings), Text("Settings"), Colors.black)
   ];
-
-  TextEditingController _mName = new TextEditingController();
-  TextEditingController _lName = new TextEditingController();
   TextEditingController _fName = new TextEditingController();
   TextEditingController _eMail = new TextEditingController();
   TextEditingController _phone = new TextEditingController();
   TextEditingController _sem = new TextEditingController();
   TextEditingController _enr = new TextEditingController();
-  TextEditingController _div = new TextEditingController();
-  TextEditingController _parent_phone = new TextEditingController();
-  TextEditingController _finalEnr = new TextEditingController();
+  TextEditingController _fSName = TextEditingController();
+  TextEditingController _sPhone = TextEditingController();
 
-  bool _enrValidate = false;
-
-  bool _mValidate = false;
-  bool _lValidate = false;
   bool _fValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
@@ -116,7 +101,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               margin: EdgeInsets.only(bottom: 20.0),
               accountName: StreamBuilder(
                 stream: Firestore.instance
-                    .collection("student_details")
+                    .collection("parent_details")
                     .document(_username)
                     .snapshots(),
                 // ignore: missing_return
@@ -130,18 +115,14 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       print(_username);
                     }
                     var username = snapshot.data;
-                    return Text(username['first_name'] +
-                        " " +
-                        username['middle_name'] +
-                        " " +
-                        username['last_name']);
+                    return Text(username['full_name']);
                   }
                   return Text("Loading...");
                 },
               ),
               accountEmail: StreamBuilder(
                 stream: Firestore.instance
-                    .collection("student_details")
+                    .collection("parent_details")
                     .document(_username)
                     .snapshots(),
                 // ignore: missing_return
@@ -157,7 +138,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       Future.delayed(Duration(seconds: 1));
                     }
                     var username = snapshot.data;
-                    return Text(username['email']);
+                    return Text(username['phone_number']);
                   }
                   return CircularProgressIndicator();
                 },
@@ -168,7 +149,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         ? Colors.blue
                         : Colors.white,
                 child: Text(
-                  "S",
+                  "J",
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),
@@ -176,46 +157,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
             ),
             new ListTile(
               title: new Text(
-                "Assignment",
-                style: Theme.of(context).textTheme.subtitle,
+                "Leave Application",
+                style: Theme.of(context).textTheme.subhead,
               ),
-              trailing: new Icon(Icons.assignment),
-              onTap: () async {
-                print(_username);
-                await Firestore.instance
-                    .collection('student_details')
-                    .document(_username)
-                    .get()
-                    .then((value) {
-                  if (value != null) {
-                    var semesterForAssignment = value["semester"];
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            Student_Assignment(semesterForAssignment)));
-                  }
-                });
-              },
-            ),
-            new ListTile(
-              title: new Text(
-                "Attendance",
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-              trailing: new Icon(Icons.add),
+              trailing: new Icon(Icons.date_range),
               onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => TakeAttendance()));
-              },
-            ),
-            new ListTile(
-              title: new Text(
-                "Change of Schedule",
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-              trailing: new Icon(Icons.schedule),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => StudentNotify()));
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) => new LeaveApplication()));
               },
             ),
           ],
@@ -224,12 +172,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.grey.shade200
+          ? Colors.grey
           : selectedIndex == 1
               ? Colors.white
               : selectedIndex == 2
-                  ? Colors.green
-                  : selectedIndex == 3 ? Colors.black : Colors.white,
+                  ? Colors.greenAccent
+                  : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
 
@@ -325,13 +273,47 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-  bool isEmpty = false;
-  var notice_board_data;
-
   Widget _buildBodyHome() {
     return ListView(
       scrollDirection: Axis.vertical,
       children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+          height: 180.0,
+          width: 300.0,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
+          child: Carousel(
+            dotColor: Colors.grey,
+            borderRadius: true,
+            radius: Radius.circular(50.0),
+            autoplayDuration: Duration(seconds: 5),
+            autoplay: true,
+            animationCurve: Curves.easeIn,
+            animationDuration: Duration(milliseconds: 1000),
+            dotSize: 6.0,
+            dotIncreasedColor: Colors.purple,
+            dotBgColor: Colors.transparent,
+            dotPosition: DotPosition.bottomCenter,
+            dotVerticalPadding: 10.0,
+            showIndicator: true,
+            indicatorBgPadding: 7.0,
+            onImageTap: (index) {
+              print(index);
+            },
+            images: [
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+              FadeInImage.assetNetwork(
+                  placeholder: 'images/loading.gif',
+                  fit: BoxFit.fill,
+                  image:
+                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
+            ],
+          ),
+        ),
         Container(
           width: MediaQuery.of(context).size.width,
           margin: EdgeInsets.only(top: 15.0),
@@ -346,7 +328,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Events",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -355,84 +337,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List events_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"].compareTo("Event") == 0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              events_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return events_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: events_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNotice(
-                                                      events_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: events_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                events_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -451,7 +387,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "College Schedule",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -460,87 +396,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List schedule_notice = new List<DocumentSnapshot>();
-
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                                  .compareTo("College Schedule") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              schedule_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return schedule_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: schedule_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNotice(
-                                                      schedule_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: schedule_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                schedule_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -559,7 +446,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 child: Text(
                   "Fee Payment",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0),
@@ -568,86 +455,38 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Container(
                 height: 140.0,
                 padding: EdgeInsets.all(5.0),
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection("e-notice-board")
-                        .orderBy("timestamp", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot != null && snapshot.hasData) {
-                        var notice_board = snapshot.data.documents;
-                        List fee_notice = new List<DocumentSnapshot>();
-                        for (int i = 0; i < notice_board.length; i++) {
-                          if (notice_board[i]["type"]
-                                  .compareTo("Fee Payment") ==
-                              0) {
-                            if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
-                                1) {
-                              continue;
-                            } else {
-                              fee_notice.add(notice_board[i]);
-                            }
-                          }
-                        }
-                        return fee_notice.isEmpty
-                            ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: fee_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNotice(
-                                                      fee_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: fee_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                fee_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                      } else {
-                        return Text("Please Wait..");
-                      }
-                    }),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 3,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.transparent,
+                      clipBehavior: Clip.antiAlias,
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FadeInImage.assetNetwork(
+                              placeholder: 'images/loading.gif',
+                              width: 170.0,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              image:
+                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text("Maisaie",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    letterSpacing: 3.0)),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -656,27 +495,55 @@ class _StudentActivityPageState extends State<StudentActivityPage>
     );
   }
 
-  void setProfile() async {
-    StreamBuilder(
-        stream: Firestore.instance
-            .collection("student_details")
-            .document(_username)
-            .snapshots(),
-        // ignore: missing_return
-        builder: (context, snapshot) {
-          if (snapshot != null && snapshot.hasData) {
-            var document = snapshot.data;
+  String cName;
 
-            _enrCheck = document['enrollment'];
-            _finalEnr.text = document['enrollment'];
-            _fName.text = document['first_name'];
-            _mName.text = document['middle_name'];
-            _lName.text = document['last_name'];
-            _eMail.text = document['email'];
-            _phone.text = document['phone_number'];
-            _sem.text = document['semester'];
+  void setProfile() async {
+    Firestore.instance
+        .collection("parent_details")
+        .document(_username)
+        .get()
+        .then((document) {
+      _fName.text = document['full_name'];
+      _name = document['full_name'];
+      _phone.text = document['phone_number'];
+      _fSName.text = document['student_name'];
+      _enr.text = document['student_enrollment'];
+      _sPhone.text = document['student_phone_number'];
+      _eMail.text = document['student_phone_email'];
+      _sem.text = document['student_semester'] +
+          " " +
+          document['student_division'] +
+          document['student_batch'];
+
+      cName = document['full_name'];
+    });
+    /*StreamBuilder(
+      stream: Firestore.instance
+          .collection("student_details")
+          .document(_username)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return Text("Loading...");
+        }
+        if (snapshot.hasData) {
+          while (_username == null || snapshot.data == null) {
+            Future.delayed(Duration(seconds: 1));
+            print(_username);
           }
-        });
+          var document = snapshot.data;
+          _enrCheck = document['enrollment'];
+          _finalEnr.text = document['enrollment'];
+          _fName.text = document['first_name'];
+          _mName.text = document['middle_name'];
+          _lName.text = document['last_name'];
+          _eMail.text = document['email'];
+          _phone.text = document['phone_number'];
+          _sem.text = document['semester'];
+        }
+        return Text("Loading...");
+      },
+    );*/
   }
 
   Widget _buildBodyProfile() {
@@ -690,19 +557,19 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           children: <Widget>[
             StreamBuilder<DocumentSnapshot>(
                 stream: Firestore.instance
-                    .collection("student_details")
+                    .collection("parent_details")
                     .document(_username)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot != null && snapshot.hasData) {
                     var doc = snapshot.data;
-                    var name = doc['first_name'];
+                    var name = doc['full_name'];
                     return CircleAvatar(
                       maxRadius: 40,
                       backgroundColor:
-                          Theme.of(context).platform == TargetPlatform.iOS
-                              ? Colors.blue
-                              : Colors.cyanAccent,
+                      Theme.of(context).platform == TargetPlatform.iOS
+                          ? Colors.blue
+                          : Colors.cyanAccent,
                       child: Text(
                         '${name[0]}',
                         style: TextStyle(fontSize: 40.0),
@@ -718,95 +585,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 children: <Widget>[
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      // ignore: missing_return
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _fName.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _enrCheck = document['enrollment'];
-                          _finalEnr.text = document['enrollment'];
-                        }
-                        return (_enrCheck.compareTo("------------")) == 0
-                            ? Row(
-                                children: <Widget>[
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.65,
-                                    child: TextField(
-                                      controller: _enr,
-                                      keyboardType: TextInputType.number,
-                                      cursorColor: Colors.purple,
-                                      cursorRadius: Radius.circular(50.0),
-                                      cursorWidth: 3.0,
-                                      decoration: new InputDecoration(
-                                          hintText: "Enrollment",
-                                          errorText: _enrValidate
-                                              ? 'Please enter valid Enrollment'
-                                              : null,
-                                          hintStyle: new TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white70,
-                                          ),
-                                          prefixIcon:
-                                              new Icon(Icons.account_circle),
-                                          border: new OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          )),
-                                    ),
-                                    margin: EdgeInsets.only(right: 15),
-                                  ),
-                                  RaisedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (_enr.text.isEmpty) {
-                                          _enrValidate = true;
-                                        } else if (_enr.text.length != 12) {
-                                          _enrValidate = true;
-                                        } else {
-                                          _enrValidate = false;
-                                          _updateEnr();
-                                        }
-                                      });
-                                    },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    colorBrightness: Brightness.light,
-                                    elevation: 24.0,
-                                    animationDuration: Duration(seconds: 5),
-                                    child: Text("Update"),
-                                  )
-                                ],
-                              )
-                            : TextField(
-                                controller: _finalEnr,
-                                enabled: false,
-                                keyboardType: TextInputType.number,
-                                cursorColor: Colors.purple,
-                                cursorRadius: Radius.circular(50.0),
-                                cursorWidth: 3.0,
-                                decoration: new InputDecoration(
-                                    hintText: "Enrollment",
-                                    hintStyle: new TextStyle(
-                                      fontSize: 15.0,
-                                      color: Colors.white70,
-                                    ),
-                                    prefixIcon: new Icon(Icons.account_circle),
-                                    border: new OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    )),
-                              );
-                      }),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
+                          .collection("parent_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -815,7 +594,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         }
                         if (snapshot.hasData) {
                           var document = snapshot.data;
-                          _fName.text = document['first_name'];
+                          _fName.text = document['full_name'];
                         }
                         return new TextField(
                           controller: _fName,
@@ -841,114 +620,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _mName.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _mName.text = document['middle_name'];
-                        }
-                        return new TextField(
-                          controller: _mName,
-                          enabled: false,
-                          keyboardType: TextInputType.text,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText: _mValidate
-                                  ? 'Please enter Middle Name'
-                                  : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.person),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _lName.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _lName.text = document['last_name'];
-                        }
-                        return new TextField(
-                          controller: _lName,
-                          enabled: false,
-                          keyboardType: TextInputType.text,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText:
-                                  _lValidate ? 'Please enter Last Name' : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.person),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _eMail.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _eMail.text = document['email'];
-                        }
-                        return new TextFormField(
-                          controller: _eMail,
-                          enabled: false,
-                          keyboardType: TextInputType.emailAddress,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText: _emailValidate
-                                  ? 'Please enter Email Address'
-                                  : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.email),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
+                          .collection("parent_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -981,10 +653,248 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                               )),
                         );
                       }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 30.0)),
+                  new Text(
+                    "Student Details",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  /*StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("parent_details")
+                          .document(_username)
+                          .snapshots(),
+                      // ignore: missing_return
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _fName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _enrCheck = document['enrollment'];
+                          _finalEnr.text = document['enrollment'];
+                        }
+                        return (_enrCheck.compareTo("------------")) == 0
+                            ? Row(
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.65,
+                              child: TextField(
+                                controller: _enr,
+                                keyboardType: TextInputType.number,
+                                cursorColor: Colors.purple,
+                                cursorRadius: Radius.circular(50.0),
+                                cursorWidth: 3.0,
+                                decoration: new InputDecoration(
+                                    hintText: "Enrollment",
+                                    errorText: _enrValidate
+                                        ? 'Please enter valid Enrollment'
+                                        : null,
+                                    hintStyle: new TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.white70,
+                                    ),
+                                    prefixIcon:
+                                    new Icon(Icons.account_circle),
+                                    border: new OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20.0),
+                                    )),
+                              ),
+                              margin: EdgeInsets.only(right: 15),
+                            ),
+                            RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (_enr.text.isEmpty) {
+                                    _enrValidate = true;
+                                  } else if (_enr.text.length != 12) {
+                                    _enrValidate = true;
+                                  } else {
+                                    _enrValidate = false;
+                                    _updateEnr();
+                                  }
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              colorBrightness: Brightness.light,
+                              elevation: 24.0,
+                              animationDuration: Duration(seconds: 5),
+                              child: Text("Update"),
+                            )
+                          ],
+                        )
+                            : TextField(
+                          controller: _finalEnr,
+                          enabled: false,
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Enrollment",
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.account_circle),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),*/
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("parent_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _fSName.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _fSName.text = document['student_name'];
+                        }
+                        return new TextField(
+                          controller: _fSName,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText:
+                                  _fValidate ? 'Please enter First Name' : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   StreamBuilder(
                       stream: Firestore.instance
-                          .collection("student_details")
+                          .collection("parent_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _enr.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _enrCheck = document['student_enrollment'];
+                          _enrCheck.compareTo("------------") == 0
+                              ? _enr.text =
+                                  "(enrollment number is not registered)"
+                              : _enr.text = document['student_enrollment'];
+                        }
+                        return new TextField(
+                          controller: _enr,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.person),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("parent_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _sPhone.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _sPhone.text = document['student_phone_number'];
+                        }
+                        return new TextField(
+                          controller: _sPhone,
+                          keyboardType: TextInputType.phone,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          enabled: false,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _phoneValidate
+                                  ? 'Please enter Phone Number'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.phone),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("parent_details")
+                          .document(_username)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.none) {
+                          _eMail.text = "Loading...!";
+                        }
+                        if (snapshot.hasData) {
+                          var document = snapshot.data;
+                          _eMail.text = document['student_email'];
+                        }
+                        return new TextFormField(
+                          controller: _eMail,
+                          enabled: false,
+                          keyboardType: TextInputType.emailAddress,
+                          cursorColor: Colors.purple,
+                          cursorRadius: Radius.circular(50.0),
+                          cursorWidth: 3.0,
+                          decoration: new InputDecoration(
+                              hintText: "Loading ...",
+                              errorText: _emailValidate
+                                  ? 'Please enter Email Address'
+                                  : null,
+                              hintStyle: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white70,
+                              ),
+                              prefixIcon: new Icon(Icons.email),
+                              border: new OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                        );
+                      }),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("parent_details")
                           .document(_username)
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -993,10 +903,10 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                         }
                         if (snapshot.hasData) {
                           var document = snapshot.data;
-                          _sem.text = document['semester'] +
+                          _sem.text = document['student_semester'] +
                               " " +
-                              document['division'] +
-                              document['batch'];
+                              document['student_division'] +
+                              document['student_batch'];
                         }
                         return new TextField(
                           controller: _sem,
@@ -1019,111 +929,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                               )),
                         );
                       }),
-                  /*new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _div.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _div.text = document['division'];
-                        }
-                        return new TextField(
-                          controller: _div,
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText:
-                                  _semValidate ? 'Please enter Semester' : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.format_list_numbered),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _div.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _div.text = document['batch'];
-                        }
-                        return new TextField(
-                          controller: _div,
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText:
-                              _semValidate ? 'Please enter Semester' : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.format_list_numbered),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),*/
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .document(_username)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.none) {
-                          _parent_phone.text = "Loading...!";
-                        }
-                        if (snapshot.hasData) {
-                          var document = snapshot.data;
-                          _parent_phone.text = document['parent_phone_number'];
-                        }
-                        return new TextField(
-                          controller: _parent_phone,
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          cursorColor: Colors.purple,
-                          cursorRadius: Radius.circular(50.0),
-                          cursorWidth: 3.0,
-                          decoration: new InputDecoration(
-                              hintText: "Loading ...",
-                              errorText:
-                                  _semValidate ? 'Please enter Semester' : null,
-                              hintStyle: new TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white70,
-                              ),
-                              prefixIcon: new Icon(Icons.phone),
-                              border: new OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              )),
-                        );
-                      }),
                 ],
               ),
             )
@@ -1136,23 +941,21 @@ class _StudentActivityPageState extends State<StudentActivityPage>
   TextEditingController _msg = new TextEditingController();
   int _type;
   var _semester;
+  String _fullName;
+  String _name;
   bool msgEmpty = true;
+
 
   Widget _buildBodyQnA() {
     var msgItems;
     //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
     Firestore.instance
-        .collection("student_details")
+        .collection("parent_details")
         .document(_username)
         .get()
         .then((snapshot) {
       setState(() {
-        _semester = snapshot["semester"];
-        _fullName = snapshot['first_name'] +
-            " " +
-            snapshot['middle_name'] +
-            " " +
-            snapshot['last_name'];
+        _semester = snapshot["student_semester"];
       });
     });
     return _semester != null
@@ -1167,7 +970,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     child: StreamBuilder(
                         stream: Firestore.instance
                             .collection('QnA')
-                            .document("student")
+                            .document("parents")
                             .collection(_semester)
                             .orderBy('timestamp', descending: true)
                             .snapshots(),
@@ -1178,8 +981,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                           return ListView.builder(
                             itemBuilder: (context, index) {
                               String senderUsername = msgItems[index]['userid'];
-                              String senderFullName =
-                                  msgItems[index]['full_name'];
+                              _fullName = msgItems[index]['full_name'];
                               int type = msgItems[index]['type'];
                               return Column(
                                 crossAxisAlignment:
@@ -1209,7 +1011,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                                           _username)) ==
                                                       0
                                                   ? "You"
-                                                  : senderFullName,
+                                                  : _fullName,
                                               style: TextStyle(
                                                   color: Colors.grey[700],
                                                   fontSize: 12),
@@ -1298,29 +1100,31 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                       SizedBox(width: 16),
                                       Expanded(
                                           child: TextFormField(
-                                        onChanged: (value) {
-                                          if (value.toString().isEmpty) {
-                                            setState(() {
-                                              msgEmpty = true;
-                                            });
-                                          } else {
-                                            if (value
+                                        controller: _msg,
+                                            onChanged: (value) {
+                                              if (value
+                                                  .toString()
+                                                  .isEmpty) {
+                                                setState(() {
+                                                  msgEmpty = true;
+                                                });
+                                              } else {
+                                                if (value
                                                     .toString()
                                                     .trim()
                                                     .length ==
-                                                0) {
-                                              setState(() {
-                                                print("Space");
-                                                msgEmpty = true;
-                                              });
-                                            } else if (value.isNotEmpty) {
-                                              setState(() {
-                                                msgEmpty = false;
-                                              });
-                                            }
-                                          }
-                                        },
-                                        controller: _msg,
+                                                    0) {
+                                                  setState(() {
+                                                    print("Space");
+                                                    msgEmpty = true;
+                                                  });
+                                                } else if (value.isNotEmpty) {
+                                                  setState(() {
+                                                    msgEmpty = false;
+                                                  });
+                                                }
+                                              }
+                                            },
                                         keyboardType: TextInputType.multiline,
                                         minLines: 1,
                                         maxLines: 100,
@@ -1364,11 +1168,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                                   _msg.clear();
                                 });
                               },
+
                               child: msgEmpty
                                   ? Container()
                                   : CircleAvatar(
-                                      child: Icon(Icons.send),
-                                    ),
+                                child: Icon(Icons.send),
+                              ),
                             ),
                           ),
                         ],
@@ -1414,14 +1219,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         throw Exception("URL Null..");
       }
       print("URL: " + _uploadedFileURL);
-      print(_fullName);
       await Firestore.instance
           .collection('QnA')
-          .document('student')
+          .document('parents')
           .collection(_semester)
           .document(DateTime.now().toString())
           .setData({
-        'full_name': _fullName,
+        'full_name': _name,
         'userid': _username,
         'message': _uploadedFileURL,
         'timestamp': DateTime.now(),
@@ -1458,6 +1262,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
       StorageUploadTask uploadTask = storageReference.putFile(_image);
+
       await uploadTask.onComplete;
       print('File Uploaded');
       await storageReference.getDownloadURL().then((fileURL) {
@@ -1471,14 +1276,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         throw Exception("URL Null..");
       }
       print("URL: " + _uploadedFileURL);
-      print(_fullName);
       await Firestore.instance
           .collection('QnA')
-          .document('student')
+          .document('parents')
           .collection(_semester)
           .document(DateTime.now().toString())
           .setData({
-        'full_name': _fullName,
+        'full_name': _name,
         'userid': _username,
         'message': _uploadedFileURL,
         'timestamp': DateTime.now(),
@@ -1499,14 +1303,13 @@ class _StudentActivityPageState extends State<StudentActivityPage>
 
   void sendMessage(String msg) async {
     if (msg.isNotEmpty) {
-      print(_fullName);
       await Firestore.instance
           .collection('QnA')
-          .document('student')
+          .document('parents')
           .collection(_semester)
           .document(DateTime.now().toString())
           .setData({
-        'full_name': _fullName,
+        'full_name': _name,
         'userid': _username,
         'message': msg,
         'timestamp': DateTime.now(),
@@ -1563,16 +1366,18 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               Icons.call,
               color: Colors.white,
             ),
-            onTap: () {
-              Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new Contactus()));
-            },
             title: Text(
               "Contact Us",
               style: TextStyle(color: Colors.white),
             ),
             trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
+            onTap: () {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Contactus()));
+            },
+
           ),
+
           ListTile(
               title: new Text(
                 "Logout",
@@ -1639,6 +1444,7 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                     barrierDismissible: true,
                     barrierLabel: '',
                     context: context,
+                    // ignore: missing_return
                     pageBuilder: (context, animation1, animation2) {});
               })
         ],
@@ -1665,97 +1471,15 @@ class _StudentActivityPageState extends State<StudentActivityPage>
 
   @override
   void initState() {
+    super.initState();
     user != null ? _username = user : setUser();
     setProfile();
-    super.initState();
-    /*var initializeAndroidSettings =
-        AndroidInitializationSettings('images/ecoleami.png');
-    var inititalizeIosSettings = IOSInitializationSettings();
-    var initializeSettings = InitializationSettings(
-        initializeAndroidSettings, inititalizeIosSettings);
-    flutterLocalNotificationsPlugin.initialize(initializeSettings,
-        onSelectNotification: onSelectNotification);*/
-    /*Firestore.instance
-        .collection("student_details")
-        .document(_username)
-        .get()
-        .then((value) {*/
-    /*var tempdata = StreamBuilder<QuerySnapshot>(
-      builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot != null) {
-          var documents = snapshot.data;
-          var data = documents.documents;
-          print("Length: $data.length");
-          return data;
-          //_showNotification(data);
-        } else {
-          return null;
-          print("else");
-        }
-      },
-      stream: Firestore.instance
-          .collection("Notify_student")
-          .document("6")
-          .collection("B")
-          .orderBy('timestamp', descending: true)
-          .snapshots(),
-    );
-    print(tempdata);
-    //});*/
   }
-
-  /* Future _showNotification(data) async {
-    var androidPlatformSpecific = AndroidNotificationDetails(
-        "Ecoleami Notification",
-        "Ecoleami Notification",
-        "Ecoleami Notification",
-        importance: Importance.Max,
-        enableVibration: true,
-        priority: Priority.High);
-    var IOSPlatformSpecific = IOSNotificationDetails();
-    var platformChannelSpecifics =
-        new NotificationDetails(androidPlatformSpecific, IOSPlatformSpecific);
-    await flutterLocalNotificationsPlugin.show(0, data[0]['full_name'],
-        data['0']['description'], platformChannelSpecifics,
-        payload: data[0]['description'].toString());
-  }
-
-  Future onSelectNotification(String payload) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => StudentNotify()));
-  }*/
 
   void setUser() async {
     prf = await SharedPreferences.getInstance();
     _username = prf.get("Username");
     //Fluttertoast.showToast(msg: prf.get("Username"));
-  }
-
-  void _updateEnr() async {
-    String _parent;
-    Firestore.instance
-        .collection("student_details")
-        .document(_username)
-        .get()
-        .then((document) {
-      _parent = document['parent_phone_number'];
-    });
-    try {
-      await Firestore.instance
-          .collection('student_details')
-          .document(_username)
-          .updateData({
-        'enrollment': _enr.text,
-      });
-      await Firestore.instance
-          .collection('parent_details')
-          .document(_parent)
-          .updateData({
-        'student_enrollment': _enr.text,
-      });
-    } catch (e) {
-      print(e.toString());
-    }
   }
 }
 
@@ -1765,157 +1489,4 @@ class NavigationItem {
   final Color color;
 
   NavigationItem(this.icon, this.title, this.color);
-}
-
-class Student_Assignment extends StatelessWidget {
-  final sem;
-  Student_Assignment(this.sem);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CommonAppBar("Assignments Semester: $sem "),
-      body: Student_Assignment_Home(sem),
-    );
-  }
-}
-
-class Student_Assignment_Home extends StatefulWidget {
-  final sem;
-  Student_Assignment_Home(this.sem);
-  @override
-  _Student_Assignment_HomeState createState() =>
-      _Student_Assignment_HomeState(sem);
-}
-
-class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
-  final sem;
-  var totalData = -1;
-  _Student_Assignment_HomeState(this.sem);
-  DownloadTaskStatus stat;
-  int prog;
-  @override
-  void initState() {
-    IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    _port.listen((message) {
-      String id = message[0];
-      DownloadTaskStatus status = message[1];
-      int progress = message[2];
-      print("Progress: $progress");
-      setState(() {});
-    });
-    FlutterDownloader.registerCallback(downloadCallback);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection("assignments")
-              .where("semester", isEqualTo: sem)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot != null && snapshot.hasData) {
-              QuerySnapshot data = snapshot.data;
-              var allData = data.documents;
-              if (data.documents.length != null) {
-                totalData = data.documents.length;
-              }
-              if (totalData == -1) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (totalData == 0) {
-                return Center(
-                  child: Text("No Assignments Are Given"),
-                );
-              } else {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-                      child: GestureDetector(
-                        onTap: () {
-                          downloadPdf(allData[index]["url"],
-                                  allData[index]['assignment name'])
-                              .then((String taskId) {
-                            if (taskId == '') {
-                              Fluttertoast.showToast(
-                                  msg: "File Could Not be Downloaded");
-                            } else {
-                              print("Task:$taskId");
-                            }
-                          });
-                        },
-                        child: Card(
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              child: Icon(Icons.picture_as_pdf),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                Icons.cloud_download,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                downloadPdf(allData[index]["url"],
-                                        allData[index]['assignment name'])
-                                    .then((String taskId) {
-                                  if (taskId == '') {
-                                    Fluttertoast.showToast(
-                                        msg: "File Could Not be Downloaded");
-                                  } else {}
-                                });
-                              },
-                            ),
-                            title: Text(allData[index]['assignment name']),
-                            subtitle: Text(
-                              allData[index]['subject'],
-                              style: TextStyle(fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  itemCount: totalData,
-                );
-              }
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          }),
-    );
-  }
-
-  ProgressDialog pr;
-  ReceivePort _port = ReceivePort();
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
-  }
-
-  @override
-  void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-    super.dispose();
-  }
-
-  Future<String> downloadPdf(String url, String name) async {
-    var directory = await getExternalStorageDirectory();
-    var filepath = '${directory.path}';
-    var taskId = await FlutterDownloader.enqueue(
-        url: url,
-        savedDir: filepath,
-        showNotification: true,
-        fileName: "$name.pdf",
-        openFileFromNotification: true);
-    return taskId;
-  }
 }

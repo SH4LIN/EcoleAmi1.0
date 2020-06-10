@@ -24,7 +24,7 @@ class LeaveApplication extends StatefulWidget {
 class _LeaveApplicationState extends State<LeaveApplication> {
   TextEditingController _description = new TextEditingController();
 
-  bool _descriptionValidate = false;
+  bool _descriptionValidate = true;
 
   File _file;
 
@@ -132,22 +132,58 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                           ? Center(
                               child: Column(
                                 children: <Widget>[
-                                  Image.file(
-                                    _file,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                    alignment: Alignment.center,
+                                  Stack(
+                                    alignment: Alignment.topRight,
+                                    children: <Widget>[
+                                      type == 0
+                                          ? Image.file(
+                                              _file,
+                                              height: 150,
+                                              fit: BoxFit.cover,
+                                              alignment: Alignment.center,
+                                            )
+                                          : Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 14),
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.pinkAccent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Icon(
+                                                    Icons.picture_as_pdf,
+                                                    color: Colors.white,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Flexible(
+                                                      child: Text(
+                                                    _file.path,
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ))
+                                                ],
+                                              ),
+                                            ),
+                                      IconButton(
+                                          icon: Icon(
+                                            Icons.cancel,
+                                            color: Colors.tealAccent,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _file = null;
+                                            });
+                                          }),
+                                    ],
                                   ),
-                                  IconButton(
-                                      icon: Icon(
-                                        Icons.cancel,
-                                        color: Colors.tealAccent,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _file = null;
-                                        });
-                                      }),
                                   RaisedButton(
                                     onPressed: _showBottom,
                                     shape: RoundedRectangleBorder(
@@ -191,7 +227,7 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                      new Padding(padding: EdgeInsets.only(bottom: 70)),
+                      new Padding(padding: EdgeInsets.only(bottom: 14)),
                       new RaisedButton(
                         onPressed: _uploaded,
                         shape: RoundedRectangleBorder(
@@ -252,21 +288,24 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                             .where('parent_phone', isEqualTo: _username)
                             .snapshots(),
                         builder: (context, snap) {
-                          len = snap.data.documents.length;
-                          return len > 0
-                              ? ListView.builder(
-                                  itemBuilder: _getItems,
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: len,
-                                )
-                              : new Align(
-                                  alignment: Alignment.center,
-                                  child: new Text(
-                                    "No Uploaded Application yet!",
-                                    style: TextStyle(fontSize: 25),
-                                  ),
-                                );
+                          if (snap.hasData && snap != null) {
+                            len = snap.data.documents.length;
+                            return len > 0
+                                ? ListView.builder(
+                                    itemBuilder: _getItems,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: len,
+                                  )
+                                : new Align(
+                                    alignment: Alignment.center,
+                                    child: new Text(
+                                      "No Uploaded Application yet!",
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  );
+                          }
+                          return Center(child: CircularProgressIndicator());
                         }))
               ],
             ),
@@ -293,15 +332,18 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                   stream: Firestore.instance
                       .collection("Leave_application")
                       .where('parent_phone', isEqualTo: _username)
-                      .orderBy('date', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['parent_name'],
-                      style: new TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['parent_name'],
+                        style: new TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -309,15 +351,18 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                   stream: Firestore.instance
                       .collection("Leave_application")
                       .where('parent_phone', isEqualTo: _username)
-                      .orderBy('date', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return Text(
-                      itemsStudent[index]['student_name'],
-                      style: new TextStyle(
-                          fontSize: 12.0, fontWeight: FontWeight.bold),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return Text(
+                        itemsStudent[index]['student_name'],
+                        style: new TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.bold),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 5.0)),
@@ -325,23 +370,26 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                   stream: Firestore.instance
                       .collection("Leave_application")
                       .where('parent_phone', isEqualTo: _username)
-                      .orderBy('date', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    return new Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      alignment: Alignment.centerLeft,
-                      child: new Column(
-                        children: <Widget>[
-                          new Text(
-                            itemsStudent[index]['description'],
-                            style: new TextStyle(
-                                fontSize: 10.0, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      return new Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        alignment: Alignment.centerLeft,
+                        child: new Column(
+                          children: <Widget>[
+                            new Text(
+                              itemsStudent[index]['description'],
+                              style: new TextStyle(
+                                  fontSize: 10.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
                 new Padding(padding: EdgeInsets.only(bottom: 15.0)),
@@ -349,57 +397,63 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                   stream: Firestore.instance
                       .collection("Leave_application")
                       .where('parent_phone', isEqualTo: _username)
-                      .orderBy('date', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    int action = itemsStudent[index]['action'];
-                    String facName = itemsStudent[index]['faculty_name'];
-                    int type = itemsStudent[index]['type'];
-                    String date = itemsStudent[index]['date'];
-                    return action == 0
-                        ? new Text(
-                            "No Response yet",
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          )
-                        : (action == 1
-                            ? new Text(
-                                "Leave Report accepted by " + facName,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : new Text(
-                                "Leave Report Rejected " + facName,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold),
-                              ));
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      int action = itemsStudent[index]['action'];
+                      String facName = itemsStudent[index]['faculty_name'];
+                      int type = itemsStudent[index]['type'];
+                      String date = itemsStudent[index]['date'];
+                      return action == 0
+                          ? new Text(
+                              "No Response yet",
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          : (action == 1
+                              ? new Text(
+                                  "Leave Report accepted by " + facName,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : new Text(
+                                  "Leave Report Rejected " + facName,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                    } else {
+                      return CircularProgressIndicator();
+                    }
                   },
                 ),
                 StreamBuilder(
                   stream: Firestore.instance
                       .collection("Leave_application")
                       .where('parent_phone', isEqualTo: _username)
-                      .orderBy('date', descending: true)
                       .snapshots(),
                   builder: (context, snap) {
-                    itemsStudent = snap.data.documents;
-                    String date = itemsStudent[index]['date'];
-                    return new Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      alignment: Alignment.centerRight,
-                      child: new Column(
-                        children: <Widget>[
-                          new Text(date),
-                        ],
-                      ),
-                    );
+                    if (snap != null && snap.hasData) {
+                      itemsStudent = snap.data.documents;
+                      String date = itemsStudent[index]['date'];
+                      return new Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        alignment: Alignment.centerRight,
+                        child: new Column(
+                          children: <Widget>[
+                            new Text(date),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Text("");
+                    }
                   },
                 ),
               ],
@@ -538,18 +592,14 @@ class _LeaveApplicationState extends State<LeaveApplication> {
         .child('Leave_Application/${Path.basename(_file.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_file);
     await uploadTask.onComplete;
-    if (uploadTask.isSuccessful) {
+    if (uploadTask.isComplete) {
       print('File Uploaded');
       storageReference.getDownloadURL().then((fileURL) {
         setState(() {
           _uploadedFileURL = fileURL;
         });
       });
-      if (_uploadedFileURL == null) {
-        pr.hide();
-        Fluttertoast.showToast(
-            msg: "There Is Some Error Uploading Image Please Try Again");
-      } else {
+      if (_uploadedFileURL != null) {
         await Firestore.instance
             .collection("Leave_application")
             .document(DateTime.now().toString())
@@ -564,18 +614,37 @@ class _LeaveApplicationState extends State<LeaveApplication> {
           'student_enrollment': _studentEnr,
           'action': 0,
           'semester': _sem,
-          'date': DateTime.now().day.toString() +
+          'date': DateTime
+              .now()
+              .day
+              .toString() +
               "/" +
-              DateTime.now().month.toString() +
+              DateTime
+                  .now()
+                  .month
+                  .toString() +
               "/" +
-              DateTime.now().year.toString(),
+              DateTime
+                  .now()
+                  .year
+                  .toString(),
+        }).then((value) {
+          pr.hide();
+          Fluttertoast.showToast(
+              msg: "Uploaded",
+              gravity: ToastGravity.BOTTOM,
+              toastLength: Toast.LENGTH_LONG);
+          setState(() {
+            _description.clear();
+            _file = null;
+            _uploadedFileURL = null;
+            _uploaded();
+          });
         });
+      } else {
         pr.hide();
         Fluttertoast.showToast(
-            msg: "Uploaded",
-            gravity: ToastGravity.BOTTOM,
-            toastLength: Toast.LENGTH_LONG);
-        Navigator.pop(context);
+            msg: "There Is Some Error Uploading Image Please Try Again");
       }
     } else {
       pr.hide();

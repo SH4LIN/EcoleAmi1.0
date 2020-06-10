@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:ecoleami1_0/FacultyActivity.dart';
+import 'package:ecoleami1_0/ForgotPassword.dart';
 import 'package:ecoleami1_0/Home.dart';
 import 'package:ecoleami1_0/StudentActivity.dart';
 import 'package:flutter/material.dart';
@@ -209,7 +210,12 @@ class _ChangePasswordState extends State<ChangePassword> {
                               buttonAlignedDropdown: true,
                               children: <Widget>[
                                 new RaisedButton(
-                                  onPressed: () => {},
+                                  onPressed: () => {
+                                    Navigator.of(context).push(
+                                        new MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                new ForgotPassword()))
+                                  },
                                   splashColor: Colors.redAccent,
                                   color: Colors.redAccent,
                                   shape: RoundedRectangleBorder(

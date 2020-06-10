@@ -6,6 +6,7 @@ import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/Assignment.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/MainScreen.dart';
+import 'package:ecoleami1_0/ShowNoticeAdmin.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -173,9 +174,7 @@ class _HomePageState extends State<HomePage> {
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
           ? Colors.white
-          : selectedIndex == 1
-              ? Colors.red
-              : selectedIndex == 3 ? Colors.black : Colors.white,
+          : selectedIndex == 3 ? Colors.black : Colors.white,
     );
   }
 
@@ -296,50 +295,6 @@ class _HomePageState extends State<HomePage> {
       scrollDirection: Axis.vertical,
       children: <Widget>[
         Container(
-          margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
-          height: 180.0,
-          width: 300.0,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
-          child: StreamBuilder(
-              stream: Firestore.instance
-                  .collection("e-notice-board")
-                  .orderBy("timestamp", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot != null && snapshot.hasData) {
-                  notice_board_data = snapshot.data.documents;
-                  int length = notice_board_data.length == 1
-                      ? notice_board_data.length
-                      : (notice_board_data.length / 2).toInt();
-                  print(length);
-                  return Container(
-                    child: Carousel(
-                      dotColor: Colors.grey,
-                      borderRadius: true,
-                      radius: Radius.circular(20.0),
-                      autoplayDuration: Duration(seconds: 5),
-                      autoplay: true,
-                      animationCurve: Curves.easeIn,
-                      animationDuration: Duration(milliseconds: 1000),
-                      dotSize: 6.0,
-                      dotIncreasedColor: Colors.purple,
-                      dotBgColor: Colors.transparent,
-                      dotPosition: DotPosition.bottomCenter,
-                      dotVerticalPadding: 10.0,
-                      showIndicator: true,
-                      indicatorBgPadding: 7.0,
-                      onImageTap: (index) {
-                        print(index);
-                      },
-                      images: _setCarouselImages(length),
-                    ),
-                  );
-                } else {
-                  return CircularProgressIndicator();
-                }
-              }),
-        ),
-        Container(
           width: MediaQuery.of(context).size.width,
           margin: EdgeInsets.only(top: 15.0),
           height: 175.0,
@@ -395,34 +350,43 @@ class _HomePageState extends State<HomePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: events_notice.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: events_notice[index]
-                                                ['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              events_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          new MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  new ShowNoticeAdmin(
+                                                      events_notice[index])));
+                                    },
+                                    child: Card(
+                                      color: Colors.transparent,
+                                      clipBehavior: Clip.antiAlias,
+                                      semanticContainer: true,
+                                      borderOnForeground: true,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          CachedNetworkImage(
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              width: 170.0,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              imageUrl: events_notice[index]
+                                                  ['url']),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2.0),
+                                            child: Text(
+                                                events_notice[index]['title'],
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 3.0)),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
@@ -494,34 +458,43 @@ class _HomePageState extends State<HomePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: schedule_notice.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: schedule_notice[index]
-                                                ['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              schedule_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          new MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  new ShowNoticeAdmin(
+                                                      schedule_notice[index])));
+                                    },
+                                    child: Card(
+                                      color: Colors.transparent,
+                                      clipBehavior: Clip.antiAlias,
+                                      semanticContainer: true,
+                                      borderOnForeground: true,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          CachedNetworkImage(
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              width: 170.0,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              imageUrl: schedule_notice[index]
+                                                  ['url']),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2.0),
+                                            child: Text(
+                                                schedule_notice[index]['title'],
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 3.0)),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
@@ -592,33 +565,43 @@ class _HomePageState extends State<HomePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: fee_notice.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.transparent,
-                                    clipBehavior: Clip.antiAlias,
-                                    semanticContainer: true,
-                                    borderOnForeground: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        CachedNetworkImage(
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            width: 170.0,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            imageUrl: fee_notice[index]['url']),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.0),
-                                          child: Text(
-                                              fee_notice[index]['title'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 3.0)),
-                                        )
-                                      ],
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          new MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  new ShowNoticeAdmin(
+                                                      fee_notice[index])));
+                                    },
+                                    child: Card(
+                                      color: Colors.transparent,
+                                      clipBehavior: Clip.antiAlias,
+                                      semanticContainer: true,
+                                      borderOnForeground: true,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          CachedNetworkImage(
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              width: 170.0,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              imageUrl: fee_notice[index]
+                                                  ['url']),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2.0),
+                                            child: Text(
+                                                fee_notice[index]['title'],
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 3.0)),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },

@@ -196,7 +196,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                             itemCount: totalTheorySubjects.length,
                           );
                         } else {
-                          return CircularProgressIndicator();
+                          return Center(child: Text("Loading..."));
                         }
                       } catch (e) {
                         print(e);
@@ -314,7 +314,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                             itemCount: totalPracticalSubjects.length,
                           );
                         } else {
-                          return CircularProgressIndicator();
+                          return Center(child: Text("Loading..."));
                         }
                       } catch (e) {
                         print(e);

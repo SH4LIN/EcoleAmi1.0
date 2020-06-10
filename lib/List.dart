@@ -1,11 +1,12 @@
 import 'dart:convert';
-
+import 'package:ecoleami1_0/ForgotPassword.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ecoleami1_0/Register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:crypto/crypto.dart';
 import 'package:convert/convert.dart';
+import 'package:ecoleami1_0/ParentActivity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'FacultyActivity.dart';
@@ -186,7 +187,11 @@ class _ListState extends State<List> {
                           ),
                         ),
                         new RaisedButton(
-                          onPressed: () => {},
+                          onPressed: () => {
+                            Navigator.of(context).push(new MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    new ForgotPassword()))
+                          },
                           splashColor: Colors.redAccent,
                           color: Colors.red,
                           shape: RoundedRectangleBorder(
@@ -273,6 +278,8 @@ class _ListState extends State<List> {
                 gravity: ToastGravity.BOTTOM,
                 toastLength: Toast.LENGTH_SHORT,
               );
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ParentActivity()));
               pr.hide();
               break;
           }

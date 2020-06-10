@@ -493,7 +493,7 @@ class _AddEventState extends State<AddEvent> {
         .child('e-board Images/${Path.basename(_image.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
-    if (uploadTask.isSuccessful) {
+    if (uploadTask.isComplete) {
       print('File Uploaded');
       storageReference.getDownloadURL().then((fileURL) {
         setState(() {

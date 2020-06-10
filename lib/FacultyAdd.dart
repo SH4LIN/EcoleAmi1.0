@@ -23,7 +23,7 @@ class _AddInfoState extends State<AddInfo> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       appBar: CommonAppBar("Faculty Details"),
       body: new Container(
         child: new Center(
@@ -68,171 +68,163 @@ class _AddState extends State<Add> {
       children: <Widget>[
         new Container(
           child: new Form(
-            child: new Card(
-              elevation: 30.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
-              child: Container(
-                padding: const EdgeInsets.all(15.0),
-                child: new Column(
-                  children: <Widget>[
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _fName,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "First Name",
-                          errorText:
-                              _fValidate ? 'Please enter First Name' : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.person),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              child: new Column(
+                children: <Widget>[
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _fName,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "First Name",
+                        errorText:
+                            _fValidate ? 'Please enter First Name' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey,
+                        ),
+                        prefixIcon: new Icon(Icons.person),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _lName,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Last Name",
+                        errorText: _lValidate ? 'Please enter Last Name' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey,
+                        ),
+                        prefixIcon: new Icon(Icons.person),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _eMail,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Email Address",
+                        errorText: _emailValidate
+                            ? 'Please enter Email Address'
+                            : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey,
+                        ),
+                        prefixIcon: new Icon(Icons.email),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    controller: _phone,
+                    keyboardType: TextInputType.phone,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    maxLength: 10,
+                    decoration: new InputDecoration(
+                        hintText: "Phone Number",
+                        errorText:
+                            _phoneValidate ? 'Please enter Phone Number' : null,
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey,
+                        ),
+                        prefixIcon: new Icon(Icons.phone),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new TextField(
+                    keyboardType: TextInputType.text,
+                    obscureText: _obscureText,
+                    enabled: false,
+                    cursorColor: Colors.purple,
+                    cursorRadius: Radius.circular(50.0),
+                    cursorWidth: 3.0,
+                    decoration: new InputDecoration(
+                        hintText: "Password",
+                        hintStyle: new TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey,
+                        ),
+                        prefixIcon: new Icon(Icons.lock),
+                        suffixIcon: new IconButton(
+                          icon: new Icon(_obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        ),
+                        border: new OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        )),
+                  ),
+                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                  new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
+                  new RaisedButton(
+                    color: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: new Text(
+                      "Add",
+                      style: new TextStyle(color: Colors.white, fontSize: 15.0),
                     ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _lName,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Last Name",
-                          errorText:
-                              _lValidate ? 'Please enter Last Name' : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.person),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
-                    ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _eMail,
-                      keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Email Address",
-                          errorText: _emailValidate
-                              ? 'Please enter Email Address'
-                              : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.email),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
-                    ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      controller: _phone,
-                      keyboardType: TextInputType.phone,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      maxLength: 10,
-                      decoration: new InputDecoration(
-                          hintText: "Phone Number",
-                          errorText: _phoneValidate
-                              ? 'Please enter Phone Number'
-                              : null,
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.phone),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
-                    ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new TextField(
-                      keyboardType: TextInputType.text,
-                      obscureText: _obscureText,
-                      enabled: false,
-                      cursorColor: Colors.purple,
-                      cursorRadius: Radius.circular(50.0),
-                      cursorWidth: 3.0,
-                      decoration: new InputDecoration(
-                          hintText: "Password",
-                          hintStyle: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                          ),
-                          prefixIcon: new Icon(Icons.lock),
-                          suffixIcon: new IconButton(
-                            icon: new Icon(_obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                            onPressed: () {
-                              setState(() {
-                                _obscureText = !_obscureText;
-                              });
-                            },
-                          ),
-                          border: new OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
-                    ),
-                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
-                    new RaisedButton(
-                      color: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      child: new Text(
-                        "Add",
-                        style:
-                            new TextStyle(color: Colors.white, fontSize: 15.0),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          if (_fName.text.isEmpty) {
-                            _fValidate = true;
-                          } else {
-                            _fValidate = false;
-                          }
-                          if (_lName.text.isEmpty) {
-                            _lValidate = true;
-                          } else {
-                            _lValidate = false;
-                          }
-                          if (_eMail.text.isEmpty) {
-                            _emailValidate = true;
-                          } else {
-                            _emailValidate = false;
-                          }
-                          if (_phone.text.isEmpty) {
-                            _phoneValidate = true;
-                          } else {
-                            _phoneValidate = false;
-                          }
-                          if (_fName.text.isNotEmpty &&
-                              _lName.text.isNotEmpty &&
-                              _eMail.text.isNotEmpty &&
-                              _phone.text.isNotEmpty) {
-                            _onClick();
-                          }
-                        });
-                      },
-                      splashColor: Colors.red,
-                    ),
-                  ],
-                ),
+                    onPressed: () {
+                      setState(() {
+                        if (_fName.text.isEmpty) {
+                          _fValidate = true;
+                        } else {
+                          _fValidate = false;
+                        }
+                        if (_lName.text.isEmpty) {
+                          _lValidate = true;
+                        } else {
+                          _lValidate = false;
+                        }
+                        if (_eMail.text.isEmpty) {
+                          _emailValidate = true;
+                        } else {
+                          _emailValidate = false;
+                        }
+                        if (_phone.text.isEmpty) {
+                          _phoneValidate = true;
+                        } else {
+                          _phoneValidate = false;
+                        }
+                        if (_fName.text.isNotEmpty &&
+                            _lName.text.isNotEmpty &&
+                            _eMail.text.isNotEmpty &&
+                            _phone.text.isNotEmpty) {
+                          _onClick();
+                        }
+                      });
+                    },
+                    splashColor: Colors.red,
+                  ),
+                ],
               ),
             ),
           ),
@@ -276,11 +268,9 @@ class _AddState extends State<Add> {
           .get();
       print(snapShot.exists.toString());
       print(_phone.text);
-      print(snapShot!=null);
+      print(snapShot != null);
       if (snapShot == null || snapShot.exists) {
-
-      }
-      else{
+      } else {
         await databaseReference
             .collection("login_details")
             .document(_phone.text)
@@ -293,8 +283,7 @@ class _AddState extends State<Add> {
       Navigator.pop(context);
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) => new ManageFaculty()));
-    }
-    else{
+    } else {
       Fluttertoast.showToast(
           msg: "Record Exist",
           gravity: ToastGravity.BOTTOM,
