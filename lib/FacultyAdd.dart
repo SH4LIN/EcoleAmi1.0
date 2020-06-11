@@ -1,5 +1,6 @@
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/ManageFaculty.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -61,6 +62,8 @@ class _AddState extends State<Add> {
     _phone.dispose();
   }
 
+  String fNameErrorText = 'Please enter First Name';
+  String lNameErrorText = 'Please enter Last Name';
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
@@ -79,10 +82,21 @@ class _AddState extends State<Add> {
                     cursorColor: Colors.purple,
                     cursorRadius: Radius.circular(50.0),
                     cursorWidth: 3.0,
+                    onChanged: (String str) {
+                      RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                      setState(() {
+                        if (fnameregex.hasMatch(str)) {
+                          _fValidate = false;
+                        } else {
+                          fNameErrorText =
+                              "Name Should Contain Only Characters";
+                          _fValidate = true;
+                        }
+                      });
+                    },
                     decoration: new InputDecoration(
                         hintText: "First Name",
-                        errorText:
-                            _fValidate ? 'Please enter First Name' : null,
+                        errorText: _fValidate ? fNameErrorText : null,
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.grey,
@@ -99,9 +113,21 @@ class _AddState extends State<Add> {
                     cursorColor: Colors.purple,
                     cursorRadius: Radius.circular(50.0),
                     cursorWidth: 3.0,
+                    onChanged: (String str) {
+                      RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                      setState(() {
+                        if (fnameregex.hasMatch(str)) {
+                          _lValidate = false;
+                        } else {
+                          lNameErrorText =
+                              "Name Should Contain Only Characters";
+                          _lValidate = true;
+                        }
+                      });
+                    },
                     decoration: new InputDecoration(
                         hintText: "Last Name",
-                        errorText: _lValidate ? 'Please enter Last Name' : null,
+                        errorText: _lValidate ? lNameErrorText : null,
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.grey,
@@ -118,10 +144,19 @@ class _AddState extends State<Add> {
                     cursorColor: Colors.purple,
                     cursorRadius: Radius.circular(50.0),
                     cursorWidth: 3.0,
+                    onChanged: (String str) {
+                      setState(() {
+                        if (EmailValidator.validate(str)) {
+                          _emailValidate = false;
+                        } else {
+                          _emailValidate = true;
+                        }
+                      });
+                    },
                     decoration: new InputDecoration(
                         hintText: "Email Address",
                         errorText: _emailValidate
-                            ? 'Please enter Email Address'
+                            ? 'Please enter Valid Email Address'
                             : null,
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
@@ -140,10 +175,21 @@ class _AddState extends State<Add> {
                     cursorRadius: Radius.circular(50.0),
                     cursorWidth: 3.0,
                     maxLength: 10,
+                    onChanged: (String str) {
+                      RegExp regexp = new RegExp(r'^[6789]\d{9}$');
+                      setState(() {
+                        if (regexp.hasMatch(str)) {
+                          _phoneValidate = false;
+                        } else {
+                          _phoneValidate = true;
+                        }
+                      });
+                    },
                     decoration: new InputDecoration(
                         hintText: "Phone Number",
-                        errorText:
-                            _phoneValidate ? 'Please enter Phone Number' : null,
+                        errorText: _phoneValidate
+                            ? 'Please enter Valid Phone Number'
+                            : null,
                         hintStyle: new TextStyle(
                           fontSize: 15.0,
                           color: Colors.grey,
@@ -194,22 +240,25 @@ class _AddState extends State<Add> {
                     ),
                     onPressed: () {
                       setState(() {
-                        if (_fName.text.isEmpty) {
+                        if ((_fName.text.trim()).length == 0) {
+                          fNameErrorText = "Please Enter First Name";
                           _fValidate = true;
                         } else {
                           _fValidate = false;
                         }
-                        if (_lName.text.isEmpty) {
+                        if ((_lName.text.trim()).length == 0) {
+                          lNameErrorText = "Please Enter Last Name";
                           _lValidate = true;
                         } else {
                           _lValidate = false;
                         }
-                        if (_eMail.text.isEmpty) {
+                        if ((_eMail.text.trim()).length == 0) {
                           _emailValidate = true;
                         } else {
                           _emailValidate = false;
                         }
-                        if (_phone.text.isEmpty) {
+                        if ((_phone.text.trim()).length == 0 ||
+                            _phone.text.length < 10) {
                           _phoneValidate = true;
                         } else {
                           _phoneValidate = false;

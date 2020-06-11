@@ -594,58 +594,49 @@ class _LeaveApplicationState extends State<LeaveApplication> {
     await uploadTask.onComplete;
     if (uploadTask.isComplete) {
       print('File Uploaded');
-      storageReference.getDownloadURL().then((fileURL) {
+      storageReference.getDownloadURL().then((fileURL) async {
         setState(() {
           _uploadedFileURL = fileURL;
         });
-      });
-      if (_uploadedFileURL != null) {
-        await Firestore.instance
-            .collection("Leave_application")
-            .document(DateTime.now().toString())
-            .setData({
-          'description': _description.text,
-          'timestamp': DateTime.now().toString(),
-          'url': _uploadedFileURL,
-          'type': type,
-          'parent_name': _name,
-          'parent_phone': _username,
-          'student_name': _studentName,
-          'student_enrollment': _studentEnr,
-          'action': 0,
-          'semester': _sem,
-          'date': DateTime
-              .now()
-              .day
-              .toString() +
-              "/" +
-              DateTime
-                  .now()
-                  .month
-                  .toString() +
-              "/" +
-              DateTime
-                  .now()
-                  .year
-                  .toString(),
-        }).then((value) {
+        if (_uploadedFileURL != null) {
+          await Firestore.instance
+              .collection("Leave_application")
+              .document(DateTime.now().toString())
+              .setData({
+            'description': _description.text,
+            'timestamp': DateTime.now().toString(),
+            'url': _uploadedFileURL,
+            'type': type,
+            'parent_name': _name,
+            'parent_phone': _username,
+            'student_name': _studentName,
+            'student_enrollment': _studentEnr,
+            'action': 0,
+            'semester': _sem,
+            'date': DateTime.now().day.toString() +
+                "/" +
+                DateTime.now().month.toString() +
+                "/" +
+                DateTime.now().year.toString(),
+          }).then((value) {
+            pr.hide();
+            Fluttertoast.showToast(
+                msg: "Uploaded",
+                gravity: ToastGravity.BOTTOM,
+                toastLength: Toast.LENGTH_LONG);
+            setState(() {
+              _description.clear();
+              _file = null;
+              _uploadedFileURL = null;
+              _uploaded();
+            });
+          });
+        } else {
           pr.hide();
           Fluttertoast.showToast(
-              msg: "Uploaded",
-              gravity: ToastGravity.BOTTOM,
-              toastLength: Toast.LENGTH_LONG);
-          setState(() {
-            _description.clear();
-            _file = null;
-            _uploadedFileURL = null;
-            _uploaded();
-          });
-        });
-      } else {
-        pr.hide();
-        Fluttertoast.showToast(
-            msg: "There Is Some Error Uploading Image Please Try Again");
-      }
+              msg: "There Is Some Error Uploading Image Please Try Again");
+        }
+      });
     } else {
       pr.hide();
       Fluttertoast.showToast(

@@ -1,5 +1,3 @@
-//import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'ShowLeave.dart';
 import 'SplashScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 
 class FacultyApplication extends StatefulWidget {
   @override

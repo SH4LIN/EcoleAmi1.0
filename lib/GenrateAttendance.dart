@@ -345,25 +345,97 @@ class QRGenerate extends StatelessWidget {
                 )) ??
                 false;
           },
-          child: Container(
-            padding: EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                new Padding(
-                  padding: const EdgeInsets.only(bottom: 50),
-                ),
-                QrImage(
-                  data: documentID,
-                  size: 300,
-                ),
-                SizedBox(height: 10),
-                Text("Scan Above QR Code for Attendance"),
-                SizedBox(height: 10),
-                new ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  buttonAlignedDropdown: true,
+          child: ListView(
+            children: [
+              Container(
+                padding: EdgeInsets.all(15),
+                child: Column(
                   children: <Widget>[
-                    new RaisedButton(
+                    new Padding(
+                      padding: const EdgeInsets.only(bottom: 50),
+                    ),
+                    QrImage(
+                      data: documentID,
+                      size: 300,
+                    ),
+                    SizedBox(height: 10),
+                    Text("Scan Above QR Code for Attendance"),
+                    SizedBox(height: 10),
+                    new ButtonBar(
+                      alignment: MainAxisAlignment.center,
+                      buttonAlignedDropdown: true,
+                      children: <Widget>[
+                        new RaisedButton(
+                          onPressed: () {
+                            Firestore.instance
+                                .collection("attendance")
+                                .document(documentID)
+                                .updateData({"status": 1});
+                            Navigator.of(context).pop();
+                          },
+                          splashColor: Colors.redAccent,
+                          color: Colors.red,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: new Text(
+                            "All Absent",
+                            style: new TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
+                              color: Colors.white,
+                              wordSpacing: 2.0,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
+                        new RaisedButton(
+                          onPressed: () {
+                            Firestore.instance
+                                .collection("student_details")
+                                .where("semester",
+                                    isEqualTo: _semester.toString())
+                                .getDocuments()
+                                .then((document) {
+                              var sem_student = document.documents;
+                              List documents = new List();
+                              sem_student.forEach((element) {
+                                if (_type.compareTo("Theory") == 0) {
+                                  if (_batch.compareTo(element['division']) ==
+                                      0) {
+                                    documents.add(element.documentID);
+                                  }
+                                } else if (_type.compareTo("Practical") == 0) {
+                                  if (_batch.compareTo(element['division'] +
+                                          element['batch']) ==
+                                      0) {
+                                    documents.add(element.documentID);
+                                  }
+                                }
+                              });
+                              Firestore.instance
+                                  .collection("attendance")
+                                  .document(documentID)
+                                  .updateData({'students': documents});
+                            });
+                          },
+                          splashColor: Colors.redAccent,
+                          color: Colors.red,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: new Text(
+                            "All Present",
+                            style: new TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
+                              color: Colors.white,
+                              wordSpacing: 2.0,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    RaisedButton(
                       onPressed: () {
                         Firestore.instance
                             .collection("attendance")
@@ -376,7 +448,7 @@ class QRGenerate extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0)),
                       child: new Text(
-                        "All Absent",
+                        "Submit",
                         style: new TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12.0,
@@ -386,120 +458,55 @@ class QRGenerate extends StatelessWidget {
                         ),
                       ),
                     ),
-                    new RaisedButton(
-                      onPressed: () {
-                        Firestore.instance
-                            .collection("student_details")
-                            .where("semester", isEqualTo: _semester.toString())
-                            .getDocuments()
-                            .then((document) {
-                          var sem_student = document.documents;
-                          List documents = new List();
-                          sem_student.forEach((element) {
-                            if (_type.compareTo("Theory") == 0) {
-                              if (_batch.compareTo(element['division']) == 0) {
-                                documents.add(element.documentID);
+                    Expanded(
+                      child: Container(
+                        child: StreamBuilder<Object>(
+                            stream: Firestore.instance
+                                .collection("attendance")
+                                .document(documentID)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot != null && snapshot.hasData) {
+                                List<dynamic> students = new List<dynamic>();
+                                DocumentSnapshot document = snapshot.data;
+                                students = document['students'];
+                                return Column(
+                                  children: <Widget>[
+                                    Text("Present Student: ${students.length}"),
+                                    students.length == 0
+                                        ? Text("No Students")
+                                        : Expanded(
+                                            child: ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                return ListTile(
+                                                  title: Text(
+                                                      "${students[index]}"),
+                                                );
+                                              },
+                                              itemCount: students.length,
+                                            ),
+                                          )
+                                  ],
+                                );
+                              } else {
+                                return CircularProgressIndicator();
                               }
-                            } else if (_type.compareTo("Practical") == 0) {
-                              if (_batch.compareTo(
-                                      element['division'] + element['batch']) ==
-                                  0) {
-                                documents.add(element.documentID);
-                              }
-                            }
-                          });
-                          Firestore.instance
-                              .collection("attendance")
-                              .document(documentID)
-                              .updateData({'students': documents});
-                        });
-                      },
-                      splashColor: Colors.redAccent,
-                      color: Colors.red,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      child: new Text(
-                        "All Present",
-                        style: new TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12.0,
-                          color: Colors.white,
-                          wordSpacing: 2.0,
-                          letterSpacing: 0.2,
-                        ),
+                            }),
                       ),
-                    ),
+                    )
+
+                    /* RaisedButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.circular(20)),
+                  color: Colors.redAccent,
+                  onPressed: null,
+                  child: Text("All Present", style: TextStyle(color: Colors.white),),
+                ),*/
                   ],
                 ),
-                RaisedButton(
-                  onPressed: () {
-                    Firestore.instance
-                        .collection("attendance")
-                        .document(documentID)
-                        .updateData({"status": 1});
-                    Navigator.of(context).pop();
-                  },
-                  splashColor: Colors.redAccent,
-                  color: Colors.red,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  child: new Text(
-                    "Submit",
-                    style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12.0,
-                      color: Colors.white,
-                      wordSpacing: 2.0,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    child: StreamBuilder<Object>(
-                        stream: Firestore.instance
-                            .collection("attendance")
-                            .document(documentID)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot != null && snapshot.hasData) {
-                            List<dynamic> students = new List<dynamic>();
-                            DocumentSnapshot document = snapshot.data;
-                            students = document['students'];
-                            return Column(
-                              children: <Widget>[
-                                Text("Present Student: ${students.length}"),
-                                students.length == 0
-                                    ? Text("No Students")
-                                    : Expanded(
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              title: Text("${students[index]}"),
-                                            );
-                                          },
-                                          itemCount: students.length,
-                                        ),
-                                      )
-                              ],
-                            );
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        }),
-                  ),
-                )
-
-                /* RaisedButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(20)),
-              color: Colors.redAccent,
-              onPressed: null,
-              child: Text("All Present", style: TextStyle(color: Colors.white),),
-            ),*/
-              ],
-            ),
+              ),
+            ],
           ),
         ));
   }

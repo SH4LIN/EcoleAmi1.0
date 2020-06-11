@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-
+import 'package:email_validator/email_validator.dart';
 import 'CommonAppBar.dart';
 
 // ignore: must_be_immutable
@@ -57,6 +57,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
   ];
   String _selectedBatch;
 
+  bool _enrValidate = false;
   bool _fValidate = false;
   bool _mValidate = false;
   bool _lValidate = false;
@@ -69,6 +70,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
 
   void dispose() {
     super.dispose();
+    _enr.dispose();
     _fName.dispose();
     _mName.dispose();
     _lName.dispose();
@@ -84,6 +86,11 @@ class _UpdateStudentState extends State<UpdateStudentData> {
   TextEditingController _phone = new TextEditingController();
   TextEditingController _parentPhone = new TextEditingController();
   TextEditingController _enr = new TextEditingController();
+
+  String fNameErrorText = 'Please enter First Name';
+  String mNameErrorText = 'Please enter Middle Name';
+  String lNameErrorText = 'Please enter Last Name';
+  bool _autoValidate = true;
 
   @override
   void initState() {
@@ -122,6 +129,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
         new Container(
           padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
+            autovalidate: _autoValidate,
             child: new Card(
               elevation: 30.0,
               shape: RoundedRectangleBorder(
@@ -139,6 +147,8 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Enrollment",
+                          errorText:
+                              _enrValidate ? "Enter valid enrollment" : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -150,6 +160,18 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _fValidate = false;
+                          } else {
+                            fNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _fValidate = true;
+                          }
+                        });
+                      },
                       controller: _fName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
@@ -158,7 +180,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       decoration: new InputDecoration(
                           hintText: "First Name",
                           errorText:
-                              _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? fNameErrorText : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -175,10 +197,21 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _mValidate = false;
+                          } else {
+                            mNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _mValidate = true;
+                          }
+                        });
+                      },
                       decoration: new InputDecoration(
                           hintText: "Middle Name",
-                          errorText:
-                              _mValidate ? 'Please enter Middle Name' : null,
+                          errorText: _mValidate ? mNameErrorText : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -195,10 +228,21 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _lValidate = false;
+                          } else {
+                            lNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _lValidate = true;
+                          }
+                        });
+                      },
                       decoration: new InputDecoration(
                           hintText: "Last Name",
-                          errorText:
-                              _lValidate ? 'Please enter Last Name' : null,
+                          errorText: _lValidate ? lNameErrorText : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -215,10 +259,19 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        setState(() {
+                          if (EmailValidator.validate(str)) {
+                            _emailValidate = false;
+                          } else {
+                            _emailValidate = true;
+                          }
+                        });
+                      },
                       decoration: new InputDecoration(
                           hintText: "Email Address",
                           errorText: _emailValidate
-                              ? 'Please enter Email Address'
+                              ? 'Please enter valid Email Address'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -236,11 +289,21 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        RegExp regexp = new RegExp(r'^[6789]\d{9}$');
+                        setState(() {
+                          if (regexp.hasMatch(str)) {
+                            _phoneValidate = false;
+                          } else {
+                            _phoneValidate = true;
+                          }
+                        });
+                      },
                       maxLength: 10,
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
                           errorText: _phoneValidate
-                              ? 'Please valid enter Phone Number'
+                              ? 'Please Enter Valid Phone Number'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -257,7 +320,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
-                        Border.all(style: BorderStyle.solid, width: 0.80),
+                            Border.all(style: BorderStyle.solid, width: 0.80),
                         borderRadius: BorderRadius.all(
                           Radius.circular(20.0),
                         ),
@@ -288,12 +351,12 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     _semValidate == false
                         ? Container()
                         : new Align(
-                        alignment: Alignment.centerLeft,
-                        child: new Text("    Please select Semester",
-                            style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400))),
+                            alignment: Alignment.centerLeft,
+                            child: new Text("    Please select Semester",
+                                style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
                       padding: const EdgeInsets.only(left: 30.0),
@@ -301,7 +364,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
-                        Border.all(style: BorderStyle.solid, width: 0.80),
+                            Border.all(style: BorderStyle.solid, width: 0.80),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: DropdownButton<String>(
@@ -329,19 +392,19 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     _divValidate == false
                         ? Container()
                         : new Align(
-                        alignment: Alignment.centerLeft,
-                        child: new Text("    Please select Division",
-                            style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400))),
+                            alignment: Alignment.centerLeft,
+                            child: new Text("    Please select Division",
+                                style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
                       padding: const EdgeInsets.only(left: 30.0),
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
-                        Border.all(style: BorderStyle.solid, width: 0.80),
+                            Border.all(style: BorderStyle.solid, width: 0.80),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: DropdownButton<String>(
@@ -369,12 +432,12 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     _batchValidate == false
                         ? Container()
                         : new Align(
-                        alignment: Alignment.centerLeft,
-                        child: new Text("    Please select Batch",
-                            style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400))),
+                            alignment: Alignment.centerLeft,
+                            child: new Text("    Please select Batch",
+                                style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _parentPhone,
@@ -440,6 +503,13 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                       ),
                       onPressed: () {
                         setState(() {
+                          if (_enr.text.isEmpty) {
+                            _enrValidate = true;
+                          } else if (_enr.text.length != 12) {
+                            _enrValidate = true;
+                          } else {
+                            _enrValidate = false;
+                          }
                           if (_fName.text.isEmpty) {
                             _fValidate = true;
                           } else {
@@ -455,7 +525,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                           } else {
                             _lValidate = false;
                           }
-                          if (_eMail.text.isEmpty ) {
+                          if (_eMail.text.isEmpty) {
                             _emailValidate = true;
                           } else {
                             _emailValidate = false;
@@ -471,7 +541,8 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                           } else {
                             _parentValidate = false;
                           }
-                          if (_fValidate == false &&
+                          if (_enrValidate == false &&
+                              _fValidate == false &&
                               _mValidate == false &&
                               _lValidate == false &&
                               _emailValidate == false &&
@@ -541,8 +612,8 @@ class _UpdateStudentState extends State<UpdateStudentData> {
       });
       await Firestore.instance
           .collection("parent_details")
-      .document(_parentPhone.text)
-      .updateData({
+          .document(_parentPhone.text)
+          .updateData({
         'student_division': _selectedDivision,
         'student_email': _eMail.text,
         'student_name': _fName.text + " " + _mName.text + " " + _lName.text,

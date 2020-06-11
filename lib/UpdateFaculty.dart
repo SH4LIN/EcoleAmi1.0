@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'CommonAppBar.dart';
 import 'ManageFaculty.dart';
+import 'package:email_validator/email_validator.dart';
 
 // ignore: must_be_immutable
 class UpdateFaculty extends StatelessWidget {
@@ -41,6 +42,11 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
   bool _lValidate = false;
   bool _emailValidate = false;
   bool _phoneValidate = false;
+
+  String fNameErrorText = 'Please enter First Name';
+  String mNameErrorText = 'Please enter Middle Name';
+  String lNameErrorText = 'Please enter Last Name';
+  bool _autoValidate = true;
 
   void dispose() {
     super.dispose();
@@ -87,6 +93,18 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
                     new TextField(
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _fValidate = false;
+                          } else {
+                            fNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _fValidate = true;
+                          }
+                        });
+                      },
                       controller: _fName,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.purple,
@@ -94,9 +112,8 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "First Name",
-                          errorText: _fValidate
-                              ? 'Please enter First Name'
-                              : null,
+                          errorText:
+                          _fValidate ? fNameErrorText : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -104,8 +121,7 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
                     new Padding(
                         padding: const EdgeInsets.only(bottom: 15.0)
@@ -116,11 +132,21 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _lValidate = false;
+                          } else {
+                            lNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _lValidate = true;
+                          }
+                        });
+                      },
                       decoration: new InputDecoration(
                           hintText: "Last Name",
-                          errorText: _lValidate
-                              ? 'Please enter Last Name'
-                              : null,
+                          errorText: _lValidate ? lNameErrorText : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -128,22 +154,30 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                           prefixIcon: new Icon(Icons.person),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
                     new Padding(
                         padding: const EdgeInsets.only(bottom: 15.0)
                     ),
-                    new TextField(
+                    new TextFormField(
                       controller: _eMail,
                       keyboardType: TextInputType.emailAddress,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        setState(() {
+                          if (EmailValidator.validate(str)) {
+                            _emailValidate = false;
+                          } else {
+                            _emailValidate = true;
+                          }
+                        });
+                      },
                       decoration: new InputDecoration(
                           hintText: "Email Address",
                           errorText: _emailValidate
-                              ? 'Please enter Email Address'
+                              ? 'Please enter valid Email Address'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -152,23 +186,30 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                           prefixIcon: new Icon(Icons.email),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
-                    new Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0)
-                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     new TextField(
                       controller: _phone,
                       keyboardType: TextInputType.phone,
                       cursorColor: Colors.purple,
                       cursorRadius: Radius.circular(50.0),
                       cursorWidth: 3.0,
+                      onChanged: (String str) {
+                        RegExp regexp = new RegExp(r'^[6789]\d{9}$');
+                        setState(() {
+                          if (regexp.hasMatch(str)) {
+                            _phoneValidate = false;
+                          } else {
+                            _phoneValidate = true;
+                          }
+                        });
+                      },
                       maxLength: 10,
                       decoration: new InputDecoration(
                           hintText: "Phone Number",
                           errorText: _phoneValidate
-                              ? 'Please enter Phone Number'
+                              ? 'Please Enter Valid Phone Number'
                               : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
@@ -177,8 +218,7 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                           prefixIcon: new Icon(Icons.phone),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20.0),
-                          )
-                      ),
+                          )),
                     ),
                     new Padding(
                         padding: const EdgeInsets.only(bottom: 15.0)

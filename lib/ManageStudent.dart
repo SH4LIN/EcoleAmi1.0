@@ -81,13 +81,14 @@ class _ManageInformationState extends State<ManageInformation> {
                     focusscopenode.unfocus();
                   }
                 },
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.number,
                 cursorColor: Colors.purple,
                 cursorRadius: Radius.circular(50.0),
                 cursorWidth: 3.0,
                 decoration: new InputDecoration(
-                    labelText: "Enrollment Search",
+                    labelText: "Search Enrollment",
                     prefixIcon: new Icon(Icons.person),
+                    suffixIcon: new IconButton(icon: Icon(Icons.cancel), onPressed:(){ _search.clear();}),
                     border: new OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     )),
@@ -96,40 +97,41 @@ class _ManageInformationState extends State<ManageInformation> {
             new Flexible(
               child: !isSearching
                   ? StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .snapshots(),
-                      builder: (context, snap) {
-                        if (snap.hasData && snap != null) {
-                          len = snap.data.documents.length;
-                          return ListView.builder(
-                            itemBuilder: _getListItemTile,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: len,
-                          );
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                      })
+                  stream: Firestore.instance
+                      .collection("student_details")
+                      .snapshots(),
+                  builder: (context, snap) {
+                    if (snap.hasData && snap != null) {
+                      len = snap.data.documents.length;
+                      return ListView.builder(
+                        itemBuilder: _getListItemTile,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: len,
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  })
                   : StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("student_details")
-                          .where("enrollment", isEqualTo: _search.text)
-                          .snapshots(),
-                      builder: (context, snap) {
-                        if (snap.hasData && snap != null) {
-                          len = snap.data.documents.length;
-                          return ListView.builder(
-                            itemBuilder: _getSearchedListItemTile,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: len,
-                          );
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                      }),
+                  stream: Firestore.instance
+                      .collection("student_details")
+                      .where("enrollment", isEqualTo: _search.text)
+                      .snapshots(),
+                  builder: (context, snap) {
+                    if (snap.hasData && snap != null) {
+                      len = snap.data.documents.length;
+                      return len > 0 ? ListView.builder(
+                        itemBuilder: _getSearchedListItemTile,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: len,
+                      ) :
+                          new Center(child: new Text("No Student found!"),);
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  }),
             ),
           ],
         ),
@@ -224,8 +226,8 @@ class _ManageInformationState extends State<ManageInformation> {
                       onPressed: () => {
                         Navigator.push(context,
                             new MaterialPageRoute(builder: (context) {
-                          return new UpdateStudent(index);
-                        }))
+                              return new UpdateStudent(index);
+                            }))
                       },
                       child: new Text("Update",
                           style: new TextStyle(color: Colors.green)),
@@ -329,8 +331,8 @@ class _ManageInformationState extends State<ManageInformation> {
                       onPressed: () => {
                         Navigator.push(context,
                             new MaterialPageRoute(builder: (context) {
-                          return new UpdateStudent(index);
-                        }))
+                              return new UpdateStudent(index);
+                            }))
                       },
                       child: new Text("Update",
                           style: new TextStyle(color: Colors.green)),

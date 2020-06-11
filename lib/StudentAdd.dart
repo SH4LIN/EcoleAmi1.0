@@ -312,7 +312,7 @@ class _AddState extends State<Add> {
                       ? Container()
                       : new Align(
                           alignment: Alignment.centerLeft,
-                          child: new Text("    Please select Semester",
+                          child: new Text("Please select Semester",
                               style: TextStyle(
                                   color: Colors.redAccent,
                                   fontSize: 12,
@@ -352,7 +352,7 @@ class _AddState extends State<Add> {
                       ? Container()
                       : new Align(
                           alignment: Alignment.centerLeft,
-                          child: new Text("    Please select Division",
+                          child: new Text("Please select Division",
                               style: TextStyle(
                                   color: Colors.redAccent,
                                   fontSize: 12,

@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/Contactus.dart';
+import 'package:ecoleami1_0/DetainList.dart';
 import 'package:ecoleami1_0/GenrateAttendance.dart';
 import 'package:ecoleami1_0/NotifyStudent.dart';
 import 'package:ecoleami1_0/ShowNoticeAdmin.dart';
@@ -193,6 +194,17 @@ class _FacultyActivityPageState extends State<FacultyActivityPage>
               onTap: () {
                 Navigator.of(context).push(new MaterialPageRoute(
                     builder: (context) => NotifyStudent()));
+              },
+            ),
+            new ListTile(
+              title: new Text(
+                "Generate Detain List",
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+              trailing: new Icon(Icons.notification_important),
+              onTap: () {
+                Navigator.of(context).push(
+                    new MaterialPageRoute(builder: (context) => DetainList()));
               },
             ),
           ],

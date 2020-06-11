@@ -26,8 +26,23 @@ class ManageInfo extends StatefulWidget {
 class _ManageInfoState extends State<ManageInfo> {
   int len = 0;
 
+  TextEditingController _search = new TextEditingController();
+  bool isSearching = false;
+
   @override
   Widget build(BuildContext context) {
+    _search.addListener(() {
+      if (_search.text.length > 0) {
+        setState(() {
+          isSearching = true;
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
+    });
+
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: CommonAppBar("Manage Faculty Details"),
@@ -35,27 +50,74 @@ class _ManageInfoState extends State<ManageInfo> {
         padding: EdgeInsets.all(5.0),
         child: new Column(
           children: <Widget>[
-            new Flexible(
-              child: StreamBuilder(
-                  stream: Firestore.instance
-                      .collection("faculty_details")
-                      .snapshots(),
-                  builder: (context, snap) {
-                    if (snap.hasData && snap != null) {
-                      len = snap.data.documents.length;
-                      return ListView.builder(
-                        itemBuilder: _getListItemTile,
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: len,
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: TextField(
+                controller: _search,
+                onTap: () {
+                  FocusScopeNode focusscopenode = FocusScope.of(context);
+                  if (!focusscopenode.hasPrimaryFocus) {
+                    focusscopenode.unfocus();
+                  }
+                },
+                keyboardType: TextInputType.text,
+                cursorColor: Colors.purple,
+                cursorRadius: Radius.circular(50.0),
+                cursorWidth: 3.0,
+                decoration: new InputDecoration(
+                    labelText: "Search Faculty",
+                    prefixIcon: new Icon(Icons.person),
+                    suffixIcon: new IconButton(
+                        icon: Icon(Icons.cancel),
+                        onPressed: () {
+                          _search.clear();
+                        }),
+                    border: new OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    )),
+              ),
             ),
+            new Flexible(
+                child: !isSearching
+                    ? StreamBuilder(
+                        stream: Firestore.instance
+                            .collection("faculty_details")
+                            .snapshots(),
+                        builder: (context, snap) {
+                          if (snap.hasData && snap != null) {
+                            len = snap.data.documents.length;
+                            return ListView.builder(
+                              itemBuilder: _getListItemTile,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: len,
+                            );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        })
+                    : StreamBuilder(
+                        stream: Firestore.instance
+                            .collection("faculty_details")
+                            .where("first_name", isEqualTo: _search.text)
+                            .snapshots(),
+                        builder: (context, snap) {
+                          if (snap.hasData && snap != null) {
+                            len = snap.data.documents.length;
+                            return len > 0
+                                ? ListView.builder(
+                                    itemBuilder: _getSearchedListItemTile,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: len,
+                                  )
+                                : new Center(
+                                    child: new Text("No Faculty found!"),
+                                  );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        })),
           ],
         ),
       ),
@@ -106,7 +168,7 @@ class _ManageInfoState extends State<ManageInfo> {
                         .collection("faculty_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      if (snap.hasData && snap != null) {
+                      if (snap != null && snap.hasData) {
                         itemsFaculty = snap.data.documents;
                         /*print(items.runtimeType);
                       print(items[index].documentID);
@@ -129,7 +191,110 @@ class _ManageInfoState extends State<ManageInfo> {
                         .collection("faculty_details")
                         .snapshots(),
                     builder: (context, snap) {
-                      if (snap.hasData && snap != null) {
+                      if (snap != null && snap.hasData) {
+                        itemsFaculty = snap.data.documents;
+                        return Text(
+                          "Email : " + itemsFaculty[index]['email'],
+                          style: new TextStyle(
+                              fontSize: 8.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
+                    }),
+                new Padding(padding: EdgeInsets.only(bottom: 21.0)),
+                new Row(
+                  children: <Widget>[
+                    new OutlineButton(
+                      onPressed: () => {
+                        Navigator.push(context,
+                            new MaterialPageRoute(builder: (context) {
+                          return new UpdateFaculty(index);
+                        }))
+                      },
+                      child: new Text("Update",
+                          style: new TextStyle(color: Colors.green)),
+                    ),
+                    new Padding(
+                      padding: EdgeInsets.only(right: 20.0),
+                    ),
+                    new OutlineButton(
+                      onPressed: () => facultyRemove(index),
+                      child: new Text("Remove",
+                          style: new TextStyle(color: Colors.red)),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getSearchedListItemTile(BuildContext context, int index) {
+    return new Card(
+      elevation: 10.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      borderOnForeground: true,
+      child: new Container(
+        padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  width: 100.0,
+                  height: 90.0,
+                  margin: EdgeInsets.only(left: 10.0, right: 7.0),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: AssetImage('images/dummyimg.png')),
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    color: Colors.redAccent,
+                  ),
+                ),
+              ],
+            ),
+            new Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("faculty_details")
+                        .where("first_name", isEqualTo: _search.text)
+                        .snapshots(),
+                    builder: (context, snap) {
+                      if (snap != null && snap.hasData) {
+                        itemsFaculty = snap.data.documents;
+                        /*print(items.runtimeType);
+                      print(items[index].documentID);
+                      print(snap.data.runtimeType);*/
+                        return Text(
+                          "Name : " +
+                              itemsFaculty[index]['first_name'] +
+                              " " +
+                              itemsFaculty[index]['last_name'],
+                          style: new TextStyle(
+                              fontSize: 10.0, fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Text("");
+                      }
+                    }),
+                new Padding(padding: EdgeInsets.only(bottom: 5.0)),
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("faculty_details")
+                        .where("first_name", isEqualTo: _search.text)
+                        .snapshots(),
+                    builder: (context, snap) {
+                      if (snap != null && snap.hasData) {
                         itemsFaculty = snap.data.documents;
                         return Text(
                           "Email : " + itemsFaculty[index]['email'],

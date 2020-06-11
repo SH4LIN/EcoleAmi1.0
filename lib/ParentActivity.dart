@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,6 +15,7 @@ import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'FacultyApplication.dart';
 import 'LeaveApplication.dart';
@@ -172,7 +174,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
       bottomNavigationBar: BottomNavBar(),
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
-          ? Colors.grey
+          ? Colors.grey.shade200
           : selectedIndex == 1
               ? Colors.white
               : selectedIndex == 2
@@ -273,224 +275,389 @@ class _ParentActivityPageState extends State<ParentActivityPage>
     );
   }
 
+  List<String> _subjectsTheory = new List<String>();
+  List<String> _subjectsPractical = new List<String>();
+  void getData() async {}
+  Map<String, int> totalTheorySubjects = new HashMap<String, int>();
+  Map<String, int> totalPracticalSubjects = new HashMap<String, int>();
+  Map<String, int> attendedPracticalSubjects = new HashMap<String, int>();
+  Map<String, int> attendedTheorySubjects = new HashMap<String, int>();
+
   Widget _buildBodyHome() {
     return ListView(
-      scrollDirection: Axis.vertical,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
-          height: 180.0,
-          width: 300.0,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0)),
-          child: Carousel(
-            dotColor: Colors.grey,
-            borderRadius: true,
-            radius: Radius.circular(50.0),
-            autoplayDuration: Duration(seconds: 5),
-            autoplay: true,
-            animationCurve: Curves.easeIn,
-            animationDuration: Duration(milliseconds: 1000),
-            dotSize: 6.0,
-            dotIncreasedColor: Colors.purple,
-            dotBgColor: Colors.transparent,
-            dotPosition: DotPosition.bottomCenter,
-            dotVerticalPadding: 10.0,
-            showIndicator: true,
-            indicatorBgPadding: 7.0,
-            onImageTap: (index) {
-              print(index);
-            },
-            images: [
-              FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  fit: BoxFit.fill,
-                  image:
-                      'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-              FadeInImage.assetNetwork(
-                  placeholder: 'images/loading.gif',
-                  fit: BoxFit.fill,
-                  image:
-                      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"),
-            ],
-          ),
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.only(top: 15.0),
-          height: 175.0,
-          alignment: Alignment.topLeft,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 10),
-                child: Text(
-                  "Events",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.0),
-                ),
-              ),
-              Container(
-                height: 140.0,
-                padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              image:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
+      children: [
+        StreamBuilder<DocumentSnapshot>(
+            stream: Firestore.instance
+                .collection("parent_details")
+                .document(_username)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot != null && snapshot.hasData) {
+                var data = snapshot.data;
+                var _currentSem = data["student_semester"];
+                var _div = data["student_division"];
+                var _batch = data["student_batch"];
+                var _usernameStudent = data["student_phone_number"];
+                Firestore.instance
+                    .collection("semwise_subjects")
+                    .document(_currentSem)
+                    .get()
+                    .then((value) {
+                  List<String> theory = List<String>();
+                  List<String> practical = List<String>();
+                  value.data.forEach((key, value) {
+                    if (value['type'].compareTo("Theory") == 0) {
+                      theory.add(key);
+                    }
+                    practical.add(key);
+                  });
+                  setState(() {
+                    _subjectsTheory = theory;
+                    _subjectsPractical = practical;
+                  });
+                });
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: new Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: Firestore.instance
+                              .collection("attendance")
+                              .where("semester", isEqualTo: _currentSem)
+                              .snapshots(),
+                          // ignore: missing_return
+                          builder: (context, snapshot) {
+                            try {
+                              if (snapshot != null &&
+                                  snapshot.hasData &&
+                                  _subjectsTheory.isNotEmpty) {
+                                var data = snapshot.data.documents;
+                                List<DocumentSnapshot> myTheoryData =
+                                    new List<DocumentSnapshot>();
+                                data.forEach((element) {
+                                  if (element["type"].compareTo("Theory") ==
+                                      0) {
+                                    if (element["batch"].compareTo(_div) == 0 &&
+                                        element['status'] == 1) {
+                                      myTheoryData.add(element);
+                                    }
+                                  }
+                                });
+                                print(_subjectsTheory);
+                                _subjectsTheory.forEach((element) {
+                                  int count = 0;
+                                  int attended = 0;
+                                  totalTheorySubjects[element] = count;
+                                  attendedTheorySubjects[element] = attended;
+                                  myTheoryData.forEach((element1) {
+                                    List<dynamic> i = new List<dynamic>();
+                                    if (element1['subject']
+                                            .compareTo(element) ==
+                                        0) {
+                                      count++;
+                                      i = element1['students'];
+                                      print(_usernameStudent);
+                                      if (i.contains(_usernameStudent)) {
+                                        attended++;
+                                      }
+                                    }
+                                  });
+                                  attendedTheorySubjects[element] = attended;
+                                  totalTheorySubjects[element] = count;
+                                });
+                                /*print("PracticalData: ${myPracticalData.length}");
+                                print("TheoryData: ${myTheoryData.length}");*/
+                                print(totalTheorySubjects.toString());
+                                print(attendedTheorySubjects.toString());
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: (context, index) {
+                                    var i = totalTheorySubjects.keys.toList();
+                                    var j = totalTheorySubjects.values.toList();
+                                    List<Color> _colors = [
+                                      Colors.red,
+                                      Colors.green
+                                    ];
+                                    Map<String, double> pieData =
+                                        new HashMap<String, double>();
+                                    pieData["Absent"] = (j[index] -
+                                            attendedTheorySubjects[i[index]])
+                                        .toDouble();
+                                    pieData["Present"] =
+                                        attendedTheorySubjects[i[index]]
+                                            .toDouble();
+                                    return Container(
+                                      height: 90,
+                                      width: 300,
+                                      child: Card(
+                                        child: Column(
+                                          children: <Widget>[
+                                            Flexible(
+                                                child: Text(
+                                              "${i[index]} (Theory)",
+                                              textAlign: TextAlign.center,
+                                            )),
+                                            j[index] != 0
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 14.0),
+                                                    child: PieChart(
+                                                      dataMap: pieData,
+                                                      colorList: _colors,
+                                                      animationDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  500),
+                                                      chartRadius: 110,
+                                                      chartType: ChartType.disc,
+                                                      showChartValues: true,
+                                                      showLegends: true,
+                                                      showChartValuesInPercentage:
+                                                          true,
+                                                      showChartValuesOutside:
+                                                          true,
+                                                      showChartValueLabel: true,
+                                                      initialAngle: 90,
+                                                    ),
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            14.0),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "No Lecture Taken Yet!",
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .lightGreen),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: totalTheorySubjects.length,
+                                );
+                              } else {
+                                return Center(child: Text("Loading..."));
+                              }
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 175.0,
-          alignment: Alignment.topLeft,
-          margin: EdgeInsets.only(top: 15.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 10),
-                child: Text(
-                  "College Schedule",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.0),
-                ),
-              ),
-              Container(
-                height: 140.0,
-                padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              image:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
+                      Expanded(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: Firestore.instance
+                              .collection("attendance")
+                              .where("semester", isEqualTo: _currentSem)
+                              .snapshots(),
+                          // ignore: missing_return
+                          builder: (context, snapshot) {
+                            try {
+                              if (snapshot != null &&
+                                  snapshot.hasData &&
+                                  _subjectsPractical.isNotEmpty) {
+                                var data = snapshot.data.documents;
+                                List<DocumentSnapshot> myPracticalData =
+                                    new List<DocumentSnapshot>();
+                                data.forEach((element) {
+                                  if (element["type"].compareTo("Practical") ==
+                                      0) {
+                                    if (element["batch"]
+                                                .compareTo(_div + _batch) ==
+                                            0 &&
+                                        element['status'] == 1) {
+                                      myPracticalData.add(element);
+                                    }
+                                  }
+                                });
+                                print(_subjectsTheory);
+                                _subjectsPractical.forEach((element) {
+                                  int count = 0;
+                                  int attended = 0;
+                                  totalPracticalSubjects[element] = count;
+                                  attendedPracticalSubjects[element] = attended;
+                                  myPracticalData.forEach((element1) {
+                                    List<dynamic> i = new List<dynamic>();
+                                    if (element1['subject']
+                                            .compareTo(element) ==
+                                        0) {
+                                      count++;
+                                      i = element1['students'];
+                                      if (i.contains(_usernameStudent)) {
+                                        attended++;
+                                      }
+                                    }
+                                  });
+                                  attendedPracticalSubjects[element] = attended;
+                                  totalPracticalSubjects[element] = count;
+                                });
+                                /*print("PracticalData: ${myPracticalData.length}");
+                                print("TheoryData: ${myTheoryData.length}");*/
+                                print(totalPracticalSubjects.toString());
+                                print(attendedPracticalSubjects.toString());
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: (context, index) {
+                                    var i =
+                                        totalPracticalSubjects.keys.toList();
+                                    var j =
+                                        totalPracticalSubjects.values.toList();
+                                    List<Color> _colors = [
+                                      Colors.red,
+                                      Colors.green
+                                    ];
+                                    Map<String, double> pieData =
+                                        new HashMap<String, double>();
+                                    pieData["Absent"] = j[index] -
+                                        attendedPracticalSubjects[i[index]]
+                                            .toDouble();
+                                    pieData["Present"] =
+                                        attendedPracticalSubjects[i[index]]
+                                            .toDouble();
+                                    return Container(
+                                      height: 150,
+                                      width: 300,
+                                      child: Card(
+                                        child: Column(
+                                          children: <Widget>[
+                                            Flexible(
+                                                child: Text(
+                                                    "${i[index]} (Practical)",
+                                                    textAlign:
+                                                        TextAlign.center)),
+                                            j[index] != 0
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 14.0),
+                                                    child: PieChart(
+                                                      dataMap: pieData,
+                                                      colorList: _colors,
+                                                      animationDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  500),
+                                                      chartRadius: 110,
+                                                      chartType: ChartType.disc,
+                                                      showChartValues: true,
+                                                      showLegends: true,
+                                                      showChartValuesInPercentage:
+                                                          true,
+                                                      showChartValuesOutside:
+                                                          true,
+                                                      showChartValueLabel: true,
+                                                      initialAngle: 90,
+                                                    ),
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            14.0),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "No Lab Taken Yet!",
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .lightGreen),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: totalPracticalSubjects.length,
+                                );
+                              } else {
+                                return Center(child: Text("Loading..."));
+                              }
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 175.0,
-          alignment: Alignment.topLeft,
-          margin: EdgeInsets.only(top: 15.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 10),
-                child: Text(
-                  "Fee Payment",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.0),
-                ),
-              ),
-              Container(
-                height: 140.0,
-                padding: EdgeInsets.all(5.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      color: Colors.transparent,
-                      clipBehavior: Clip.antiAlias,
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FadeInImage.assetNetwork(
-                              placeholder: 'images/loading.gif',
-                              width: 170.0,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              image:
-                                  'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg'),
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text("Maisaie",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    letterSpacing: 3.0)),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+                      StreamBuilder<QuerySnapshot>(
+                          stream: Firestore.instance
+                              .collection("attendance")
+                              .where('students',
+                                  arrayContains: _usernameStudent)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot != null && snapshot.hasData) {
+                              QuerySnapshot document = snapshot.data;
+                              List<DocumentSnapshot> data = document.documents;
+                              return data.length == 0
+                                  ? Align(
+                                      alignment: Alignment.center,
+                                      child: Text("No Attendance Submitted"))
+                                  : Expanded(
+                                      child: ListView.builder(
+                                          itemCount: data.length,
+                                          itemBuilder: (context, index) {
+                                            return Card(
+                                              margin: EdgeInsets.all(14),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(14.0),
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: <Widget>[
+                                                        Flexible(
+                                                          child: Container(
+                                                            child: Center(
+                                                              child: Text(
+                                                                "${data[index]['subject']}(${data[index]["type"]})",
+                                                                softWrap: true,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      child: Text(
+                                                          "${data[index]['date']}"),
+                                                    ),
+                                                    Container(
+                                                        child: Text(
+                                                            "${data[index]['time']}")),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                    );
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          })
+                    ],
+                  ),
+                );
+              } else {
+                return CircularProgressIndicator();
+              }
+            }),
       ],
     );
   }
@@ -567,9 +734,9 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                     return CircleAvatar(
                       maxRadius: 40,
                       backgroundColor:
-                      Theme.of(context).platform == TargetPlatform.iOS
-                          ? Colors.blue
-                          : Colors.cyanAccent,
+                          Theme.of(context).platform == TargetPlatform.iOS
+                              ? Colors.blue
+                              : Colors.cyanAccent,
                       child: Text(
                         '${name[0]}',
                         style: TextStyle(fontSize: 40.0),
@@ -945,7 +1112,6 @@ class _ParentActivityPageState extends State<ParentActivityPage>
   String _name;
   bool msgEmpty = true;
 
-
   Widget _buildBodyQnA() {
     var msgItems;
     //print(DateTime.now().day.toString() +"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString());
@@ -1101,30 +1267,28 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                       Expanded(
                                           child: TextFormField(
                                         controller: _msg,
-                                            onChanged: (value) {
-                                              if (value
-                                                  .toString()
-                                                  .isEmpty) {
-                                                setState(() {
-                                                  msgEmpty = true;
-                                                });
-                                              } else {
-                                                if (value
+                                        onChanged: (value) {
+                                          if (value.toString().isEmpty) {
+                                            setState(() {
+                                              msgEmpty = true;
+                                            });
+                                          } else {
+                                            if (value
                                                     .toString()
                                                     .trim()
                                                     .length ==
-                                                    0) {
-                                                  setState(() {
-                                                    print("Space");
-                                                    msgEmpty = true;
-                                                  });
-                                                } else if (value.isNotEmpty) {
-                                                  setState(() {
-                                                    msgEmpty = false;
-                                                  });
-                                                }
-                                              }
-                                            },
+                                                0) {
+                                              setState(() {
+                                                print("Space");
+                                                msgEmpty = true;
+                                              });
+                                            } else if (value.isNotEmpty) {
+                                              setState(() {
+                                                msgEmpty = false;
+                                              });
+                                            }
+                                          }
+                                        },
                                         keyboardType: TextInputType.multiline,
                                         minLines: 1,
                                         maxLines: 100,
@@ -1168,12 +1332,11 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   _msg.clear();
                                 });
                               },
-
                               child: msgEmpty
                                   ? Container()
                                   : CircleAvatar(
-                                child: Icon(Icons.send),
-                              ),
+                                      child: Icon(Icons.send),
+                                    ),
                             ),
                           ),
                         ],
@@ -1375,9 +1538,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
               Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new Contactus()));
             },
-
           ),
-
           ListTile(
               title: new Text(
                 "Logout",

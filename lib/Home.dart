@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as Path;
 import 'AddEvent.dart';
 import 'ChangePassword.dart';
+import 'DetainList.dart';
 import 'ManageVerification.dart';
 import 'ShowImage.dart';
 import 'SplashScreen.dart';
@@ -144,8 +145,11 @@ class _HomePageState extends State<HomePage> {
                 "Generate Detain List",
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-              trailing: new Icon(Icons.access_time),
-              onTap: _onItemTapped1,
+              trailing: new Icon(Icons.notification_important),
+              onTap: () {
+                Navigator.of(context).push(
+                    new MaterialPageRoute(builder: (context) => DetainList()));
+              },
             ),
             new ListTile(
               title: new Text(

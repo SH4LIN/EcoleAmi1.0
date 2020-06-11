@@ -307,6 +307,7 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
   TextEditingController _assignmentName = new TextEditingController();
   var _selectedSemester;
   var _selectedSubject;
+  bool _assignmentValidate = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -320,8 +321,21 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
               cursorColor: Colors.purple,
               cursorRadius: Radius.circular(50.0),
               cursorWidth: 3.0,
+              onChanged: (String str) {
+                RegExp fnameregex = RegExp(r"^[a-zA-Z\d ]*$");
+                setState(() {
+                  if (fnameregex.hasMatch(str)) {
+                    _assignmentValidate = false;
+                  } else {
+                    _assignmentValidate = true;
+                  }
+                });
+              },
               decoration: new InputDecoration(
                   hintText: "Assignment Name",
+                  errorText: _assignmentValidate
+                      ? "Assignment Name Can not Contain Special Character"
+                      : null,
                   border: new OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                   )),
@@ -559,7 +573,18 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
               margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               width: MediaQuery.of(context).size.width * 0.5,
               child: RaisedButton(
-                onPressed: () => uploadPdf(),
+                onPressed: () {
+                  setState(() {
+                    if (_assignmentName.text.trim().length == 0) {
+                      _assignmentValidate = true;
+                    } else {
+                      _assignmentValidate = false;
+                    }
+                  });
+                  if (_assignmentValidate == false) {
+                    uploadPdf();
+                  }
+                },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 child: Row(
