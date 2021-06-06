@@ -54,7 +54,7 @@ class _SetForgotPassState extends State<SetForgotPass> {
             children: <Widget>[
               new Container(
                   padding:
-                      const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
+                  const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
                   child: new Form(
                       child: new Card(
                           elevation: 30.0,
@@ -76,7 +76,7 @@ class _SetForgotPassState extends State<SetForgotPass> {
                                   decoration: new InputDecoration(
                                       hintText: "Set Password",
                                       errorText:
-                                          _passValidate ? errorMessage : null,
+                                      _passValidate ? errorMessage : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
                                         color: Colors.grey,
@@ -94,12 +94,12 @@ class _SetForgotPassState extends State<SetForgotPass> {
                                       ),
                                       border: new OutlineInputBorder(
                                         borderRadius:
-                                            BorderRadius.circular(20.0),
+                                        BorderRadius.circular(20.0),
                                       )),
                                 ),
                                 new Padding(
                                     padding:
-                                        const EdgeInsets.only(bottom: 15.0)),
+                                    const EdgeInsets.only(bottom: 15.0)),
                                 new TextField(
                                   controller: _confirmPass,
                                   cursorColor: Colors.purple,
@@ -109,7 +109,7 @@ class _SetForgotPassState extends State<SetForgotPass> {
                                   decoration: new InputDecoration(
                                       hintText: "Confirm Password",
                                       errorText:
-                                          _cPassValidate ? errorMessage2 : null,
+                                      _cPassValidate ? errorMessage2 : null,
                                       hintStyle: new TextStyle(
                                         fontSize: 15.0,
                                         color: Colors.grey,
@@ -127,17 +127,17 @@ class _SetForgotPassState extends State<SetForgotPass> {
                                       ),
                                       border: new OutlineInputBorder(
                                         borderRadius:
-                                            BorderRadius.circular(20.0),
+                                        BorderRadius.circular(20.0),
                                       )),
                                 ),
                                 new Padding(
                                     padding:
-                                        const EdgeInsets.only(bottom: 20.0)),
+                                    const EdgeInsets.only(bottom: 20.0)),
                                 new RaisedButton(
                                   color: Colors.redAccent,
                                   shape: RoundedRectangleBorder(
                                       borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                      BorderRadius.circular(10.0)),
                                   child: new Text(
                                     "Save",
                                     style: new TextStyle(
@@ -150,26 +150,26 @@ class _SetForgotPassState extends State<SetForgotPass> {
                                         if (_pass.text.isEmpty) {
                                           _passValidate = true;
                                           errorMessage =
-                                              "Password can not be empty";
+                                          "Password can not be empty";
                                         } else {
                                           _passValidate = false;
                                         }
                                         if (_confirmPass.text.isEmpty) {
                                           _cPassValidate = true;
                                           errorMessage2 =
-                                              "Password does not match";
+                                          "Password does not match";
                                         } else {
                                           _cPassValidate = false;
                                         }
                                         if (_passValidate == false &&
                                             _cPassValidate == false) {
                                           if (_pass.text.compareTo(
-                                                  _confirmPass.text) !=
+                                              _confirmPass.text) !=
                                               0) {
                                             _cPassValidate = true;
                                             _confirmPass.clear();
                                             errorMessage2 =
-                                                "Password does not match";
+                                            "Password does not match";
                                           } else {
                                             _passValidate = false;
                                             _cPassValidate = false;

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/Register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -129,9 +130,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  Future<void> _checkUser() {
+  Future<void> _checkUser() async {
     // ignore: missing_return
-    Firestore.instance
+    await Firestore.instance
         .collection("login_details")
         .document(_userName.text)
         .get()
@@ -139,7 +140,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       if (!document.exists) {
         dialogNoUser();
       } else {
+        pass = document['password'];
         role = document['role'];
+        if (pass == null) {
+          notRegistered();
+        } else {
+
+        }
         print(role);
         switch (role) {
           case "admin":
@@ -239,6 +246,36 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         },
       );
 
+  void notRegistered() => showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Error!',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('First register yourself'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Register'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Register()));
+            },
+          ),
+        ],
+      );
+    },
+  );
+
   Future<void> verifyPhone(String phone, BuildContext context) async {
     saveSate();
     FirebaseAuth _auth = FirebaseAuth.instance;
@@ -307,86 +344,84 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         borderRadius: BorderRadius.circular(20.0),
                       )),
                 ),
-                Center(
-                  child: new RaisedButton(
-                      color: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      child: new Text(
-                        "Verify",
-                        style: new TextStyle(
-                          color: Colors.white,
-                          fontSize: 15.0,
-                          wordSpacing: 2.0,
-                          letterSpacing: 0.3,
-                        ),
+                new Padding(
+                    padding: const EdgeInsets.only(bottom: 40.0, left: 150)),
+                new RaisedButton(
+                    color: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: new Text(
+                      "Verify",
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        wordSpacing: 2.0,
+                        letterSpacing: 0.3,
                       ),
-                      splashColor: Colors.red,
-                      onPressed: () async {
-                        /*           if (_otp.text.length < 6) {
-                          setState(() {
-                            _otpValidate = true;
-                            errorMessage = "Invalid OTP";
-                          });
-                        } else {
+                    ),
+                    splashColor: Colors.red,
+                    onPressed: () async {
+                      /*           if (_otp.text.length < 6) {
+                        setState(() {
+                          _otpValidate = true;
+                          errorMessage = "Invalid OTP";
+                        });
+                      } else {
           setState(() {
           _otpValidate = false;
           });
           }*/
-                        /*try {
-                          print("Try");
-                          AuthCredential credential =
-                              PhoneAuthProvider.getCredential(
-                                  verificationId: verificationId,
-                                  smsCode: _otp.text.trim());
-                          AuthResult result =
-                              await _auth.signInWithCredential(credential);
-                          FirebaseUser user = result.user;
-                          print("User");
-                          print(user);
-                          if (user != null) {
-                            Navigator.of(context).pop();
-                            if (role == "parent") {
-                              Navigator.of(context).pushReplacement(
-                                  new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          new SetForgotPass()));
-                            } else {
-                              Navigator.of(context).pushReplacement(
-                                  new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          new SetPassword()));
-                            }
-                          } else {
-                            print("Error");
-                          }
-                        } catch (e) {
-                          print("Errorr");
-                          handleError(e);
-                        }*/
-                        try {
-                          final AuthCredential credential =
-                              PhoneAuthProvider.getCredential(
-                            verificationId: verificationId,
-                            smsCode: _otp.text.trim(),
-                          );
-                          AuthResult result =
-                              await _auth.signInWithCredential(credential);
-                          final FirebaseUser user = result.user;
-                          final FirebaseUser currentUser =
-                              await _auth.currentUser();
-                          assert(user.uid == currentUser.uid);
+                      /*try {
+                        print("Try");
+                        AuthCredential credential =
+                            PhoneAuthProvider.getCredential(
+                                verificationId: verificationId,
+                                smsCode: _otp.text.trim());
+                        AuthResult result =
+                            await _auth.signInWithCredential(credential);
+                        FirebaseUser user = result.user;
+                        print("User");
+                        print(user);
+                        if (user != null) {
                           Navigator.of(context).pop();
-                          Navigator.of(context).pushReplacement(
-                              new MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      new SetForgotPass()));
-                        } catch (e) {
-                          handleError(e);
-                          print("Erorrrrrrrrrrrrrrrrrrrrr " + e.toString());
+                          if (role == "parent") {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        new SetForgotPass()));
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        new SetPassword()));
+                          }
+                        } else {
+                          print("Error");
                         }
-                      }),
-                )
+                      } catch (e) {
+                        print("Errorr");
+                        handleError(e);
+                      }*/
+                      try {
+                        final AuthCredential credential =
+                            PhoneAuthProvider.getCredential(
+                          verificationId: verificationId,
+                          smsCode: _otp.text.trim(),
+                        );
+                        AuthResult result =
+                            await _auth.signInWithCredential(credential);
+                        final FirebaseUser user = result.user;
+                        final FirebaseUser currentUser =
+                            await _auth.currentUser();
+                        assert(user.uid == currentUser.uid);
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                            builder: (BuildContext context) => new SetForgotPass()));
+                      } catch (e) {
+                        handleError(e);
+                        print("Erorrrrrrrrrrrrrrrrrrrrr " + e.toString());
+                      }
+                    })
               ],
             ),
           );

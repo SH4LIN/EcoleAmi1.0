@@ -249,9 +249,7 @@ class _DetainListState extends State<DetainList> {
                           cursorWidth: 3.0,
                           decoration: new InputDecoration(
                               hintText: "Criteria",
-                              errorText: _validate
-                                  ? errormsg
-                                  : null,
+                              errorText: _validate ? errormsg : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.grey,
@@ -274,31 +272,30 @@ class _DetainListState extends State<DetainList> {
                   color: Colors.redAccent,
                   onPressed: () {
                     setState(() {
-
-
-                    if (__criteria.text.isEmpty) {
-                      _validate = true;
-                    } else {
-                      if (int.parse(__criteria.text) > 100 ) {
+                      if (__criteria.text.isEmpty) {
                         _validate = true;
-                        errormsg = "Please enter number less then \'100\'";
                       } else {
-                        _validate = false;
+                        if (int.parse(__criteria.text) > 100) {
+                          _validate = true;
+                          errormsg = "Please enter number less then \'100\'";
+                        } else {
+                          _validate = false;
+                        }
                       }
-                    }
-                    if (_selectedSemester != null && _selectedSubject != null &&
-                        _selectedPT != null && _selectedBatch != null &&
-                        _validate != true) {
-                      Navigator.of(context).pushReplacement(
-                          new MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                              new Detain(
-                                  _selectedSubject.toString(),
-                                  _selectedPT.toString(),
-                                  _selectedSemester.toString(),
-                                  _selectedBatch.toString(),
-                                  __criteria.text)));
-                    }
+                      if (_selectedSemester != null &&
+                          _selectedSubject != null &&
+                          _selectedPT != null &&
+                          _selectedBatch != null &&
+                          _validate != true) {
+                        Navigator.of(context).pushReplacement(
+                            new MaterialPageRoute(
+                                builder: (BuildContext context) => new Detain(
+                                    _selectedSubject.toString(),
+                                    _selectedPT.toString(),
+                                    _selectedSemester.toString(),
+                                    _selectedBatch.toString(),
+                                    __criteria.text)));
+                      }
                     });
                   },
                   child: Text(
@@ -388,6 +385,15 @@ class _FinalDetainState extends State<FinalDetain> {
                     padding: EdgeInsets.only(top: 15),
                   ),
                   new Container(child: Center(child: Text(_subject))),
+                  new Container(
+                      child: Center(
+                          child: detainedstudent != null
+                              ? Text(
+                                  detainedstudent.length.toString() +
+                                      " student(s) detained",
+                                  style: TextStyle(color: Colors.red),
+                                )
+                              : Container())),
 
                   new Expanded(
                       child: StreamBuilder(
@@ -553,8 +559,7 @@ class _FinalDetainState extends State<FinalDetain> {
             DateTime.now().second.toString(),
         'detain_student': detainedstudent,
       });
-      Fluttertoast.showToast(
-          msg: "Submitted", gravity: ToastGravity.BOTTOM);
+      Fluttertoast.showToast(msg: "Submitted", gravity: ToastGravity.BOTTOM);
       pr.hide();
       Navigator.pop(context);
       Navigator.of(context).push(new MaterialPageRoute(
@@ -577,112 +582,151 @@ class _ShowDetainState extends State<ShowDetain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar("Detain List"),
-      body: new ListView(
-//        scrollDirection: Axis.vertical,
-          padding: EdgeInsets.all(5.0),
+      body: StreamBuilder(
+        stream: Firestore.instance
+            .collection('detain_list')
+            .orderBy('semester', descending: false)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot != null && snapshot.hasData) {
+            var data = snapshot.data.documents;
+            return data.length > 0
+                ? ListView.builder(
+                    itemCount: data.length,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        margin: EdgeInsets.all(8),
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.of(context).push(new MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    new StudentDetainList(
+                                        data[index]['detain_student'])));
+                          },
+                          leading: Text(
+                            index.toString(),
+                            style: TextStyle(fontSize: 15),
+                          ),
+                          trailing: Text(data[index]['semester'] +
+                              " " +
+                              data[index]['batch']),
+                          title: Text(
+                            data[index]['subject'] +
+                                " \n" +
+                                data[index]['type'],
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          subtitle: Text(data[index]['date']),
+                        ),
+                      );
+                    })
+                : Center(
+                    child:
+                        Container(child: new Text("No detain list generated")));
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
+    );
+  }
+}
+
+class StudentDetainList extends StatelessWidget {
+  final List<dynamic> student;
+
+  StudentDetainList(this.student);
+
+  @override
+  Widget build(BuildContext context) {
+    return StudentList(student);
+  }
+}
+
+class StudentList extends StatefulWidget {
+  final List<dynamic> student;
+
+  StudentList(this.student);
+
+  @override
+  _StudentListState createState() => _StudentListState(student);
+}
+
+class _StudentListState extends State<StudentList> {
+  final List<dynamic> student;
+
+  _StudentListState(this.student);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CommonAppBar("Detain List"),
+      body: Container(
+        child: new ListView(
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                StreamBuilder(
-                  stream: Firestore.instance
-                      .collection('detain_list')
-                      .orderBy('timestamp', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot != null && snapshot.hasData) {
-                      var data = snapshot.data.documents;
-                      detainedList = new List<dynamic>();
-                      return Container(
-                          child: ListView.builder(
-                              itemCount: data.length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) {
-                                detainedList = data[index]['detain_student'];
-                                return Container(
-                                  child: Center(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 30),
-                                        ),
-                                        Text(data[index]['semester'] + " " + data[index]['batch']  + " " + "(" + data[index]['type'] + ")" + " " + data[index]['date']),
-                                        Text(data[index]['subject']),
-                                        Text(detainedList.length.toString() + ' Student(s) Detained'),
-                                        Container(
-                                          height: detainedList.length == 1
-                                              ? 90
-                                              : 200,
-//                                          height: 200,
-                                          child: ListView.builder(
-                                              itemCount: detainedList.length,
-                                              shrinkWrap: true,
-                                              scrollDirection: Axis.vertical,
-                                              itemBuilder: (context, index) {
-                                                return StreamBuilder<
-                                                        DocumentSnapshot>(
-                                                    stream: Firestore.instance
-                                                        .collection(
-                                                            "student_details")
-                                                        .document(
-                                                            detainedList[index])
-                                                        .snapshots(),
-                                                    builder:
-                                                        (context, snapshot) {
-                                                      if (snapshot != null &&
-                                                          snapshot.hasData) {
-                                                        var data =
-                                                            snapshot.data;
-                                                        return Container(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    left: 20,
-                                                                    right: 20,
-                                                                    top: 10),
-                                                            child: Card(
-                                                              child: ListTile(
-                                                                leading: Text(
-                                                                  index
-                                                                      .toString(),
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          15),
-                                                                ),
-                                                                trailing: Text(data[
-                                                                        'division'] +
-                                                                    data[
-                                                                        'batch']),
-                                                                title: Text(data[
-                                                                    'enrollment']),
-                                                                subtitle: Text(data[
-                                                                        'first_name'] +
-                                                                    " " +
-                                                                    data[
-                                                                        'middle_name'] +
-                                                                    " " +
-                                                                    data[
-                                                                        'last_name']),
-                                                              ),
-                                                            ));
-                                                      } else {
-                                                        return CircularProgressIndicator();
-                                                      }
-                                                    });
-                                              }),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }));
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                  },
-                ),
-              ],
-            )
-          ]),
+            student.length > 0
+                ? Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 30),
+                      ),
+                      Center(
+                        child: Text(
+                          student.length.toString() +
+                              " student(s) were detained",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 30),
+                      ),
+                      ListView.builder(
+                          itemCount: student.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            return StreamBuilder<DocumentSnapshot>(
+                                stream: Firestore.instance
+                                    .collection("student_details")
+                                    .document(student[index])
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot != null && snapshot.hasData) {
+                                    var data = snapshot.data;
+                                    return Container(
+                                        padding: EdgeInsets.only(
+                                            left: 20, right: 20, top: 10),
+                                        child: Card(
+                                          child: ListTile(
+                                            leading: Text(
+                                              index.toString(),
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                            trailing: Text(data['division'] +
+                                                data['batch']),
+                                            title: Text(data['enrollment']),
+                                            subtitle: Text(data['first_name'] +
+                                                " " +
+                                                data['middle_name'] +
+                                                " " +
+                                                data['last_name']),
+                                          ),
+                                        ));
+                                  } else {
+                                    return CircularProgressIndicator();
+                                  }
+                                });
+                          }),
+                    ],
+                  )
+                : Container(
+                    child:
+                        Center(child: new Text("No Student(s) were detained")))
+          ],
+        ),
+      ),
     );
   }
 }

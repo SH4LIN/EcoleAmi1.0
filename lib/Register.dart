@@ -72,9 +72,7 @@ class __RegisterPageState extends State<_RegisterPage> {
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
           AuthResult result = await _auth.signInWithCredential(credential);
-
           FirebaseUser user = result.user;
-
           if (user != null) {
             Navigator.of(context).pop();
             if (role == "parent") {
@@ -138,62 +136,110 @@ class __RegisterPageState extends State<_RegisterPage> {
                         borderRadius: BorderRadius.circular(20.0),
                       )),
                 ),
-                Center(
-                  child: new RaisedButton(
-                      color: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      child: new Text(
-                        "Verify",
-                        style: new TextStyle(
-                          color: Colors.white,
-                          fontSize: 15.0,
-                          wordSpacing: 2.0,
-                          letterSpacing: 0.3,
-                        ),
+                new RaisedButton(
+                    color: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: new Text(
+                      "Verify",
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        wordSpacing: 2.0,
+                        letterSpacing: 0.3,
                       ),
-                      splashColor: Colors.red,
-                      onPressed: () async {
-                        if (_otp.text.length < 6) {
-                          setState(() {
-                            _otpValidate = true;
-                            errorMessage = "Invalid OTP";
-                          });
-                        } else {
-                          setState(() {
-                            _otpValidate = false;
-                          });
-                          try {
-                            AuthCredential credential =
-                                PhoneAuthProvider.getCredential(
-                                    verificationId: verificationId,
-                                    smsCode: _otp.text.trim());
-                            AuthResult result =
-                                await _auth.signInWithCredential(credential);
-                            FirebaseUser user = result.user;
-                            print(user);
-                            if (user != null) {
-                              Navigator.of(context).pop();
-                              if (role == "parent") {
-                                Navigator.of(context).pushReplacement(
-                                    new MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            new SetParentDetails()));
-                              } else {
-                                Navigator.of(context).pushReplacement(
-                                    new MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            new SetPassword()));
-                              }
-                            } else {
-                              print("Error");
-                            }
-                          } catch (e) {
-                            handleError(e);
+                    ),
+                    splashColor: Colors.red,
+                    onPressed: () async {
+                      /*await _auth.currentUser().then((user) {
+                        if (user != null) {
+                          Navigator.of(context).pop();
+                          if (role == "parent") {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (
+                                        BuildContext context) => new SetParentDetails()));
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (
+                                        BuildContext context) => new SetPassword()));
                           }
+                        } else {
+                          signIn();
                         }
-                      }),
-                )
+                      });*/
+
+                      /*           if (_otp.text.length < 6) {
+                        setState(() {
+                          _otpValidate = true;
+                          errorMessage = "Invalid OTP";
+                        });
+                      } else {
+          setState(() {
+          _otpValidate = false;
+          });
+          }*/
+                      /*try {
+                        print("Try");
+                        AuthCredential credential =
+                            PhoneAuthProvider.getCredential(
+                                verificationId: verificationId,
+                                smsCode: _otp.text.trim());
+                        AuthResult result =
+                            await _auth.signInWithCredential(credential);
+                        FirebaseUser user = result.user;
+                        print("User");
+                        print(user);
+                        if (user != null) {
+                          Navigator.of(context).pop();
+                          if (role == "parent") {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        new SetParentDetails()));
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        new SetPassword()));
+                          }
+                        } else {
+                          print("Error");
+                        }
+                      } catch (e) {
+                        print("Errorr");
+                        handleError(e);
+                      }*/
+                      try {
+                        final AuthCredential credential =
+                            PhoneAuthProvider.getCredential(
+                          verificationId: verificationId,
+                          smsCode: _otp.text.trim(),
+                        );
+                        AuthResult result =
+                            await _auth.signInWithCredential(credential);
+                        final FirebaseUser user = result.user;
+                        final FirebaseUser currentUser =
+                            await _auth.currentUser();
+                        assert(user.uid == currentUser.uid);
+                        Navigator.of(context).pop();
+                        if (role == "parent") {
+                          Navigator.of(context).pushReplacement(
+                              new MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      new SetParentDetails()));
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                              new MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      new SetPassword()));
+                        }
+                      } catch (e) {
+                        handleError(e);
+                        print("Erorrrrrrrrrrrrrrrrrrrrr " + e.toString());
+                      }
+                    })
               ],
             ),
           );
@@ -220,16 +266,17 @@ class __RegisterPageState extends State<_RegisterPage> {
       }
     } catch (e) {
       handleError(e);
-      print("Erorrrrrrrrrrrrrrrrrrrrr " + e.toString());
     }
   }
 
   handleError(PlatformException error) {
-    print(error);
+    print(error.code);
+
     switch (error.code) {
       case 'ERROR_INVALID_VERIFICATION_CODE':
         FocusScope.of(context).requestFocus(new FocusNode());
         setState(() {
+          _otpValidate = true;
           errorMessage = 'Invalid Code';
         });
         Navigator.of(context).pop();
@@ -237,19 +284,20 @@ class __RegisterPageState extends State<_RegisterPage> {
           print('sign in');
         });
         break;
+
       default:
         setState(() {
           errorMessage = error.message;
+//          print(errorMessage);
         });
-
         break;
     }
   }
 
   // ignore: missing_return
-  Future<void> _checkUser() {
+  Future<void> _checkUser() async {
     // ignore: missing_return
-    Firestore.instance
+    await Firestore.instance
         .collection("login_details")
         .document(_userName.text)
         .get()

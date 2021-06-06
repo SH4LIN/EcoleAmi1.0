@@ -61,11 +61,45 @@ class _NotifyStudentState extends State<NotifyStudent> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new CommonAppBar("Notify Student"),
-      backgroundColor: Colors.grey,
       body: new Container(
           child: new ListView(
         children: <Widget>[
-          new Container(
+          ListView.builder(
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              index += 1;
+              return Card(
+                margin: EdgeInsets.all(8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Colors.blue
+                            : Colors.black12,
+                    child: Text(
+                      index.toString(),
+                      style: TextStyle(fontSize: 20.0, color: Colors.black),
+                    ),
+                  ),
+                  /*trailing: new IconButton(
+      icon: new Icon(Icons.add_a_photo),
+      onPressed: () {
+      _showBottom(index.toString(), "student");
+      },
+      ),*/
+                  title: Text("Semester " + index.toString()),
+                  onTap: () {
+                    /*    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) =>
+      Student_Semester(index.toString())));*/
+                  },
+                ),
+              );
+            },
+            itemCount: 6,
+          ),
+   /*       new Container(
             padding: const EdgeInsets.only(left: 24.0, right: 25.0, top: 25.0),
             child: new Form(
                 child: new Card(
@@ -244,7 +278,7 @@ class _NotifyStudentState extends State<NotifyStudent> {
                 ),
               ),
             )),
-          )
+          )*/
         ],
       )),
     );

@@ -70,7 +70,7 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar("Update Faculty Details"),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       body: BodyUpdate(context),
     );
   }
@@ -80,11 +80,7 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
       children: <Widget>[
         new Container(
           child: new Form(
-            child: new Card(
-              elevation: 30.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-              ),
+
               child: Container(
                 padding: const EdgeInsets.all(15.0),
                 child: new Column(
@@ -305,7 +301,6 @@ class _UpdateFacultyState extends State<UpdateFacultyData> {
                   ],
                 ),
               ),
-            ),
           ),
         ),
       ],

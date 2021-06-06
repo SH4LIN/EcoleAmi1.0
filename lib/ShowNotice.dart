@@ -52,9 +52,8 @@ class _ShowState extends State<Show> {
                   children: <Widget>[
                     new CachedNetworkImage(
                       placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(
-                        backgroundColor: Colors.cyan,
-                      )),
+                          child:
+                          CircularProgressIndicator(backgroundColor: Colors.cyan,)),
                       width: (MediaQuery.of(context).size.width),
                       height: (MediaQuery.of(context).size.width),
                       imageUrl: _username['url'],
@@ -85,61 +84,29 @@ class _ShowState extends State<Show> {
                         child: new Text(
                           _username['type'],
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 21,
                           ),
                         ),
                       ),
                       new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          new Align(
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              children: <Widget>[
-                                new Text(
-                                  "Upload Date",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: new Text(
-                                    _username['timestamp'].toDate().toString(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                      new Align(
+                        alignment: Alignment.centerLeft,
+                        child: new Text(
+                          _username['timestamp'].toDate().toString(),
+                          style: TextStyle(
+                            fontSize: 21,
                           ),
-                          new Align(
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              children: <Widget>[
-                                new Text(
-                                  "Expiry Date",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: new Text(
-                                    _username['expiry_date']
-                                        .toDate()
-                                        .toString(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ),
+                      ),
+                      new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                      new Align(
+                        alignment: Alignment.centerLeft,
+                        child: new Text(
+                          _username['expiry_date'].toDate().toString(),
+                          style: TextStyle(
+                            fontSize: 21,
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

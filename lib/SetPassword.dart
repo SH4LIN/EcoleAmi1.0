@@ -39,6 +39,8 @@ class _SetPasswordState extends State<SetPassword> {
   String errorMessage;
   String errorMessage2;
 
+  String doc=null;
+
   @override
   void initState() {
     super.initState();
@@ -51,10 +53,15 @@ class _SetPasswordState extends State<SetPassword> {
 
   void setUser() async {
     prf = await SharedPreferences.getInstance();
-    _username = prf.get("rUsername");
-    _role = prf.get("rRole");
-    print(_role);
-    print(_username);
+    setState(() {
+      _username = prf.get("rUsername");
+      _role = prf.get("rRole");
+      print(_role);
+      print(_username);
+//      doc = _role != null ? _role + "_details" : null;
+      doc = _role + "_details";
+      print(doc);
+    });
   }
 
   void dispose() {
@@ -73,143 +80,150 @@ class _SetPasswordState extends State<SetPassword> {
         child: new Center(
           child: new ListView(
             children: <Widget>[
-              new Container(
-                padding:
-                    const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
-                child: new Form(
-                    child: Card(
-                  elevation: 30.0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  child: Container(
-                    padding: const EdgeInsets.all(5.0),
-                    child: new Column(
-                      children: <Widget>[
-                        new ExpansionTile(
-                          title: Text("Personal Details",
-                              style: TextStyle(fontSize: 15)),
-                          children: <Widget>[
-                            StreamBuilder(
-                                stream: Firestore.instance
-                                    .collection(_role + "_details")
-                                    .document(_username)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.none) {
-                                    _fullName.text = "Loading...!";
-                                  }
-                                  if (snapshot.hasData) {
-                                    var document = snapshot.data;
-                                    _fullName.text = document['first_name'] +
-                                        " " +
-                                        document['middle_name'] +
-                                        " " +
-                                        document['last_name'];
-                                  }
-                                  return new TextField(
-                                    controller: _fullName,
-                                    enabled: false,
-                                    decoration: new InputDecoration(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5.0),
-                                        hintText: "Full Name",
-                                        hintStyle: new TextStyle(
-                                          fontSize: 15.0,
-                                          color: Colors.white70,
-                                        ),
-                                        prefixIcon: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 15.0),
-                                          child: Icon(Icons.person),
-                                        )),
-                                  );
-                                }),
-                            new Padding(
-                                padding: const EdgeInsets.only(bottom: 15.0)),
-                            StreamBuilder(
-                                stream: Firestore.instance
-                                    .collection(_role + "_details")
-                                    .document(_username)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.none) {
-                                    _email.text = "Loading...!";
-                                  }
-                                  if (snapshot.hasData) {
-                                    var document = snapshot.data;
-                                    _email.text = document['email'];
-                                  }
-                                  return new TextField(
-                                    controller: _email,
-                                    enabled: false,
-                                    decoration: new InputDecoration(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5.0),
-                                        hintText: "Email",
-                                        hintStyle: new TextStyle(
-                                          fontSize: 15.0,
-                                          color: Colors.white70,
-                                        ),
-                                        prefixIcon: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 15.0),
-                                          child: Icon(Icons.email),
-                                        )),
-                                  );
-                                }),
-                            new Padding(
-                                padding: const EdgeInsets.only(bottom: 15.0)),
-                            StreamBuilder(
-                                stream: Firestore.instance
-                                    .collection("student_details")
-                                    .document(_username)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.none) {
-                                    _enroll.text = "Loading...!";
-                                  }
-                                  if (snapshot.hasData) {
-                                    var document = snapshot.data;
-                                    _enroll.text = document['enrollment'];
-                                    _enrCheck = document['enrollment'];
-                                    print(_enrCheck);
-                                  }
-                                  return (_enrCheck
-                                              .compareTo("------------")) ==
-                                          0
-                                      ? Container(width: 0, height: 0)
-                                      : TextField(
-                                          controller: _enroll,
-                                          enabled: false,
-                                          decoration: new InputDecoration(
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 5.0),
-                                              hintText: "Enrollment",
-                                              hintStyle: new TextStyle(
-                                                fontSize: 15.0,
-                                                color: Colors.white70,
-                                              ),
-                                              prefixIcon: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 15.0),
-                                                child: Icon(Icons.person),
-                                              )),
-                                        );
-                                }),
-                            /*: new Container();*/
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
-              ),
+//              new Container(
+//                padding:
+//                    const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
+//                child: new Form(
+//                    child: Card(
+//                  elevation: 30.0,
+//                  shape: RoundedRectangleBorder(
+//                      borderRadius: BorderRadius.circular(10.0)),
+//                  child: Container(
+//                    padding: const EdgeInsets.all(5.0),
+//                    child: new Column(
+//                      children: <Widget>[
+//                        new ExpansionTile(
+//                          title: Text("Personal Details",
+//                              style: TextStyle(fontSize: 15)),
+//                          children: <Widget>[
+//                            doc == null
+//                                ? CircularProgressIndicator()
+//                                : StreamBuilder(
+//                                    stream: Firestore.instance
+//                                        .collection(doc)
+//                                        .document(_username)
+//                                        .snapshots(),
+//                                    builder: (context, snapshot) {
+//                                      if (snapshot.connectionState ==
+//                                          ConnectionState.none) {
+//                                        _fullName.text = "Loading...!";
+//                                      }
+//                                      if (snapshot.hasData) {
+//                                        var document = snapshot.data;
+//                                        _fullName.text =
+//                                            document['first_name'] +
+//                                                " " +
+//                                                document['middle_name'] +
+//                                                " " +
+//                                                document['last_name'];
+//                                      }
+//                                      return new TextField(
+//                                        controller: _fullName,
+//                                        enabled: false,
+//                                        decoration: new InputDecoration(
+//                                            contentPadding:
+//                                                const EdgeInsets.symmetric(
+//                                                    vertical: 5.0),
+//                                            hintText: "Full Name",
+//                                            hintStyle: new TextStyle(
+//                                              fontSize: 15.0,
+//                                              color: Colors.white70,
+//                                            ),
+//                                            prefixIcon: Padding(
+//                                              padding: const EdgeInsets.only(
+//                                                  bottom: 15.0),
+//                                              child: Icon(Icons.person),
+//                                            )),
+//                                      );
+//                                    }),
+//                            new Padding(
+//                                padding: const EdgeInsets.only(bottom: 15.0)),
+//                            StreamBuilder(
+//                                stream: Firestore.instance
+//                                    .collection(doc)
+//                                    .document(_username)
+//                                    .snapshots(),
+//                                builder: (context, snapshot) {
+//                                  if (snapshot.connectionState ==
+//                                      ConnectionState.none) {
+//                                    _email.text = "Loading...!";
+//                                  }
+//                                  if (snapshot.hasData) {
+//                                    var document = snapshot.data;
+//                                    _email.text = document['email'];
+//                                  }
+//                                  return new TextField(
+//                                    controller: _email,
+//                                    enabled: false,
+//                                    decoration: new InputDecoration(
+//                                        contentPadding:
+//                                            const EdgeInsets.symmetric(
+//                                                vertical: 5.0),
+//                                        hintText: "Email",
+//                                        hintStyle: new TextStyle(
+//                                          fontSize: 15.0,
+//                                          color: Colors.white70,
+//                                        ),
+//                                        prefixIcon: Padding(
+//                                          padding: const EdgeInsets.only(
+//                                              bottom: 15.0),
+//                                          child: Icon(Icons.email),
+//                                        )),
+//                                  );
+//                                }),
+//                            new Padding(
+//                                padding: const EdgeInsets.only(bottom: 15.0)),
+//                            /*  _role != "student"
+//                                ? new Container()
+//                                : StreamBuilder(
+//                                    stream: Firestore.instance
+//                                        .collection("student_details")
+//                                        .document(_username)
+//                                        .snapshots(),
+//                                    builder: (context, snapshot) {
+//                                      if (snapshot.connectionState ==
+//                                          ConnectionState.none) {
+//                                        _enroll.text = "Loading...!";
+//                                      }
+//                                      if (snapshot.hasData) {
+//                                        var document = snapshot.data;
+//                                        _enroll.text = document['enrollment'];
+//                                        _enrCheck = document['enrollment'];
+//                                        print(_enrCheck);
+//                                      }
+//                                      return (_enrCheck
+//                                                  .compareTo("------------")) ==
+//                                              0
+//                                          ? Container(width: 0, height: 0)
+//                                          : TextField(
+//                                              controller: _enroll,
+//                                              enabled: false,
+//                                              decoration: new InputDecoration(
+//                                                  contentPadding:
+//                                                      const EdgeInsets
+//                                                              .symmetric(
+//                                                          vertical: 5.0),
+//                                                  hintText: "Enrollment",
+//                                                  hintStyle: new TextStyle(
+//                                                    fontSize: 15.0,
+//                                                    color: Colors.white70,
+//                                                  ),
+//                                                  prefixIcon: Padding(
+//                                                    padding:
+//                                                        const EdgeInsets.only(
+//                                                            bottom: 15.0),
+//                                                    child: Icon(Icons.person),
+//                                                  )),
+//                                            );
+//                                    }),*/
+//                            /*: new Container();*/
+//                          ],
+//                        ),
+//                      ],
+//                    ),
+//                  ),
+//                )),
+//              ),
               new Container(
                   padding:
                       const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),

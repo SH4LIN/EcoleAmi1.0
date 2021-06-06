@@ -100,7 +100,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                             _subjectsTheory.isNotEmpty) {
                           var data = snapshot.data.documents;
                           List<DocumentSnapshot> myTheoryData =
-                              new List<DocumentSnapshot>();
+                          new List<DocumentSnapshot>();
                           data.forEach((element) {
                             if (element["type"].compareTo("Theory") == 0) {
                               if (element["batch"].compareTo(_div) == 0 &&
@@ -139,7 +139,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                               var j = totalTheorySubjects.values.toList();
                               List<Color> _colors = [Colors.red, Colors.green];
                               Map<String, double> pieData =
-                                  new HashMap<String, double>();
+                              new HashMap<String, double>();
                               pieData["Absent"] =
                                   (j[index] - attendedTheorySubjects[i[index]])
                                       .toDouble();
@@ -153,41 +153,41 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                                     children: <Widget>[
                                       Flexible(
                                           child: Text(
-                                        "${i[index]} (Theory)",
-                                        textAlign: TextAlign.center,
-                                      )),
+                                            "${i[index]} (Theory)",
+                                            textAlign: TextAlign.center,
+                                          )),
                                       j[index] != 0
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 14.0),
-                                              child: PieChart(
-                                                dataMap: pieData,
-                                                colorList: _colors,
-                                                animationDuration:
-                                                    Duration(milliseconds: 500),
-                                                chartRadius: 110,
-                                                chartType: ChartType.ring,
-                                                showChartValues: true,
-                                                showLegends: true,
-                                                showChartValuesInPercentage:
-                                                    true,
-                                                showChartValuesOutside: true,
-                                                showChartValueLabel: true,
-                                                initialAngle: 90,
-                                              ),
-                                            )
+                                        padding: const EdgeInsets.only(
+                                            top: 14.0),
+                                        child: PieChart(
+                                          dataMap: pieData,
+                                          colorList: _colors,
+                                          animationDuration:
+                                          Duration(milliseconds: 500),
+                                          chartRadius: 110,
+                                          chartType: ChartType.ring,
+                                          showChartValues: true,
+                                          showLegends: true,
+                                          showChartValuesInPercentage:
+                                          true,
+                                          showChartValuesOutside: true,
+                                          showChartValueLabel: true,
+                                          initialAngle: 90,
+                                        ),
+                                      )
                                           : Padding(
-                                              padding:
-                                                  const EdgeInsets.all(14.0),
-                                              child: Center(
-                                                child: Text(
-                                                  "No Lecture Taken Yet!",
-                                                  style: TextStyle(
-                                                      color: Colors.lightGreen),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ),
+                                        padding:
+                                        const EdgeInsets.all(14.0),
+                                        child: Center(
+                                          child: Text(
+                                            "No Lecture Taken Yet!",
+                                            style: TextStyle(
+                                                color: Colors.lightGreen),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -218,11 +218,11 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                             _subjectsPractical.isNotEmpty) {
                           var data = snapshot.data.documents;
                           List<DocumentSnapshot> myPracticalData =
-                              new List<DocumentSnapshot>();
+                          new List<DocumentSnapshot>();
                           data.forEach((element) {
                             if (element["type"].compareTo("Practical") == 0) {
                               if (element["batch"].compareTo(_div + _batch) ==
-                                      0 &&
+                                  0 &&
                                   element['status'] == 1) {
                                 myPracticalData.add(element);
                               }
@@ -258,7 +258,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                               var j = totalPracticalSubjects.values.toList();
                               List<Color> _colors = [Colors.red, Colors.green];
                               Map<String, double> pieData =
-                                  new HashMap<String, double>();
+                              new HashMap<String, double>();
                               pieData["Absent"] = j[index] -
                                   attendedPracticalSubjects[i[index]]
                                       .toDouble();
@@ -276,36 +276,36 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                                               textAlign: TextAlign.center)),
                                       j[index] != 0
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 14.0),
-                                              child: PieChart(
-                                                dataMap: pieData,
-                                                colorList: _colors,
-                                                animationDuration:
-                                                    Duration(milliseconds: 500),
-                                                chartRadius: 110,
-                                                chartType: ChartType.ring,
-                                                showChartValues: true,
-                                                showLegends: true,
-                                                showChartValuesInPercentage:
-                                                    true,
-                                                showChartValuesOutside: true,
-                                                showChartValueLabel: true,
-                                                initialAngle: 90,
-                                              ),
-                                            )
+                                        padding: const EdgeInsets.only(
+                                            top: 14.0),
+                                        child: PieChart(
+                                          dataMap: pieData,
+                                          colorList: _colors,
+                                          animationDuration:
+                                          Duration(milliseconds: 500),
+                                          chartRadius: 110,
+                                          chartType: ChartType.ring,
+                                          showChartValues: true,
+                                          showLegends: true,
+                                          showChartValuesInPercentage:
+                                          true,
+                                          showChartValuesOutside: true,
+                                          showChartValueLabel: true,
+                                          initialAngle: 90,
+                                        ),
+                                      )
                                           : Padding(
-                                              padding:
-                                                  const EdgeInsets.all(14.0),
-                                              child: Center(
-                                                child: Text(
-                                                  "No Lab Taken Yet!",
-                                                  style: TextStyle(
-                                                      color: Colors.lightGreen),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            )
+                                        padding:
+                                        const EdgeInsets.all(14.0),
+                                        child: Center(
+                                          child: Text(
+                                            "No Lab Taken Yet!",
+                                            style: TextStyle(
+                                                color: Colors.lightGreen),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -333,50 +333,50 @@ class _TakeAttendanceState extends State<TakeAttendance> {
                         List<DocumentSnapshot> data = document.documents;
                         return data.length == 0
                             ? Align(
-                                alignment: Alignment.center,
-                                child: Text("No Attendance Submitted"))
+                            alignment: Alignment.center,
+                            child: Text("No Attendance Submitted"))
                             : Expanded(
-                                child: ListView.builder(
-                                    itemCount: data.length,
-                                    itemBuilder: (context, index) {
-                                      return Card(
-                                        margin: EdgeInsets.all(14),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(14.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: <Widget>[
-                                                  Flexible(
-                                                    child: Container(
-                                                      child: Center(
-                                                        child: Text(
-                                                          "${data[index]['subject']}(${data[index]["type"]})",
-                                                          softWrap: true,
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Container(
-                                                child: Text(
-                                                    "${data[index]['date']}"),
-                                              ),
-                                              Container(
+                          child: ListView.builder(
+                              itemCount: data.length,
+                              itemBuilder: (context, index) {
+                                return Card(
+                                  margin: EdgeInsets.all(14),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14.0),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment
+                                              .spaceAround,
+                                          children: <Widget>[
+                                            Flexible(
+                                              child: Container(
+                                                child: Center(
                                                   child: Text(
-                                                      "${data[index]['time']}")),
-                                            ],
-                                          ),
+                                                    "${data[index]['subject']}(${data[index]["type"]})",
+                                                    softWrap: true,
+                                                    textAlign:
+                                                    TextAlign.center,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    }),
-                              );
+                                        Container(
+                                          child: Text(
+                                              "${data[index]['date']}"),
+                                        ),
+                                        Container(
+                                            child: Text(
+                                                "${data[index]['time']}")),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                        );
                       } else {
                         return CircularProgressIndicator();
                       }
@@ -463,7 +463,7 @@ class _TakeAttendanceState extends State<TakeAttendance> {
       );
       setState(() {
         result.rawContent =
-            'null (You returned using the "back"-button before scanning anything. Result)';
+        'null (You returned using the "back"-button before scanning anything. Result)';
       });
       Fluttertoast.showToast(
           msg: result.rawContent?.toString() ?? "",

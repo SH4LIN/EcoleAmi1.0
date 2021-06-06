@@ -1,3 +1,5 @@
+//import 'dart:html';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'ShowLeave.dart';
 import 'SplashScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path/path.dart' as Path;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class FacultyApplication extends StatefulWidget {
   @override
@@ -210,11 +219,12 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                       int action = itemsStudent[index]['action'];
                       String facName = itemsStudent[index]['faculty_name'];
                       int type = itemsStudent[index]['type'];
+                      String fileUrl;
                       return action == 0
                           ? new Row(
                               children: <Widget>[
                                 Padding(
-                                  padding: EdgeInsets.only(right: 20.0),
+                                  padding: EdgeInsets.only(right: 10.0),
                                 ),
                                 new OutlineButton(
                                   onPressed: () => _accept(index),
@@ -223,7 +233,7 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                                           new TextStyle(color: Colors.green)),
                                 ),
                                 new Padding(
-                                  padding: EdgeInsets.only(right: 20.0),
+                                  padding: EdgeInsets.only(right: 10.0),
                                 ),
                                 new OutlineButton(
                                   onPressed: () => {
@@ -241,7 +251,7 @@ class _FacultyApplicationState extends State<FacultyApplication> {
                                       style: new TextStyle(color: Colors.cyan)),
                                 ),
                                 new Padding(
-                                  padding: EdgeInsets.only(right: 20.0),
+                                  padding: EdgeInsets.only(right: 10.0),
                                 ),
                                 new OutlineButton(
                                   onPressed: () => _decline(index),
@@ -304,6 +314,19 @@ class _FacultyApplicationState extends State<FacultyApplication> {
       ),
     );
   }
+
+  /*Future<String> downloadPdf(String url, String name) async {
+    var directory = await getApplicationDocumentsDirectory();
+    var filepath = '${directory.path}/' + name;
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var file = File(filepath);
+      print(filepath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filepath;
+    }
+    return '';
+  }*/
 
   void _accept(int id) async {
     showGeneralDialog(

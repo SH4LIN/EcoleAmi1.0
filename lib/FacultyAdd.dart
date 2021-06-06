@@ -1,10 +1,10 @@
 import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:ecoleami1_0/ManageFaculty.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:email_validator/email_validator.dart';
 
 class FacultyAdd extends StatelessWidget {
   @override
@@ -64,218 +64,221 @@ class _AddState extends State<Add> {
 
   String fNameErrorText = 'Please enter First Name';
   String lNameErrorText = 'Please enter Last Name';
+
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
     return new ListView(
       children: <Widget>[
         new Container(
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
-            child: Container(
-              padding: const EdgeInsets.all(15.0),
-              child: new Column(
-                children: <Widget>[
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _fName,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    onChanged: (String str) {
-                      RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
-                      setState(() {
-                        if (fnameregex.hasMatch(str)) {
-                          _fValidate = false;
-                        } else {
-                          fNameErrorText =
-                              "Name Should Contain Only Characters";
-                          _fValidate = true;
-                        }
-                      });
-                    },
-                    decoration: new InputDecoration(
-                        hintText: "First Name",
-                        errorText: _fValidate ? fNameErrorText : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey,
-                        ),
-                        prefixIcon: new Icon(Icons.person),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _lName,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    onChanged: (String str) {
-                      RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
-                      setState(() {
-                        if (fnameregex.hasMatch(str)) {
-                          _lValidate = false;
-                        } else {
-                          lNameErrorText =
-                              "Name Should Contain Only Characters";
-                          _lValidate = true;
-                        }
-                      });
-                    },
-                    decoration: new InputDecoration(
-                        hintText: "Last Name",
-                        errorText: _lValidate ? lNameErrorText : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey,
-                        ),
-                        prefixIcon: new Icon(Icons.person),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _eMail,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    onChanged: (String str) {
-                      setState(() {
-                        if (EmailValidator.validate(str)) {
-                          _emailValidate = false;
-                        } else {
-                          _emailValidate = true;
-                        }
-                      });
-                    },
-                    decoration: new InputDecoration(
-                        hintText: "Email Address",
-                        errorText: _emailValidate
-                            ? 'Please enter Valid Email Address'
-                            : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey,
-                        ),
-                        prefixIcon: new Icon(Icons.email),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    controller: _phone,
-                    keyboardType: TextInputType.phone,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    maxLength: 10,
-                    onChanged: (String str) {
-                      RegExp regexp = new RegExp(r'^[6789]\d{9}$');
-                      setState(() {
-                        if (regexp.hasMatch(str)) {
-                          _phoneValidate = false;
-                        } else {
-                          _phoneValidate = true;
-                        }
-                      });
-                    },
-                    decoration: new InputDecoration(
-                        hintText: "Phone Number",
-                        errorText: _phoneValidate
-                            ? 'Please enter Valid Phone Number'
-                            : null,
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey,
-                        ),
-                        prefixIcon: new Icon(Icons.phone),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new TextField(
-                    keyboardType: TextInputType.text,
-                    obscureText: _obscureText,
-                    enabled: false,
-                    cursorColor: Colors.purple,
-                    cursorRadius: Radius.circular(50.0),
-                    cursorWidth: 3.0,
-                    decoration: new InputDecoration(
-                        hintText: "Password",
-                        hintStyle: new TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey,
-                        ),
-                        prefixIcon: new Icon(Icons.lock),
-                        suffixIcon: new IconButton(
-                          icon: new Icon(_obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        )),
-                  ),
-                  new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                  new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
-                  new RaisedButton(
-                    color: Colors.redAccent,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: new Text(
-                      "Add",
-                      style: new TextStyle(color: Colors.white, fontSize: 15.0),
+
+              child: Container(
+                padding: const EdgeInsets.all(15.0),
+                child: new Column(
+                  children: <Widget>[
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new TextField(
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _fValidate = false;
+                          } else {
+                            fNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _fValidate = true;
+                          }
+                        });
+                      },
+                      controller: _fName,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.purple,
+                      cursorRadius: Radius.circular(50.0),
+                      cursorWidth: 3.0,
+                      decoration: new InputDecoration(
+                          hintText: "First Name",
+                          errorText:
+                              _fValidate ? fNameErrorText : null,
+                          hintStyle: new TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: new Icon(Icons.person),
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        if ((_fName.text.trim()).length == 0) {
-                          fNameErrorText = "Please Enter First Name";
-                          _fValidate = true;
-                        } else {
-                          _fValidate = false;
-                        }
-                        if ((_lName.text.trim()).length == 0) {
-                          lNameErrorText = "Please Enter Last Name";
-                          _lValidate = true;
-                        } else {
-                          _lValidate = false;
-                        }
-                        if ((_eMail.text.trim()).length == 0) {
-                          _emailValidate = true;
-                        } else {
-                          _emailValidate = false;
-                        }
-                        if ((_phone.text.trim()).length == 0 ||
-                            _phone.text.length < 10) {
-                          _phoneValidate = true;
-                        } else {
-                          _phoneValidate = false;
-                        }
-                        if (_fName.text.isNotEmpty &&
-                            _lName.text.isNotEmpty &&
-                            _eMail.text.isNotEmpty &&
-                            _phone.text.isNotEmpty) {
-                          _onClick();
-                        }
-                      });
-                    },
-                    splashColor: Colors.red,
-                  ),
-                ],
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new TextField(
+                      onChanged: (String str) {
+                        RegExp fnameregex = RegExp(r"^[a-zA-Z]*$");
+                        setState(() {
+                          if (fnameregex.hasMatch(str)) {
+                            _lValidate = false;
+                          } else {
+                            lNameErrorText =
+                            "Name Should Contain Only Characters";
+                            _lValidate = true;
+                          }
+                        });
+                      },
+                      controller: _lName,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.purple,
+                      cursorRadius: Radius.circular(50.0),
+                      cursorWidth: 3.0,
+                      decoration: new InputDecoration(
+                          hintText: "Last Name",
+                          errorText:
+                              _lValidate ? lNameErrorText : null,
+                          hintStyle: new TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: new Icon(Icons.person),
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new TextField(
+                      onChanged: (String str) {
+                        setState(() {
+                          if (EmailValidator.validate(str)) {
+                            _emailValidate = false;
+                          } else {
+                            _emailValidate = true;
+                          }
+                        });
+                      },
+                      controller: _eMail,
+                      keyboardType: TextInputType.emailAddress,
+                      cursorColor: Colors.purple,
+                      cursorRadius: Radius.circular(50.0),
+                      cursorWidth: 3.0,
+                      decoration: new InputDecoration(
+                          hintText: "Email Address",
+                          errorText: _emailValidate
+                              ? 'Please enter valid Email Address'
+                              : null,
+                          hintStyle: new TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: new Icon(Icons.email),
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new TextField(
+                      onChanged: (String str) {
+                        RegExp regexp = new RegExp(r'^[6789]\d{9}$');
+                        setState(() {
+                          if (regexp.hasMatch(str)) {
+                            _phoneValidate = false;
+                          } else {
+                            _phoneValidate = true;
+                          }
+                        });
+                      },
+                      controller: _phone,
+                      keyboardType: TextInputType.phone,
+                      cursorColor: Colors.purple,
+                      cursorRadius: Radius.circular(50.0),
+                      cursorWidth: 3.0,
+                      maxLength: 10,
+                      decoration: new InputDecoration(
+                          hintText: "Phone Number",
+                          errorText: _phoneValidate
+                              ? 'Please Enter Valid Phone Number'
+                              : null,
+                          hintStyle: new TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: new Icon(Icons.phone),
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new TextField(
+                      keyboardType: TextInputType.text,
+                      obscureText: _obscureText,
+                      enabled: false,
+                      cursorColor: Colors.purple,
+                      cursorRadius: Radius.circular(50.0),
+                      cursorWidth: 3.0,
+                      decoration: new InputDecoration(
+                          hintText: "Password",
+                          hintStyle: new TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: new Icon(Icons.lock),
+                          suffixIcon: new IconButton(
+                            icon: new Icon(_obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
+                    ),
+                    new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                    new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
+                    new RaisedButton(
+                      color: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      child: new Text(
+                        "Add",
+                        style:
+                            new TextStyle(color: Colors.white, fontSize: 15.0),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          if (_fName.text.isEmpty) {
+                            _fValidate = true;
+                          } else {
+                            _fValidate = false;
+                          }
+                          if (_lName.text.isEmpty) {
+                            _lValidate = true;
+                          } else {
+                            _lValidate = false;
+                          }
+                          if (_eMail.text.isEmpty) {
+                            _emailValidate = true;
+                          } else {
+                            _emailValidate = false;
+                          }
+                          if (_phone.text.isEmpty) {
+                            _phoneValidate = true;
+                          } else {
+                            _phoneValidate = false;
+                          }
+                          if (_fName.text.isNotEmpty &&
+                              _lName.text.isNotEmpty &&
+                              _eMail.text.isNotEmpty &&
+                              _phone.text.isNotEmpty) {
+                            _onClick();
+                          }
+                        });
+                      },
+                      splashColor: Colors.red,
+                    ),
+                  ],
+                ),
               ),
-            ),
           ),
         ),
       ],
@@ -317,11 +320,26 @@ class _AddState extends State<Add> {
           .get();
       print(snapShot.exists.toString());
       print(_phone.text);
-      print(snapShot != null);
+      print(snapShot!=null);
       if (snapShot == null || snapShot.exists) {
-      } else {
+
+      }
+      else{
         await databaseReference
             .collection("login_details")
+            .document(_phone.text)
+            .setData({'password': null, 'role': "faculty"});
+      }
+      final snap = await databaseReference
+          .collection("verification_details")
+          .document(_phone.text)
+          .get();
+      if (snap == null || snap.exists) {
+
+      }
+      else{
+        await databaseReference
+            .collection("verification_details")
             .document(_phone.text)
             .setData({'password': null, 'role': "faculty"});
       }
@@ -332,7 +350,8 @@ class _AddState extends State<Add> {
       Navigator.pop(context);
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) => new ManageFaculty()));
-    } else {
+    }
+    else{
       Fluttertoast.showToast(
           msg: "Record Exist",
           gravity: ToastGravity.BOTTOM,

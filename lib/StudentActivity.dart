@@ -13,9 +13,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+
 //import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:compressimage/compressimage.dart';
+
+//import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -162,16 +164,30 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                   return CircularProgressIndicator();
                 },
               ),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor:
-                    Theme.of(context).platform == TargetPlatform.iOS
-                        ? Colors.blue
-                        : Colors.white,
-                child: Text(
-                  "S",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
+              currentAccountPicture: StreamBuilder<DocumentSnapshot>(
+                  stream: Firestore.instance
+                      .collection("student_details")
+                      .document(_username)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      var doc = snapshot.data;
+                      var name = doc['first_name'];
+                      return CircleAvatar(
+                        maxRadius: 40,
+                        backgroundColor:
+                            Theme.of(context).platform == TargetPlatform.iOS
+                                ? Colors.blue
+                                : Colors.cyanAccent,
+                        child: Text(
+                          '${name[0]}',
+                          style: TextStyle(fontSize: 40.0),
+                        ),
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  }),
               arrowColor: Colors.red,
             ),
             new ListTile(
@@ -205,17 +221,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
               onTap: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => TakeAttendance()));
-              },
-            ),
-            new ListTile(
-              title: new Text(
-                "Change of Schedule",
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-              trailing: new Icon(Icons.schedule),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => StudentNotify()));
               },
             ),
           ],
@@ -666,7 +671,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
         builder: (context, snapshot) {
           if (snapshot != null && snapshot.hasData) {
             var document = snapshot.data;
-
             _enrCheck = document['enrollment'];
             _finalEnr.text = document['enrollment'];
             _fName.text = document['first_name'];
@@ -724,14 +728,14 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                       // ignore: missing_return
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.none) {
-                          _fName.text = "Loading...!";
+                          _enr.text = "Loading...!";
                         }
                         if (snapshot.hasData) {
                           var document = snapshot.data;
                           _enrCheck = document['enrollment'];
                           _finalEnr.text = document['enrollment'];
                         }
-                        return (_enrCheck.compareTo("------------")) == 0
+                        return _enrCheck.compareTo("------------") == 0
                             ? Row(
                                 children: <Widget>[
                                   Container(
@@ -1390,12 +1394,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      /*    print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1448,12 +1452,12 @@ class _StudentActivityPageState extends State<StudentActivityPage>
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      /* print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1547,17 +1551,6 @@ class _StudentActivityPageState extends State<StudentActivityPage>
                 Navigator.of(context).push(new MaterialPageRoute(
                     builder: (BuildContext context) => new ChangePassword()));
               }),
-          ListTile(
-            leading: Icon(
-              Icons.info_outline,
-              color: Colors.white,
-            ),
-            title: Text(
-              "About Us",
-              style: TextStyle(color: Colors.white),
-            ),
-            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-          ),
           ListTile(
             leading: Icon(
               Icons.call,
@@ -1769,7 +1762,9 @@ class NavigationItem {
 
 class Student_Assignment extends StatelessWidget {
   final sem;
+
   Student_Assignment(this.sem);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1781,7 +1776,9 @@ class Student_Assignment extends StatelessWidget {
 
 class Student_Assignment_Home extends StatefulWidget {
   final sem;
+
   Student_Assignment_Home(this.sem);
+
   @override
   _Student_Assignment_HomeState createState() =>
       _Student_Assignment_HomeState(sem);
@@ -1790,9 +1787,12 @@ class Student_Assignment_Home extends StatefulWidget {
 class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
   final sem;
   var totalData = -1;
+
   _Student_Assignment_HomeState(this.sem);
+
   DownloadTaskStatus stat;
   int prog;
+
   @override
   void initState() {
     IsolateNameServer.registerPortWithName(
@@ -1838,14 +1838,16 @@ class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
                       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                       child: GestureDetector(
                         onTap: () {
+                          String fileUrl;
                           downloadPdf(allData[index]["url"],
                                   allData[index]['assignment name'])
-                              .then((String taskId) {
-                            if (taskId == '') {
+                              .then((String url) {
+                            fileUrl = url;
+                            if (fileUrl == '') {
                               Fluttertoast.showToast(
                                   msg: "File Could Not be Downloaded");
                             } else {
-                              print("Task:$taskId");
+                              OpenFile.open(fileUrl, type: 'pdf');
                             }
                           });
                         },
@@ -1860,13 +1862,17 @@ class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
                                 color: Colors.black,
                               ),
                               onPressed: () {
+                                String fileUrl;
                                 downloadPdf(allData[index]["url"],
-                                        allData[index]['assignment name'])
-                                    .then((String taskId) {
-                                  if (taskId == '') {
+                                    allData[index]['assignment name'])
+                                    .then((String url) {
+                                  fileUrl = url;
+                                  if (fileUrl == '') {
                                     Fluttertoast.showToast(
                                         msg: "File Could Not be Downloaded");
-                                  } else {}
+                                  } else {
+                                    OpenFile.open(fileUrl);
+                                  }
                                 });
                               },
                             ),
@@ -1894,6 +1900,7 @@ class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
 
   ProgressDialog pr;
   ReceivePort _port = ReceivePort();
+
   static void downloadCallback(
       String id, DownloadTaskStatus status, int progress) {
     final SendPort send =
@@ -1908,6 +1915,20 @@ class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
   }
 
   Future<String> downloadPdf(String url, String name) async {
+    var directory = await getApplicationDocumentsDirectory();
+    var filepath = '${directory.path}/' + name;
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var file = File(filepath);
+      print(filepath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filepath;
+    }
+    return '';
+  }
+}
+
+/* Future<String> downloadPdf(String url, String name) async {
     var directory = await getExternalStorageDirectory();
     var filepath = '${directory.path}';
     var taskId = await FlutterDownloader.enqueue(
@@ -1918,4 +1939,4 @@ class _Student_Assignment_HomeState extends State<Student_Assignment_Home> {
         openFileFromNotification: true);
     return taskId;
   }
-}
+}*/

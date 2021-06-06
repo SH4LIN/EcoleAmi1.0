@@ -4,7 +4,6 @@ import 'package:ecoleami1_0/CommonAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'SplashScreen.dart';
-
 var Msg;
 
 class StudentNotify extends StatefulWidget {
@@ -45,6 +44,7 @@ class _StudentNotifyState extends State<StudentNotify> {
     print(_username);
   }
 
+
   /* Future setProfile() async {
     Firestore.instance
         .collection("student_details")
@@ -60,7 +60,7 @@ class _StudentNotifyState extends State<StudentNotify> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar("Notification"),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey,
       body: _studentNotification(),
     );
   }
@@ -75,6 +75,7 @@ class _StudentNotifyState extends State<StudentNotify> {
       setState(() {
         _semester = document['semester'];
         _division = document['division'];
+        print(_semester);
       });
     });
     return _semester != null
@@ -85,7 +86,7 @@ class _StudentNotifyState extends State<StudentNotify> {
                 children: <Widget>[
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    height: MediaQuery.of(context).size.height * .85,
                     child: StreamBuilder(
                       stream: Firestore.instance
                           .collection("Notify_student")
@@ -193,4 +194,6 @@ class _StudentNotifyState extends State<StudentNotify> {
           )
         : Center(child: CircularProgressIndicator());
   }
+
+
 }

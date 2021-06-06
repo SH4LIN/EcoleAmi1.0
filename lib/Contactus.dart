@@ -20,7 +20,7 @@ class Contactus extends StatelessWidget {
             cardColor: Colors.white,
             textColor: Colors.teal.shade900,
             logo: AssetImage(
-              'images/logo.jpeg',
+              'images/logo.png',
             ),
             companyName: 'Ècoleami',
             companyColor: Colors.black,

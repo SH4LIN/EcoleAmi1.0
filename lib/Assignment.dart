@@ -74,6 +74,8 @@ class _Assignment_HomeState extends State<Assignment_Home> {
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
+              color: Colors.redAccent,
+              splashColor: Colors.red,
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) => UploadAssignment()));
@@ -98,11 +100,13 @@ class _Assignment_HomeState extends State<Assignment_Home> {
 
 class Student_Semester_Assignments extends StatelessWidget {
   final sem;
+
   Student_Semester_Assignments(this.sem);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar("Assignments Semester: $sem "),
+      appBar: CommonAppBar("Assignments Semester $sem "),
       body: Semwise_Assignment(sem),
     );
   }
@@ -110,7 +114,9 @@ class Student_Semester_Assignments extends StatelessWidget {
 
 class Semwise_Assignment extends StatefulWidget {
   final sem;
+
   Semwise_Assignment(this.sem);
+
   @override
   _Semwise_AssignmentState createState() => _Semwise_AssignmentState(sem);
 }
@@ -118,7 +124,9 @@ class Semwise_Assignment extends StatefulWidget {
 class _Semwise_AssignmentState extends State<Semwise_Assignment> {
   final sem;
   var totalData = -1;
+
   _Semwise_AssignmentState(this.sem);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -243,7 +251,7 @@ class _Semwise_AssignmentState extends State<Semwise_Assignment> {
                                             child: new Text(
                                               "Yes",
                                               style: TextStyle(
-                                                  color: Colors.red,
+                                                  color: Colors.redAccent,
                                                   fontSize: 18),
                                             ))
                                       ],
@@ -307,7 +315,11 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
   TextEditingController _assignmentName = new TextEditingController();
   var _selectedSemester;
   var _selectedSubject;
-  bool _assignmentValidate = false;
+
+  bool _validate = false;
+  bool _semValidate = false;
+  bool _subjectValidate = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -316,26 +328,27 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  if (value.isEmpty) {
+                    _validate = true;
+                  } else {
+                    if (value.trim().length == 0) {
+                      _validate = true;
+                    } else {
+                      _validate = false;
+                    }
+                  }
+                });
+              },
               controller: _assignmentName,
               keyboardType: TextInputType.text,
               cursorColor: Colors.purple,
               cursorRadius: Radius.circular(50.0),
               cursorWidth: 3.0,
-              onChanged: (String str) {
-                RegExp fnameregex = RegExp(r"^[a-zA-Z\d ]*$");
-                setState(() {
-                  if (fnameregex.hasMatch(str)) {
-                    _assignmentValidate = false;
-                  } else {
-                    _assignmentValidate = true;
-                  }
-                });
-              },
               decoration: new InputDecoration(
                   hintText: "Assignment Name",
-                  errorText: _assignmentValidate
-                      ? "Assignment Name Can not Contain Special Character"
-                      : null,
+                  errorText: _validate ? 'Enter Assignment Name' : null,
                   border: new OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                   )),
@@ -386,6 +399,19 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                   }
                 }),
           ),
+          _semValidate
+              ? Container(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Please select semester",
+                        style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400)),
+                  ),
+                )
+              : Container(),
           _selectedSemester != null
               ? Column(
                   children: <Widget>[
@@ -434,6 +460,19 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                             }
                           }),
                     ),
+                    _subjectValidate
+                        ? Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("Please select subject",
+                                  style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400)),
+                            ),
+                          )
+                        : Container(),
                     _file == null
                         ? Container(
                             margin: EdgeInsets.symmetric(horizontal: 8),
@@ -441,6 +480,8 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                               onPressed: () => getPdf(),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
+                              color: Colors.redAccent,
+                              splashColor: Colors.red,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -461,6 +502,8 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                                   onPressed: () => getPdf(),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20)),
+                                  color: Colors.redAccent,
+                                  splashColor: Colors.red,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
@@ -509,6 +552,8 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                         onPressed: () => getPdf(),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
+                        color: Colors.redAccent,
+                        splashColor: Colors.red,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -529,6 +574,8 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
                             onPressed: () => getPdf(),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20)),
+                            color: Colors.redAccent,
+                            splashColor: Colors.red,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -575,18 +622,27 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
               child: RaisedButton(
                 onPressed: () {
                   setState(() {
-                    if (_assignmentName.text.trim().length == 0) {
-                      _assignmentValidate = true;
+                    if (_selectedSemester == null) {
+                      _semValidate = true;
                     } else {
-                      _assignmentValidate = false;
+                      _semValidate = false;
+                      if (_selectedSubject == null) {
+                        _subjectValidate = true;
+                      } else {
+                        _subjectValidate = false;
+                      }
+                    }
+                    if (_validate == false &&
+                        _semValidate == false &&
+                        _subjectValidate == false) {
+                      uploadPdf();
                     }
                   });
-                  if (_assignmentValidate == false) {
-                    uploadPdf();
-                  }
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
+                color: Colors.redAccent,
+                splashColor: Colors.red,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -607,14 +663,21 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
 
   StorageReference storageReference;
   File _file;
+
   Future getPdf() async {
     _file = null;
-    var file = await FilePicker.getFile(
-        type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
-    if (file != null) {
-      setState(() {
-        _file = file;
-      });
+    try {
+      var file = await FilePicker.getFile(
+          type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
+      print("Test");
+      print(file);
+      if (file != null) {
+        setState(() {
+          _file = file;
+        });
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -656,7 +719,7 @@ class _Upload_Assignment_PageState extends State<Upload_Assignment_Page> {
         Fluttertoast.showToast(msg: "Error Uploading Assignment");
       }
     } else {
-      Fluttertoast.showToast(msg: "Please Select File First");
+      Fluttertoast.showToast(msg: "Please choose a file first", gravity: ToastGravity.CENTER);
     }
   }
 }

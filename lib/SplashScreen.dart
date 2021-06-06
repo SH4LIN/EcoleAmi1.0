@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
     WidgetsFlutterBinding.ensureInitialized();
     await FlutterDownloader.initialize(
         debug: true // optional: set false to disable printing logs to console
-        );
+    );
   }
 
   @override
@@ -77,14 +77,14 @@ class _SplashScreenState extends State<SplashScreen> {
         height: double.infinity,
         width: double.infinity,
         foregroundDecoration: BoxDecoration(
-            //backgroundBlendMode: BlendMode.colorBurn,
-            /*gradient: LinearGradient(
+          //backgroundBlendMode: BlendMode.colorBurn,
+          /*gradient: LinearGradient(
             colors: const [
               Colors.grey,
               Colors.black,
             ],
           ),*/
-            ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

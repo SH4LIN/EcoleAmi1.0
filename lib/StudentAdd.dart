@@ -134,7 +134,7 @@ class _AddState extends State<Add> {
                           _fValidate = false;
                         } else {
                           fNameErrorText =
-                              "Name Should Contain Only Characters";
+                          "Name Should Contain Only Characters";
                           _fValidate = true;
                         }
                       });
@@ -165,7 +165,7 @@ class _AddState extends State<Add> {
                           _mValidate = false;
                         } else {
                           mNameErrorText =
-                              "Name Should Contain Only Characters";
+                          "Name Should Contain Only Characters";
                           _mValidate = true;
                         }
                       });
@@ -196,7 +196,7 @@ class _AddState extends State<Add> {
                           _lValidate = false;
                         } else {
                           lNameErrorText =
-                              "Name Should Contain Only Characters";
+                          "Name Should Contain Only Characters";
                           _lValidate = true;
                         }
                       });
@@ -311,12 +311,12 @@ class _AddState extends State<Add> {
                   _semValidate == false
                       ? Container()
                       : new Align(
-                          alignment: Alignment.centerLeft,
-                          child: new Text("Please select Semester",
-                              style: TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400))),
+                      alignment: Alignment.centerLeft,
+                      child: new Text("    Please select Semester",
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400))),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -351,12 +351,12 @@ class _AddState extends State<Add> {
                   _divValidate == false
                       ? Container()
                       : new Align(
-                          alignment: Alignment.centerLeft,
-                          child: new Text("Please select Division",
-                              style: TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400))),
+                      alignment: Alignment.centerLeft,
+                      child: new Text("    Please select Division",
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400))),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -390,12 +390,12 @@ class _AddState extends State<Add> {
                   _batchValidate == false
                       ? Container()
                       : new Align(
-                          alignment: Alignment.centerLeft,
-                          child: new Text("Please select Batch",
-                              style: TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400))),
+                      alignment: Alignment.centerLeft,
+                      child: new Text("Please select Batch",
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400))),
                   new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                   new TextField(
                     controller: _parentPhone,

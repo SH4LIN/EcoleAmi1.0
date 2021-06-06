@@ -54,6 +54,9 @@ class _ListState extends State<List> {
     //checkState();
   }
 
+  String errorMessage1;
+  String errorMessage2;
+
   @override
   Widget build(BuildContext context) {
     return new ListView(
@@ -83,8 +86,7 @@ class _ListState extends State<List> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Username",
-                          errorText:
-                              _userValidate ? 'Please enter Username' : null,
+                          errorText: _userValidate ? errorMessage1 : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -104,8 +106,7 @@ class _ListState extends State<List> {
                       cursorWidth: 3.0,
                       decoration: new InputDecoration(
                           hintText: "Password",
-                          errorText:
-                              _passValidate ? 'Please enter Password' : null,
+                          errorText: _passValidate ? errorMessage2 : null,
                           hintStyle: new TextStyle(
                             fontSize: 15.0,
                             color: Colors.grey,
@@ -143,19 +144,23 @@ class _ListState extends State<List> {
                         setState(() {
                           if (_userName.text.isEmpty) {
                             _userValidate = true;
+                            errorMessage1 = "Please enter username";
                           } else {
                             _userValidate = false;
                           }
-
-                          if (_pass.text.isEmpty) {
+                          if (_userName.text.isNotEmpty) {
+                            _onClick();
+                          }
+                          /*if (_pass.text.isEmpty) {
                             _passValidate = true;
+                            errorMessage2 = "Invalid Password";
                           } else {
                             _passValidate = false;
                           }
                           if (_userName.text.isNotEmpty &&
                               _pass.text.isNotEmpty) {
                             _onClick();
-                          }
+                          }*/
                         });
                       },
                       splashColor: Colors.red,
@@ -221,48 +226,63 @@ class _ListState extends State<List> {
 
   var _passwordHash;
 
-  void _onClick() {
+  void _onClick() async{
     showProgressbar();
-    Firestore.instance
+    print(_userValidate);
+    print(errorMessage1);
+    await Firestore.instance
         .collection("login_details")
         .document(_userName.text.trim())
         .get()
         .then((document) {
       if (!document.exists) {
-        Fluttertoast.showToast(
+        setState(() {
+          _userValidate = true;
+          errorMessage1 = "Username Does Not Exist";
+        });
+        print(_userValidate);
+        print(errorMessage1);
+
+        /* Fluttertoast.showToast(
             msg: "Username Does Not Exist",
             gravity: ToastGravity.BOTTOM,
-            toastLength: Toast.LENGTH_LONG);
+            toastLength: Toast.LENGTH_LONG);*/
         pr.hide();
       } else {
+        _userValidate = false;
         role = document['role'];
         _password = document['password'];
         print(_password);
         _passwordHash = md5.convert(utf8.encode(_pass.text));
         if (_passwordHash.toString().compareTo(_password) == 0) {
+          setState(() {
+            _passValidate = false;
+          });
+
           saveState();
           switch (role) {
             case "student":
+              pr.hide();
               Fluttertoast.showToast(
                 msg: "Login successfully",
                 gravity: ToastGravity.BOTTOM,
                 toastLength: Toast.LENGTH_SHORT,
               );
-              pr.hide();
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (BuildContext context) => new StudentActivity()));
               break;
             case "admin":
+              pr.hide();
               Fluttertoast.showToast(
                 msg: "Login successfully",
                 gravity: ToastGravity.BOTTOM,
                 toastLength: Toast.LENGTH_SHORT,
               );
-              pr.hide();
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (BuildContext context) => new Home()));
               break;
             case "faculty":
+              pr.hide();
               Fluttertoast.showToast(
                 msg: "Login successfully",
                 gravity: ToastGravity.BOTTOM,
@@ -270,9 +290,9 @@ class _ListState extends State<List> {
               );
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (BuildContext context) => new FacultyActivity()));
-              pr.hide();
               break;
             case "parent":
+              pr.hide();
               Fluttertoast.showToast(
                 msg: "Login successfully",
                 gravity: ToastGravity.BOTTOM,
@@ -280,16 +300,20 @@ class _ListState extends State<List> {
               );
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (BuildContext context) => new ParentActivity()));
-              pr.hide();
               break;
           }
         } else {
           pr.hide();
-          Fluttertoast.showToast(
+          setState(() {
+            _passValidate = true;
+            errorMessage2 = "Invalid Password";
+          });
+
+          /*Fluttertoast.showToast(
             msg: "Invalid Password",
             gravity: ToastGravity.BOTTOM,
             toastLength: Toast.LENGTH_SHORT,
-          );
+          );*/
         }
       }
     });

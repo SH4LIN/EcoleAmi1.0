@@ -2,9 +2,10 @@ import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:compressimage/compressimage.dart';
+//import 'package:compressimage/compressimage.dart';
 import 'package:ecoleami1_0/Assignment.dart';
 import 'package:ecoleami1_0/CommonAppBar.dart';
+import 'package:ecoleami1_0/DetainList.dart';
 import 'package:ecoleami1_0/MainScreen.dart';
 import 'package:ecoleami1_0/ShowNoticeAdmin.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,7 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as Path;
 import 'AddEvent.dart';
 import 'ChangePassword.dart';
-import 'DetainList.dart';
+import 'Contactus.dart';
 import 'ManageVerification.dart';
 import 'ShowImage.dart';
 import 'SplashScreen.dart';
@@ -102,59 +103,73 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor:
-                    Theme.of(context).platform == TargetPlatform.iOS
-                        ? Colors.blue
-                        : Colors.white,
-                child: Text(
-                  "A",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
+              currentAccountPicture: StreamBuilder<DocumentSnapshot>(
+                  stream: Firestore.instance
+                      .collection("admin_details")
+                      .document(_username)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      var doc = snapshot.data;
+                      var name = doc['first_name'];
+                      return CircleAvatar(
+                        maxRadius: 40,
+                        backgroundColor:
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Colors.blue
+                            : Colors.cyanAccent,
+                        child: Text(
+                          '${name[0]}',
+                          style: TextStyle(fontSize: 40.0),
+                        ),
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  }),
               arrowColor: Colors.red,
             ),
             new ListTile(
               title: new Text(
                 "Manage Student",
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle,
               ),
               trailing: new Icon(Icons.account_circle),
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(new MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        new ManageVerification("Student")));
+                    new ManageVerification("Student")));
               },
             ),
             new ListTile(
               title: new Text(
                 "Manage Faculty",
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle,
               ),
               trailing: new Icon(Icons.account_circle),
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(new MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        new ManageVerification("Faculty")));
+                    new ManageVerification("Faculty")));
               },
             ),
             new ListTile(
               title: new Text(
                 "Generate Detain List",
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle,
               ),
-              trailing: new Icon(Icons.notification_important),
+              trailing: new Icon(Icons.access_time),
               onTap: () {
                 Navigator.of(context).push(
-                    new MaterialPageRoute(builder: (context) => DetainList()));
+                    MaterialPageRoute(builder: (context) => DetainList()));
               },
             ),
             new ListTile(
               title: new Text(
                 "Assignments",
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle,
               ),
               trailing: new Icon(Icons.assignment),
               onTap: () {
@@ -168,12 +183,12 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavBar(),
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                Navigator.of(context).push(new MaterialPageRoute(
-                    builder: (context) => new AddEvent()));
-              },
-            )
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).push(new MaterialPageRoute(
+              builder: (context) => new AddEvent()));
+        },
+      )
           : null,
       body: callPage(selectedIndex),
       backgroundColor: selectedIndex == 0
@@ -224,9 +239,9 @@ class _HomePageState extends State<HomePage> {
       height: 45,
       decoration: isSelected
           ? BoxDecoration(
-              color: item.color,
-              borderRadius: BorderRadius.circular(16.0),
-            )
+        color: item.color,
+        borderRadius: BorderRadius.circular(16.0),
+      )
           : null,
       child: ListView(scrollDirection: Axis.horizontal, children: <Widget>[
         Row(
@@ -237,8 +252,8 @@ class _HomePageState extends State<HomePage> {
                   size: 25.0,
                   color: isSelected
                       ? item.title.data.compareTo("Settings") == 0
-                          ? Colors.white
-                          : backgroundColor
+                      ? Colors.white
+                      : backgroundColor
                       : Colors.black),
               child: item.icon,
             ),
@@ -246,12 +261,12 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.only(left: 15.0),
               child: isSelected
                   ? Text(
-                      item.title.data,
-                      style: TextStyle(
-                          color: item.title.data.compareTo("Settings") == 0
-                              ? Colors.white
-                              : backgroundColor),
-                    )
+                item.title.data,
+                style: TextStyle(
+                    color: item.title.data.compareTo("Settings") == 0
+                        ? Colors.white
+                        : backgroundColor),
+              )
                   : Container(),
             )
           ],
@@ -264,9 +279,9 @@ class _HomePageState extends State<HomePage> {
     List data = new List<Widget>();
     for (int i = 0; i < len; i++) {
       if (notice_board_data[i]["expiry_date"]
-              .toDate()
-              .toString()
-              .compareTo(DateTime.now().toString()) <
+          .toDate()
+          .toString()
+          .compareTo(DateTime.now().toString()) <
           1) {
         continue;
       }
@@ -333,9 +348,9 @@ class _HomePageState extends State<HomePage> {
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"].compareTo("Event") == 0) {
                             if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
                             } else {
@@ -345,56 +360,56 @@ class _HomePageState extends State<HomePage> {
                         }
                         return events_notice.isEmpty
                             ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
                             : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: events_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNoticeAdmin(
-                                                      events_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: events_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                events_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
+                          scrollDirection: Axis.horizontal,
+                          itemCount: events_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                        new ShowNoticeAdmin(
+                                            events_notice[index])));
+                              },
+                              child: Card(
+                                color: Colors.transparent,
+                                clipBehavior: Clip.antiAlias,
+                                semanticContainer: true,
+                                borderOnForeground: true,
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    CachedNetworkImage(
+                                        placeholder: (context, url) => Center(
+                                            child:
+                                            CircularProgressIndicator()),
+                                        width: 170.0,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        imageUrl: events_notice[index]
+                                        ['url']),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2.0),
+                                      child: Text(
+                                          events_notice[index]['title'],
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14.0,
+                                              letterSpacing: 3.0)),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       } else {
                         return CircularProgressIndicator();
                       }
@@ -438,12 +453,12 @@ class _HomePageState extends State<HomePage> {
 
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"]
-                                  .compareTo("College Schedule") ==
+                              .compareTo("College Schedule") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
                             } else {
@@ -453,56 +468,56 @@ class _HomePageState extends State<HomePage> {
                         }
                         return schedule_notice.isEmpty
                             ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
                             : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: schedule_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNoticeAdmin(
-                                                      schedule_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: schedule_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                schedule_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
+                          scrollDirection: Axis.horizontal,
+                          itemCount: schedule_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                        new ShowNoticeAdmin(
+                                            schedule_notice[index])));
+                              },
+                              child: Card(
+                                color: Colors.transparent,
+                                clipBehavior: Clip.antiAlias,
+                                semanticContainer: true,
+                                borderOnForeground: true,
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    CachedNetworkImage(
+                                        placeholder: (context, url) => Center(
+                                            child:
+                                            CircularProgressIndicator()),
+                                        width: 170.0,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        imageUrl: schedule_notice[index]
+                                        ['url']),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2.0),
+                                      child: Text(
+                                          schedule_notice[index]['title'],
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14.0,
+                                              letterSpacing: 3.0)),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       } else {
                         return CircularProgressIndicator();
                       }
@@ -545,12 +560,12 @@ class _HomePageState extends State<HomePage> {
                         List fee_notice = new List<DocumentSnapshot>();
                         for (int i = 0; i < notice_board.length; i++) {
                           if (notice_board[i]["type"]
-                                  .compareTo("Fee Payment") ==
+                              .compareTo("Fee Payment") ==
                               0) {
                             if (notice_board[i]["expiry_date"]
-                                    .toDate()
-                                    .toString()
-                                    .compareTo(DateTime.now().toString()) <
+                                .toDate()
+                                .toString()
+                                .compareTo(DateTime.now().toString()) <
                                 1) {
                               continue;
                             } else {
@@ -560,56 +575,56 @@ class _HomePageState extends State<HomePage> {
                         }
                         return fee_notice.isEmpty
                             ? Center(
-                                child: Text(
-                                  "No Events Available",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-                              )
+                          child: Text(
+                            "No Events Available",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                        )
                             : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: fee_notice.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new ShowNoticeAdmin(
-                                                      fee_notice[index])));
-                                    },
-                                    child: Card(
-                                      color: Colors.transparent,
-                                      clipBehavior: Clip.antiAlias,
-                                      semanticContainer: true,
-                                      borderOnForeground: true,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          CachedNetworkImage(
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              width: 170.0,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              imageUrl: fee_notice[index]
-                                                  ['url']),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.0),
-                                            child: Text(
-                                                fee_notice[index]['title'],
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 3.0)),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
+                          scrollDirection: Axis.horizontal,
+                          itemCount: fee_notice.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                        new ShowNoticeAdmin(
+                                            fee_notice[index])));
+                              },
+                              child: Card(
+                                color: Colors.transparent,
+                                clipBehavior: Clip.antiAlias,
+                                semanticContainer: true,
+                                borderOnForeground: true,
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    CachedNetworkImage(
+                                        placeholder: (context, url) => Center(
+                                            child:
+                                            CircularProgressIndicator()),
+                                        width: 170.0,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        imageUrl: fee_notice[index]
+                                        ['url']),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2.0),
+                                      child: Text(
+                                          fee_notice[index]['title'],
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14.0,
+                                              letterSpacing: 3.0)),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       } else {
                         return Text("Please Wait..");
                       }
@@ -736,9 +751,9 @@ class _HomePageState extends State<HomePage> {
                     return CircleAvatar(
                       maxRadius: 40,
                       backgroundColor:
-                          Theme.of(context).platform == TargetPlatform.iOS
-                              ? Colors.blue
-                              : Colors.cyanAccent,
+                      Theme.of(context).platform == TargetPlatform.iOS
+                          ? Colors.blue
+                          : Colors.cyanAccent,
                       child: Text(
                         '${name[0]}',
                         style: TextStyle(fontSize: 40.0),
@@ -777,7 +792,7 @@ class _HomePageState extends State<HomePage> {
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? 'Please enter First Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -889,17 +904,10 @@ class _HomePageState extends State<HomePage> {
                     builder: (BuildContext context) => new ChangePassword()));
               }),
           ListTile(
-            leading: Icon(
-              Icons.info_outline,
-              color: Colors.white,
-            ),
-            title: Text(
-              "About Us",
-              style: TextStyle(color: Colors.white),
-            ),
-            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-          ),
-          ListTile(
+            onTap: () {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new Contactus()));
+            },
             leading: Icon(
               Icons.call,
               color: Colors.white,
@@ -954,13 +962,13 @@ class _HomePageState extends State<HomePage> {
                               new FlatButton(
                                   onPressed: () async {
                                     SharedPreferences prf =
-                                        await SharedPreferences.getInstance();
+                                    await SharedPreferences.getInstance();
                                     prf.setBool("isLoggedIn", false);
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pushReplacement(
                                         new MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                new MainScreen()));
+                                            new MainScreen()));
                                   },
                                   child: new Text(
                                     "Logout",
@@ -1109,11 +1117,8 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                 _showBottom(index.toString(), "student");
               },
             ),
-            title: Text(
-              "Semester " + index.toString(),
-              style: TextStyle(fontSize: 17),
-            ),
-            subtitle: StreamBuilder(
+            title: Text("Semester " + index.toString()),
+            subtitle: StreamBuilder<QuerySnapshot>(
                 stream: Firestore.instance
                     .collection('QnA')
                     .document("student")
@@ -1123,33 +1128,38 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                 builder: (context, snapshot) {
                   if (snapshot != null && snapshot.hasData) {
                     msgItems = snapshot.data.documents;
+                  } else {
+                    return Text("Please wait");
                   }
-                  while (snapshot == null) {}
-                  String name = msgItems[0]['full_name'] == fullName
-                      ? ""
-                      : msgItems[0]['full_name'] + ": ";
-                  String message = msgItems[0]['message'];
-                  return msgItems[0]['type'] == 0
-                      ? Text(name + message, style: TextStyle(fontSize: 15))
-                      : RichText(
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.body1,
-                            children: [
-                              TextSpan(
-                                  text: name + 'Photo',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300)),
-                              WidgetSpan(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 3.0),
-                                  child: Icon(Icons.photo_camera, size: 20),
-                                ),
-                              ),
-                            ],
+                  if (msgItems.isNotEmpty) {
+                    String name = msgItems[0]['full_name'] == fullName
+                        ? ""
+                        : msgItems[0]['full_name'] + ": ";
+                    String message = msgItems[0]['message'];
+                    return msgItems[0]['type'] == 0
+                        ? Text(name + message, style: TextStyle(fontSize: 15))
+                        : RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.body1,
+                        children: [
+                          TextSpan(
+                              text: name + 'Photo',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w300)),
+                          WidgetSpan(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3.0),
+                              child: Icon(Icons.photo_camera, size: 20),
+                            ),
                           ),
-                        );
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Text("Tap here to chat");
+                  }
                 }),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -1197,32 +1207,40 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
                   if (snapshot != null && snapshot.hasData) {
                     msgItems = snapshot.data.documents;
                   }
-                  String name = msgItems[0]['full_name'] == fullName
-                      ? ""
-                      : msgItems[0]['full_name'] + ": ";
-                  String message = msgItems[0]['message'];
-                  return msgItems[0]['type'] == 0
-                      ? Text(name + message, style: TextStyle(fontSize: 15))
-                      : RichText(
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.body1,
-                            children: [
-                              TextSpan(
-                                  text: name + 'Photo',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300)),
-                              WidgetSpan(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 3.0),
-                                  child: Icon(Icons.photo_camera, size: 20),
-                                ),
-                              ),
-                            ],
+                  if (msgItems.length != 0) {
+                    String name = msgItems[0]['full_name'] == fullName
+                        ? ""
+                        : msgItems[0]['full_name'] + ": ";
+                    String message = msgItems[0]['message'];
+                    return msgItems[0]['type'] == 0
+                        ? Text(name + message, style: TextStyle(fontSize: 15))
+                        : RichText(
+                      text: TextSpan(
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .body1,
+                        children: [
+                          TextSpan(
+                              text: name + 'Photo',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w300)),
+                          WidgetSpan(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3.0),
+                              child: Icon(Icons.photo_camera, size: 20),
+                            ),
                           ),
-                        );
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Text("Tap here to chat");
+                  }
                 }),
+
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (BuildContext context) =>
@@ -1234,7 +1252,6 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       itemCount: 6,
     );
   }
-
   Future _showBottom(String index, String role) async {
     String sem = index;
     showModalBottomSheet(
@@ -1297,12 +1314,12 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       });
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+     /* print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1357,12 +1374,12 @@ class __buildBodyQnAState extends State<_buildBodyQnA>
       });
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+    /*  print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1473,229 +1490,229 @@ class _Student_SemesterState extends State<Student_Semester> {
     var msgItems;
     return sem != null
         ? ListView(
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.76,
-                    child: StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('QnA')
-                            .document("student")
-                            .collection(sem.toString())
-                            .orderBy('timestamp', descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot != null && snapshot.hasData) {
-                            msgItems = snapshot.data.documents;
-                          }
-                          return ListView.builder(
-                            itemBuilder: (context, index) {
-                              String senderUsername = msgItems[index]['userid'];
-                              String senderFullName =
-                                  msgItems[index]['full_name'];
-                              int type = msgItems[index]['type'];
-                              return Column(
-                                crossAxisAlignment:
-                                    (senderUsername.compareTo(_username)) == 0
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    alignment:
-                                        (senderUsername.compareTo(_username)) ==
-                                                0
-                                            ? Alignment.topRight
-                                            : Alignment.topLeft,
-                                    child: Wrap(children: <Widget>[
-                                      Bubble(
-                                        padding: BubbleEdges.only(left: 8),
-                                        elevation: 10.0,
-                                        shadowColor: Colors.white,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              (senderUsername.compareTo(
-                                                          _username)) ==
-                                                      0
-                                                  ? "You"
-                                                  : senderFullName,
-                                              style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                  fontSize: 12),
-                                            ),
-                                            SizedBox(height: 8),
-                                            type == 0
-                                                ? Text(
-                                                    msgItems[index]['message'],
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black),
-                                                  )
-                                                : GestureDetector(
-                                                    onTap: () {
-                                                      print(index);
-                                                      Navigator.of(context).push(
-                                                          new MaterialPageRoute(
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  ShowImage(msgItems[
-                                                                          index]
-                                                                      [
-                                                                      'message'])));
-                                                    },
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: msgItems[index]
-                                                          ['message'],
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Center(
-                                                              child:
-                                                                  CircularProgressIndicator()),
-                                                      errorWidget: (context,
-                                                          url, error) {
-                                                        return Center(
-                                                            child: Icon(
-                                                                Icons.error));
-                                                      },
-                                                    ),
-                                                  ),
-                                            SizedBox(height: 3),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(
-                                                  msgItems[index]['time'],
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 10),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        nip: (senderUsername
-                                                    .compareTo(_username)) ==
-                                                0
-                                            ? BubbleNip.rightTop
-                                            : BubbleNip.leftTop,
-                                      ),
-                                    ]),
-                                    padding:
-                                        EdgeInsets.only(top: 10.0, left: 8),
-                                    margin: EdgeInsets.only(bottom: 8),
-                                  ),
-                                ],
-                              );
-                            },
-                            reverse: true,
-                            itemCount: msgItems != null ? msgItems.length : 0,
-                          );
-                        }),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(top: 15),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(26),
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Row(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.76,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("student")
+                      .collection(sem.toString())
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        String senderFullName =
+                        msgItems[index]['full_name'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      SizedBox(width: 16),
-                                      Expanded(
-                                          child: TextFormField(
-                                        onChanged: (value) {
-                                          if (value.toString().isEmpty) {
-                                            setState(() {
-                                              msgEmpty = true;
-                                            });
-                                          } else {
-                                            if (value
-                                                    .toString()
-                                                    .trim()
-                                                    .length ==
-                                                0) {
-                                              setState(() {
-                                                print("Space");
-                                                msgEmpty = true;
-                                              });
-                                            } else if (value.isNotEmpty) {
-                                              setState(() {
-                                                msgEmpty = false;
-                                              });
-                                            }
-                                          }
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : senderFullName,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
                                         },
-                                        controller: _msg,
-                                        keyboardType: TextInputType.multiline,
-                                        minLines: 1,
-                                        maxLines: 100,
-                                        decoration: InputDecoration(
-                                          hintText: 'Type a message',
-                                          border: InputBorder.none,
-                                          alignLabelWithHint: true,
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) {
+                                            return Center(
+                                                child: Icon(
+                                                    Icons.error));
+                                          },
                                         ),
-                                      )),
-                                      GestureDetector(
-                                        onTap: () => sendCameraImage(),
-                                        child: Icon(Icons.camera_alt,
-                                            color: Theme.of(context).hintColor),
                                       ),
-                                      SizedBox(width: 8.0),
-                                      GestureDetector(
-                                        onTap: () => sendImage(),
-                                        child: Icon(Icons.image,
-                                            color: Theme.of(context).hintColor),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(width: 8.0),
-                                      SizedBox(width: 8.0),
                                     ],
                                   ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
                                 ),
-                              ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      onChanged: (value) {
+                                        if (value.toString().isEmpty) {
+                                          setState(() {
+                                            msgEmpty = true;
+                                          });
+                                        } else {
+                                          if (value
+                                              .toString()
+                                              .trim()
+                                              .length ==
+                                              0) {
+                                            setState(() {
+                                              print("Space");
+                                              msgEmpty = true;
+                                            });
+                                          } else if (value.isNotEmpty) {
+                                            setState(() {
+                                              msgEmpty = false;
+                                            });
+                                          }
+                                        }
+                                      },
+                                      controller: _msg,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendCameraImage(),
+                                  child: Icon(Icons.camera_alt,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          AnimatedContainer(
-                            duration: Duration(seconds: 1),
-                            curve: Curves.fastOutSlowIn,
-                            margin: EdgeInsets.only(top: 15),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _type = 0;
-                                  sendMessage(_msg.text);
-                                  _msg.clear();
-                                });
-                              },
-                              child: msgEmpty
-                                  ? Container()
-                                  : CircleAvatar(
-                                      child: Icon(Icons.send),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
-            ],
-          )
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    AnimatedContainer(
+                      duration: Duration(seconds: 1),
+                      curve: Curves.fastOutSlowIn,
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: msgEmpty
+                            ? Container()
+                            : CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
         : Center(child: CircularProgressIndicator());
   }
 
@@ -1709,12 +1726,12 @@ class _Student_SemesterState extends State<Student_Semester> {
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+  /*    print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1766,12 +1783,12 @@ class _Student_SemesterState extends State<Student_Semester> {
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+      /*print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1907,227 +1924,227 @@ class _Parents_SemesterState extends State<Parents_Semester> {
     var msgItems;
     return sem != null
         ? ListView(
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.76,
-                    child: StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('QnA')
-                            .document("parents")
-                            .collection(sem.toString())
-                            .orderBy('timestamp', descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot != null && snapshot.hasData) {
-                            msgItems = snapshot.data.documents;
-                          }
-                          return ListView.builder(
-                            itemBuilder: (context, index) {
-                              String senderUsername = msgItems[index]['userid'];
-                              String senderFullName =
-                                  msgItems[index]['full_name'];
-                              int type = msgItems[index]['type'];
-                              return Column(
-                                crossAxisAlignment:
-                                    (senderUsername.compareTo(_username)) == 0
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    alignment:
-                                        (senderUsername.compareTo(_username)) ==
-                                                0
-                                            ? Alignment.topRight
-                                            : Alignment.topLeft,
-                                    child: Wrap(children: <Widget>[
-                                      Bubble(
-                                        padding: BubbleEdges.only(left: 8),
-                                        elevation: 10.0,
-                                        shadowColor: Colors.white,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              (senderUsername.compareTo(
-                                                          _username)) ==
-                                                      0
-                                                  ? "You"
-                                                  : senderFullName,
-                                              style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                  fontSize: 12),
-                                            ),
-                                            SizedBox(height: 8),
-                                            type == 0
-                                                ? Text(
-                                                    msgItems[index]['message'],
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black),
-                                                  )
-                                                : GestureDetector(
-                                                    onTap: () {
-                                                      print(index);
-                                                      Navigator.of(context).push(
-                                                          new MaterialPageRoute(
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  ShowImage(msgItems[
-                                                                          index]
-                                                                      [
-                                                                      'message'])));
-                                                    },
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: msgItems[index]
-                                                          ['message'],
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Center(
-                                                              child:
-                                                                  CircularProgressIndicator()),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          new Icon(Icons.error),
-                                                    ),
-                                                  ),
-                                            SizedBox(height: 3),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(
-                                                  msgItems[index]['time'],
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 10),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        nip: (senderUsername
-                                                    .compareTo(_username)) ==
-                                                0
-                                            ? BubbleNip.rightTop
-                                            : BubbleNip.leftTop,
-                                      ),
-                                    ]),
-                                    padding:
-                                        EdgeInsets.only(top: 10.0, left: 8),
-                                    margin: EdgeInsets.only(bottom: 8),
-                                  ),
-                                ],
-                              );
-                            },
-                            reverse: true,
-                            itemCount: msgItems != null ? msgItems.length : 0,
-                          );
-                        }),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(top: 15),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(26),
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Row(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.76,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("parents")
+                      .collection(sem.toString())
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        String senderFullName =
+                        msgItems[index]['full_name'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      SizedBox(width: 16),
-                                      Expanded(
-                                          child: TextFormField(
-                                        autofocus: true,
-                                        onChanged: (value) {
-                                          if (value.toString().isEmpty) {
-                                            setState(() {
-                                              msgEmpty = true;
-                                            });
-                                          } else {
-                                            if (value
-                                                    .toString()
-                                                    .trim()
-                                                    .length ==
-                                                0) {
-                                              setState(() {
-                                                print("Space");
-                                                msgEmpty = true;
-                                              });
-                                            } else if (value.isNotEmpty) {
-                                              setState(() {
-                                                msgEmpty = false;
-                                              });
-                                            }
-                                          }
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : senderFullName,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
                                         },
-                                        controller: _msg,
-                                        keyboardType: TextInputType.multiline,
-                                        minLines: 1,
-                                        maxLines: 100,
-                                        decoration: InputDecoration(
-                                          hintText: 'Type a message',
-                                          border: InputBorder.none,
-                                          alignLabelWithHint: true,
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) =>
+                                          new Icon(Icons.error),
                                         ),
-                                      )),
-                                      GestureDetector(
-                                        onTap: () => sendCameraImage(),
-                                        child: Icon(Icons.camera_alt,
-                                            color: Theme.of(context).hintColor),
                                       ),
-                                      SizedBox(width: 8.0),
-                                      GestureDetector(
-                                        onTap: () => sendImage(),
-                                        child: Icon(Icons.image,
-                                            color: Theme.of(context).hintColor),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(width: 8.0),
-                                      SizedBox(width: 8.0),
                                     ],
                                   ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
                                 ),
-                              ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      autofocus: true,
+                                      onChanged: (value) {
+                                        if (value.toString().isEmpty) {
+                                          setState(() {
+                                            msgEmpty = true;
+                                          });
+                                        } else {
+                                          if (value
+                                              .toString()
+                                              .trim()
+                                              .length ==
+                                              0) {
+                                            setState(() {
+                                              print("Space");
+                                              msgEmpty = true;
+                                            });
+                                          } else if (value.isNotEmpty) {
+                                            setState(() {
+                                              msgEmpty = false;
+                                            });
+                                          }
+                                        }
+                                      },
+                                      controller: _msg,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendCameraImage(),
+                                  child: Icon(Icons.camera_alt,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          AnimatedContainer(
-                            duration: Duration(seconds: 1),
-                            curve: Curves.fastOutSlowIn,
-                            margin: EdgeInsets.only(top: 15),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _type = 0;
-                                  sendMessage(_msg.text);
-                                  _msg.clear();
-                                });
-                              },
-                              child: msgEmpty
-                                  ? Container()
-                                  : CircleAvatar(
-                                      child: Icon(Icons.send),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
-            ],
-          )
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    AnimatedContainer(
+                      duration: Duration(seconds: 1),
+                      curve: Curves.fastOutSlowIn,
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: msgEmpty
+                            ? Container()
+                            : CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
         : Center(child: CircularProgressIndicator());
   }
 
@@ -2141,12 +2158,12 @@ class _Parents_SemesterState extends State<Parents_Semester> {
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+   /*   print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -2198,12 +2215,12 @@ class _Parents_SemesterState extends State<Parents_Semester> {
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+   /*   print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');

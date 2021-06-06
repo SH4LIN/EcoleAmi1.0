@@ -269,11 +269,11 @@ class _AddEventState extends State<AddEvent> {
                                     } else {
                                       _desValidate = false;
                                     }
-                                   /* if (_date.text.isEmpty) {
+                                    if (_date.text.isEmpty) {
                                       _dateValidate = true;
                                     } else {
                                       _dateValidate = false;
-                                    }*/
+                                    }
                                     if (_selectedType == null) {
                                       _eventTypeValidate = true;
                                     } else {
@@ -281,7 +281,7 @@ class _AddEventState extends State<AddEvent> {
                                     }
                                     if (_titleValidate == false &&
                                         _desValidate == false &&
-//                                        _dateValidate == false &&
+                                        _dateValidate == false &&
                                         _eventTypeValidate == false) {
                                       _uploadFile();
                                     }
@@ -342,11 +342,11 @@ class _AddEventState extends State<AddEvent> {
                                   } else {
                                     _desValidate = false;
                                   }
-                                  /*if (_date.text.isEmpty) {
+                                  if (_date.text.isEmpty) {
                                     _dateValidate = true;
                                   } else {
                                     _dateValidate = false;
-                                  }*/
+                                  }
                                   print(_selectedType);
                                   /*if (_selectedType == "Event" || _selectedType == "College Schedule" || _selectedType == "Fee Payment") {
                                             _eventTypeValidate = false;
@@ -362,7 +362,7 @@ class _AddEventState extends State<AddEvent> {
                                   print(_eventTypeValidate);
                                   if (_titleValidate == false &&
                                       _desValidate == false &&
-//                                      _dateValidate == false &&
+                                      _dateValidate == false &&
                                       _eventTypeValidate == false) {
                                     if (_image == null) {
                                       Fluttertoast.showToast(
@@ -503,18 +503,12 @@ class _AddEventState extends State<AddEvent> {
         .child('e-board Images/${Path.basename(_image.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
-    if(uploadTask.isSuccessful) {
+    if(uploadTask.isComplete) {
       print('File Uploaded');
-      storageReference.getDownloadURL().then((fileURL) {
+      await storageReference.getDownloadURL().then((fileURL) async {
         setState(() {
           _uploadedFileURL = fileURL;
         });
-      });
-      if (_uploadedFileURL == null) {
-        pr.hide();
-        Fluttertoast.showToast(
-            msg: "There Is Some Error Uploading Image Please Try Again");
-      } else {
         final snapShot = await Firestore.instance
             .collection("e-notice-board")
             .document(now.toString())
@@ -538,7 +532,7 @@ class _AddEventState extends State<AddEvent> {
               toastLength: Toast.LENGTH_LONG);
           Navigator.pop(context);
         }
-      }
+      });
     }
     else{
       pr.hide();

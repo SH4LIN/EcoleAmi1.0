@@ -1,5 +1,7 @@
 //import 'dart:html';
 
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:ecoleami1_0/SplashScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -67,245 +69,245 @@ class _SetParentDetailsState extends State<SetParentDetails> {
           children: <Widget>[
             new Container(
               padding:
-                  const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
+              const EdgeInsets.only(left: 15.0, right: 15.0, top: 25.0),
               child: new Form(
                   child: new Card(
-                elevation: 30.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Container(
-                  padding: const EdgeInsets.all(5.0),
-                  child: new Column(
-                    children: <Widget>[
-                      new ExpansionTile(
-                        title: Text("Student Details",
-                            style: TextStyle(fontSize: 15)),
+                    elevation: 30.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      child: new Column(
                         children: <Widget>[
-                          StreamBuilder(
-                              stream: Firestore.instance
-                                  .collection("parent_details")
-                                  .document(_username)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.none) {
-                                  _studentFullName.text = "Loading...!";
-                                }
-                                if (snapshot.hasData) {
-                                  var document = snapshot.data;
-                                  _studentFullName.text =
+                          new ExpansionTile(
+                            title: Text("Student Details",
+                                style: TextStyle(fontSize: 15)),
+                            children: <Widget>[
+                              StreamBuilder(
+                                  stream: Firestore.instance
+                                      .collection("parent_details")
+                                      .document(_username)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.none) {
+                                      _studentFullName.text = "Loading...!";
+                                    }
+                                    if (snapshot.hasData) {
+                                      var document = snapshot.data;
+                                      _studentFullName.text =
                                       document['student_name'];
-                                }
-                                return new TextField(
-                                  controller: _studentFullName,
-                                  enabled: false,
-                                  decoration: new InputDecoration(
-                                      contentPadding:
+                                    }
+                                    return new TextField(
+                                      controller: _studentFullName,
+                                      enabled: false,
+                                      decoration: new InputDecoration(
+                                          contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 5.0),
-                                      hintText: "Student Full Name",
-                                      hintStyle: new TextStyle(
-                                        fontSize: 15.0,
-                                        color: Colors.white70,
-                                      ),
-                                      prefixIcon: Padding(
-                                        padding:
+                                          hintText: "Student Full Name",
+                                          hintStyle: new TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white70,
+                                          ),
+                                          prefixIcon: Padding(
+                                            padding:
                                             const EdgeInsets.only(bottom: 15.0),
-                                        child: Icon(Icons.person),
-                                      )),
-                                );
-                              }),
-                          new Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0)),
-                          StreamBuilder(
-                              stream: Firestore.instance
-                                  .collection("parent_details")
-                                  .document(_username)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.none) {
-                                  _enroll.text = "Loading...!";
-                                }
-                                if (snapshot.hasData) {
-                                  var document = snapshot.data;
-                                  _enroll.text = document['student_enrollment'];
-                                  _enrCheck = document['student_enrollment'];
-                                  print(_enrCheck);
-                                }
-                                return (_enrCheck.compareTo("------------")) ==
+                                            child: Icon(Icons.person),
+                                          )),
+                                    );
+                                  }),
+                              new Padding(
+                                  padding: const EdgeInsets.only(bottom: 15.0)),
+                              StreamBuilder(
+                                  stream: Firestore.instance
+                                      .collection("parent_details")
+                                      .document(_username)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.none) {
+                                      _enroll.text = "Loading...!";
+                                    }
+                                    if (snapshot.hasData) {
+                                      var document = snapshot.data;
+                                      _enroll.text = document['student_enrollment'];
+                                      _enrCheck = document['student_enrollment'];
+                                      print(_enrCheck);
+                                    }
+                                    return (_enrCheck.compareTo("------------")) ==
                                         0
-                                    ? Container(width: 0, height: 0)
-                                    : TextField(
-                                        controller: _enroll,
-                                        enabled: false,
-                                        decoration: new InputDecoration(
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 5.0),
-                                            hintText: "Student Full Name",
-                                            hintStyle: new TextStyle(
-                                              fontSize: 15.0,
-                                              color: Colors.white70,
-                                            ),
-                                            prefixIcon: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 15.0),
-                                              child: Icon(Icons.person),
-                                            )),
-                                      );
-                              }),
+                                        ? Container(width: 0, height: 0)
+                                        : TextField(
+                                      controller: _enroll,
+                                      enabled: false,
+                                      decoration: new InputDecoration(
+                                          contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 5.0),
+                                          hintText: "Student Full Name",
+                                          hintStyle: new TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white70,
+                                          ),
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 15.0),
+                                            child: Icon(Icons.person),
+                                          )),
+                                    );
+                                  }),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              )),
+                    ),
+                  )),
             ),
             new Container(
               padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
               child: new Form(
                   child: new Card(
-                elevation: 30.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Container(
-                  padding: const EdgeInsets.all(15.0),
-                  child: new Column(
-                    children: <Widget>[
-                      new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                      new TextField(
-                        controller: _fullName,
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        cursorColor: Colors.purple,
-                        cursorRadius: Radius.circular(50.0),
-                        cursorWidth: 3.0,
-                        decoration: new InputDecoration(
-                            hintText: "Full Name",
-                            errorText: _fullNameValidate
-                                ? 'Please enter Full Name'
-                                : null,
-                            hintStyle: new TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.grey,
+                    elevation: 30.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Container(
+                      padding: const EdgeInsets.all(15.0),
+                      child: new Column(
+                        children: <Widget>[
+                          new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                          new TextField(
+                            controller: _fullName,
+                            autofocus: true,
+                            keyboardType: TextInputType.text,
+                            cursorColor: Colors.purple,
+                            cursorRadius: Radius.circular(50.0),
+                            cursorWidth: 3.0,
+                            decoration: new InputDecoration(
+                                hintText: "Full Name",
+                                errorText: _fullNameValidate
+                                    ? 'Please enter Full Name'
+                                    : null,
+                                hintStyle: new TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.grey,
+                                ),
+                                prefixIcon: new Icon(Icons.account_circle),
+                                border: new OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                )),
+                          ),
+                          new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                          new TextField(
+                            onChanged: (value) {
+                              validateStructure(value);
+                            },
+                            controller: _pass,
+                            obscureText: _obscureText,
+                            autofocus: true,
+                            cursorColor: Colors.purple,
+                            cursorRadius: Radius.circular(50.0),
+                            cursorWidth: 3.0,
+                            decoration: new InputDecoration(
+                                hintText: "Set Password",
+                                errorText: _passValidate ? errorMessage : null,
+                                hintStyle: new TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.grey,
+                                ),
+                                prefixIcon: new Icon(Icons.lock),
+                                suffixIcon: new IconButton(
+                                  icon: new Icon(_obscureText
+                                      ? Icons.visibility_off
+                                      : Icons.visibility),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
+                                border: new OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                )),
+                          ),
+                          new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                          new TextField(
+                            controller: _confirmPass,
+                            cursorColor: Colors.purple,
+                            obscureText: _obscureText1,
+                            cursorRadius: Radius.circular(50.0),
+                            cursorWidth: 3.0,
+                            decoration: new InputDecoration(
+                                hintText: "Confirm Password",
+                                errorText: _cPassValidate ? errorMessage2 : null,
+                                hintStyle: new TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.grey,
+                                ),
+                                prefixIcon: new Icon(Icons.lock),
+                                suffixIcon: new IconButton(
+                                  icon: new Icon(_obscureText1
+                                      ? Icons.visibility_off
+                                      : Icons.visibility),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText1 = !_obscureText1;
+                                    });
+                                  },
+                                ),
+                                border: new OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                )),
+                          ),
+                          new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
+                          new RaisedButton(
+                            color: Colors.redAccent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            child: new Text(
+                              "Save",
+                              style: new TextStyle(
+                                  color: Colors.white, fontSize: 15.0),
                             ),
-                            prefixIcon: new Icon(Icons.account_circle),
-                            border: new OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
+                            onPressed: () {
+                              setState(() {
+                                if (_passValidate == false) {
+                                  if (_fullName.text.isEmpty) {
+                                    _fullNameValidate = true;
+                                  } else {
+                                    _fullNameValidate = false;
+                                  }
+                                  if (_pass.text.isEmpty) {
+                                    _passValidate = true;
+                                  } else {
+                                    _passValidate = false;
+                                  }
+                                  if (_confirmPass.text.isEmpty) {
+                                    _cPassValidate = true;
+                                    errorMessage2 = "Password does not match";
+                                  } else {
+                                    _cPassValidate = false;
+                                  }
+                                  if (_pass.text.compareTo(_confirmPass.text) !=
+                                      0) {
+                                    _cPassValidate = true;
+                                    _confirmPass.clear();
+                                    errorMessage2 = "Password does not match";
+                                  }
+                                  if (_fullNameValidate == false &&
+                                      _passValidate == false &&
+                                      _cPassValidate == false) {
+                                    saveDetails();
+                                  }
+                                }
+                              });
+                            },
+                            splashColor: Colors.red,
+                          )
+                        ],
                       ),
-                      new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                      new TextField(
-                        onChanged: (value) {
-                          validateStructure(value);
-                        },
-                        controller: _pass,
-                        obscureText: _obscureText,
-                        autofocus: true,
-                        cursorColor: Colors.purple,
-                        cursorRadius: Radius.circular(50.0),
-                        cursorWidth: 3.0,
-                        decoration: new InputDecoration(
-                            hintText: "Set Password",
-                            errorText: _passValidate ? errorMessage : null,
-                            hintStyle: new TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.grey,
-                            ),
-                            prefixIcon: new Icon(Icons.lock),
-                            suffixIcon: new IconButton(
-                              icon: new Icon(_obscureText
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
-                              },
-                            ),
-                            border: new OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                      ),
-                      new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                      new TextField(
-                        controller: _confirmPass,
-                        cursorColor: Colors.purple,
-                        obscureText: _obscureText1,
-                        cursorRadius: Radius.circular(50.0),
-                        cursorWidth: 3.0,
-                        decoration: new InputDecoration(
-                            hintText: "Confirm Password",
-                            errorText: _cPassValidate ? errorMessage2 : null,
-                            hintStyle: new TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.grey,
-                            ),
-                            prefixIcon: new Icon(Icons.lock),
-                            suffixIcon: new IconButton(
-                              icon: new Icon(_obscureText1
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureText1 = !_obscureText1;
-                                });
-                              },
-                            ),
-                            border: new OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                      ),
-                      new Padding(padding: const EdgeInsets.only(bottom: 20.0)),
-                      new RaisedButton(
-                        color: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: new Text(
-                          "Save",
-                          style: new TextStyle(
-                              color: Colors.white, fontSize: 15.0),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            if (_passValidate == false) {
-                              if (_fullName.text.isEmpty) {
-                                _fullNameValidate = true;
-                              } else {
-                                _fullNameValidate = false;
-                              }
-                              if (_pass.text.isEmpty) {
-                                _passValidate = true;
-                              } else {
-                                _passValidate = false;
-                              }
-                              if (_confirmPass.text.isEmpty) {
-                                _cPassValidate = true;
-                                errorMessage2 = "Password does not match";
-                              } else {
-                                _cPassValidate = false;
-                              }
-                              if (_pass.text.compareTo(_confirmPass.text) !=
-                                  0) {
-                                _cPassValidate = true;
-                                _confirmPass.clear();
-                                errorMessage2 = "Password does not match";
-                              }
-                              if (_fullNameValidate == false &&
-                                  _passValidate == false &&
-                                  _cPassValidate == false) {
-                                saveDetails();
-                              }
-                            }
-                          });
-                        },
-                        splashColor: Colors.red,
-                      )
-                    ],
-                  ),
-                ),
-              )),
+                    ),
+                  )),
             )
           ],
         ),
@@ -326,12 +328,13 @@ class _SetParentDetailsState extends State<SetParentDetails> {
   }
 
   Future<void> saveDetails() async {
+    var _passwordHash = md5.convert(utf8.encode(_pass.text));
     try {
       Firestore.instance
           .collection("login_details")
           .document(_username)
           .updateData({
-        'password': _pass.text,
+        'password': _passwordHash.toString(),
       });
       Firestore.instance
           .collection("parent_details")

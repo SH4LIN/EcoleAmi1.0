@@ -88,171 +88,171 @@ class _LeaveApplicationState extends State<LeaveApplication> {
               new Container(
                 child: new Form(
                     child: Container(
-                  padding: const EdgeInsets.all(15.0),
-                  child: new Column(
-                    children: <Widget>[
-                      new TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            if (value.isEmpty) {
-                              _descriptionValidate = true;
-                            } else {
-                              if (value.trim().length == 0) {
-                                _descriptionValidate = true;
-                              } else {
-                                _descriptionValidate = false;
-                              }
-                            }
-                          });
-                        },
-                        controller: _description,
-                        keyboardType: TextInputType.multiline,
-                        autofocus: true,
-                        maxLines: 3,
-                        maxLength: 100,
-                        cursorColor: Colors.purple,
-                        cursorRadius: Radius.circular(50.0),
-                        cursorWidth: 3.0,
-                        decoration: new InputDecoration(
-                            prefixIcon: new Icon(Icons.description),
-                            labelText: "Description",
-                            errorText: _descriptionValidate
-                                ? 'Please Enter Description'
-                                : null,
-                            border: new OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            hintStyle: new TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.grey,
-                            )),
-                      ),
-                      new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
-                      _file != null
-                          ? Center(
-                              child: Column(
-                                children: <Widget>[
-                                  Stack(
-                                    alignment: Alignment.topRight,
-                                    children: <Widget>[
-                                      type == 0
-                                          ? Image.file(
-                                              _file,
-                                              height: 150,
-                                              fit: BoxFit.cover,
-                                              alignment: Alignment.center,
-                                            )
-                                          : Container(
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 14),
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.pinkAccent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20)),
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.picture_as_pdf,
-                                                    color: Colors.white,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  Flexible(
-                                                      child: Text(
-                                                    _file.path,
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ))
-                                                ],
-                                              ),
-                                            ),
-                                      IconButton(
-                                          icon: Icon(
-                                            Icons.cancel,
-                                            color: Colors.tealAccent,
+                      padding: const EdgeInsets.all(15.0),
+                      child: new Column(
+                        children: <Widget>[
+                          new TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                if (value.isEmpty) {
+                                  _descriptionValidate = true;
+                                } else {
+                                  if (value.trim().length == 0) {
+                                    _descriptionValidate = true;
+                                  } else {
+                                    _descriptionValidate = false;
+                                  }
+                                }
+                              });
+                            },
+                            controller: _description,
+                            keyboardType: TextInputType.multiline,
+                            autofocus: true,
+                            maxLines: 3,
+                            maxLength: 100,
+                            cursorColor: Colors.purple,
+                            cursorRadius: Radius.circular(50.0),
+                            cursorWidth: 3.0,
+                            decoration: new InputDecoration(
+                                prefixIcon: new Icon(Icons.description),
+                                labelText: "Description",
+                                errorText: _descriptionValidate
+                                    ? 'Please Enter Description'
+                                    : null,
+                                border: new OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                hintStyle: new TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.grey,
+                                )),
+                          ),
+                          new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+                          _file != null
+                              ? Center(
+                            child: Column(
+                              children: <Widget>[
+                                Stack(
+                                  alignment: Alignment.topRight,
+                                  children: <Widget>[
+                                    type == 0
+                                        ? Image.file(
+                                      _file,
+                                      height: 150,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center,
+                                    )
+                                        : Container(
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 14),
+                                      padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                          color: Colors.pinkAccent,
+                                          borderRadius:
+                                          BorderRadius.circular(
+                                              20)),
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .width,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.picture_as_pdf,
+                                            color: Colors.white,
                                           ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _file = null;
-                                            });
-                                          }),
-                                    ],
-                                  ),
-                                  RaisedButton(
-                                    onPressed: _showBottom,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    color: Colors.redAccent,
-                                    child: Text(
-                                      "Change Document",
-                                      style: TextStyle(color: Colors.white),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Flexible(
+                                              child: Text(
+                                                _file.path,
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ))
+                                        ],
+                                      ),
                                     ),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.cancel,
+                                          color: Colors.tealAccent,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _file = null;
+                                          });
+                                        }),
+                                  ],
+                                ),
+                                RaisedButton(
+                                  onPressed: _showBottom,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20)),
+                                  color: Colors.redAccent,
+                                  child: Text(
+                                    "Change Document",
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                  new Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 15.0)),
-                                  _descriptionValidate == true
-                                      ? new Container()
-                                      : new RaisedButton(
-                                          onPressed: () {
-                                            _uploadFile();
-                                          },
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          color: Colors.redAccent,
-                                          child: Text(
-                                            "Upload",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        )
-                                ],
-                              ),
-                            )
-                          : new RaisedButton(
-                              onPressed: _showBottom,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              color: Colors.redAccent,
-                              child: Text(
-                                "Select Document",
-                                style: TextStyle(color: Colors.white),
-                              ),
+                                ),
+                                new Padding(
+                                    padding:
+                                    const EdgeInsets.only(bottom: 15.0)),
+                                _descriptionValidate == true
+                                    ? new Container()
+                                    : new RaisedButton(
+                                  onPressed: () {
+                                    _uploadFile();
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20)),
+                                  color: Colors.redAccent,
+                                  child: Text(
+                                    "Upload",
+                                    style:
+                                    TextStyle(color: Colors.white),
+                                  ),
+                                )
+                              ],
                             ),
-                      new Padding(padding: EdgeInsets.only(bottom: 14)),
-                      new RaisedButton(
-                        onPressed: _uploaded,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        color: Colors.redAccent,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "Uploaded Applications",
+                          )
+                              : new RaisedButton(
+                            onPressed: _showBottom,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            color: Colors.redAccent,
+                            child: Text(
+                              "Select Document",
                               style: TextStyle(color: Colors.white),
                             ),
-                            SizedBox(
-                              width: 8,
+                          ),
+                          new Padding(padding: EdgeInsets.only(bottom: 14)),
+                          new RaisedButton(
+                            onPressed: _uploaded,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            color: Colors.redAccent,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Uploaded Applications",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Icon(
+                                  Icons.cloud,
+                                  color: Colors.white,
+                                )
+                              ],
                             ),
-                            Icon(
-                              Icons.cloud,
-                              color: Colors.white,
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                )),
+                          )
+                        ],
+                      ),
+                    )),
               ),
             ],
           ),
@@ -292,18 +292,18 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                             len = snap.data.documents.length;
                             return len > 0
                                 ? ListView.builder(
-                                    itemBuilder: _getItems,
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: len,
-                                  )
+                              itemBuilder: _getItems,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: len,
+                            )
                                 : new Align(
-                                    alignment: Alignment.center,
-                                    child: new Text(
-                                      "No Uploaded Application yet!",
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  );
+                              alignment: Alignment.center,
+                              child: new Text(
+                                "No Uploaded Application yet!",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            );
                           }
                           return Center(child: CircularProgressIndicator());
                         }))
@@ -407,27 +407,27 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                       String date = itemsStudent[index]['date'];
                       return action == 0
                           ? new Text(
-                              "No Response yet",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            )
+                        "No Response yet",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      )
                           : (action == 1
-                              ? new Text(
-                                  "Leave Report accepted by " + facName,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              : new Text(
-                                  "Leave Report Rejected " + facName,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold),
-                                ));
+                          ? new Text(
+                        "Leave Report accepted by " + facName,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold),
+                      )
+                          : new Text(
+                        "Leave Report Rejected " + facName,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold),
+                      ));
                     } else {
                       return CircularProgressIndicator();
                     }
@@ -503,20 +503,6 @@ class _LeaveApplicationState extends State<LeaveApplication> {
                       _chooseFileFromCamera();
                     },
                   ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.picture_as_pdf,
-                      color: Colors.white,
-                    ),
-                    title: Text(
-                      "PDF",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      getPdf();
-                    },
-                  ),
                   new RaisedButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
@@ -558,7 +544,7 @@ class _LeaveApplicationState extends State<LeaveApplication> {
     });
   }
 
-  Future getPdf() async {
+  /*Future getPdf() async {
     _file = null;
     var file = await FilePicker.getFile(
         type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
@@ -568,7 +554,7 @@ class _LeaveApplicationState extends State<LeaveApplication> {
         type = 1;
       });
     }
-  }
+  }*/
 
   String _uploadedFileURL;
 
@@ -613,11 +599,20 @@ class _LeaveApplicationState extends State<LeaveApplication> {
             'student_enrollment': _studentEnr,
             'action': 0,
             'semester': _sem,
-            'date': DateTime.now().day.toString() +
+            'date': DateTime
+                .now()
+                .day
+                .toString() +
                 "/" +
-                DateTime.now().month.toString() +
+                DateTime
+                    .now()
+                    .month
+                    .toString() +
                 "/" +
-                DateTime.now().year.toString(),
+                DateTime
+                    .now()
+                    .year
+                    .toString(),
           }).then((value) {
             pr.hide();
             Fluttertoast.showToast(
@@ -637,6 +632,7 @@ class _LeaveApplicationState extends State<LeaveApplication> {
               msg: "There Is Some Error Uploading Image Please Try Again");
         }
       });
+
     } else {
       pr.hide();
       Fluttertoast.showToast(

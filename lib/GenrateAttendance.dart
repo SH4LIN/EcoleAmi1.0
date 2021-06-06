@@ -86,162 +86,162 @@ class _AttendanceState extends State<Attendance> {
             ),
             _selectedSemester != null
                 ? Column(
-                    children: <Widget>[
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: new BoxDecoration(
-                          border:
-                              Border.all(style: BorderStyle.solid, width: 0.80),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: StreamBuilder(
-                            stream: Firestore.instance
-                                .collection("semwise_subjects")
-                                .document(_selectedSemester)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              List<String> _subjects = new List<String>();
-                              if (snapshot != null && snapshot.hasData) {
-                                DocumentSnapshot document = snapshot.data;
-                                _subjects =
-                                    document.data.keys.toList(growable: false);
-                                return DropdownButton<String>(
-                                  underline: SizedBox(),
-                                  items: _subjects.map((String key) {
-                                    return new DropdownMenuItem<String>(
-                                      value: key,
-                                      child: new Text(key),
-                                    );
-                                  }).toList(),
-                                  hint: Text("Subject"),
-                                  onChanged: (String newVal) {
-                                    setState(() {
-                                      this._selectedSubject = newVal;
-                                      this._selectedPT = null;
-                                    });
-                                  },
-                                  value: _selectedSubject,
-                                  isExpanded: true,
-                                );
-                              } else {
-                                return DropdownButton<String>(
-                                  underline: Container(),
-                                  hint: Text("Semester"),
-                                  isExpanded: true,
-                                );
-                              }
-                            }),
-                      ),
-                    ],
-                  )
+              children: <Widget>[
+                Container(
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: new BoxDecoration(
+                    border:
+                    Border.all(style: BorderStyle.solid, width: 0.80),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("semwise_subjects")
+                          .document(_selectedSemester)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        List<String> _subjects = new List<String>();
+                        if (snapshot != null && snapshot.hasData) {
+                          DocumentSnapshot document = snapshot.data;
+                          _subjects =
+                              document.data.keys.toList(growable: false);
+                          return DropdownButton<String>(
+                            underline: SizedBox(),
+                            items: _subjects.map((String key) {
+                              return new DropdownMenuItem<String>(
+                                value: key,
+                                child: new Text(key),
+                              );
+                            }).toList(),
+                            hint: Text("Subject"),
+                            onChanged: (String newVal) {
+                              setState(() {
+                                this._selectedSubject = newVal;
+                                this._selectedPT = null;
+                              });
+                            },
+                            value: _selectedSubject,
+                            isExpanded: true,
+                          );
+                        } else {
+                          return DropdownButton<String>(
+                            underline: Container(),
+                            hint: Text("Semester"),
+                            isExpanded: true,
+                          );
+                        }
+                      }),
+                ),
+              ],
+            )
                 : Center(),
             _selectedSubject != null
                 ? Column(
-                    children: <Widget>[
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: new BoxDecoration(
-                          border:
-                              Border.all(style: BorderStyle.solid, width: 0.80),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: StreamBuilder(
-                            stream: Firestore.instance
-                                .collection("semwise_batches")
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              List<String> _pt = new List<String>();
-                              if (snapshot != null && snapshot.hasData) {
-                                List<DocumentSnapshot> document =
-                                    snapshot.data.documents;
-                                document.forEach((element) async {
-                                  await _pt.add(element.documentID);
-                                });
-                                return DropdownButton<String>(
-                                  underline: SizedBox(),
-                                  items: _pt.map((String val) {
-                                    return new DropdownMenuItem<String>(
-                                      value: val,
-                                      child: new Text(val),
-                                    );
-                                  }).toList(),
-                                  hint: Text("PT"),
-                                  onChanged: (String newVal) {
-                                    setState(() {
-                                      this._selectedPT = newVal;
-                                      this._selectedBatch = null;
-                                    });
-                                  },
-                                  value: _selectedPT,
-                                  isExpanded: true,
-                                );
-                              } else {
-                                return DropdownButton<String>(
-                                  underline: Container(),
-                                  hint: Text("PT"),
-                                  isExpanded: true,
-                                );
-                              }
-                            }),
-                      ),
-                    ],
-                  )
+              children: <Widget>[
+                Container(
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: new BoxDecoration(
+                    border:
+                    Border.all(style: BorderStyle.solid, width: 0.80),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("semwise_batches")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        List<String> _pt = new List<String>();
+                        if (snapshot != null && snapshot.hasData) {
+                          List<DocumentSnapshot> document =
+                              snapshot.data.documents;
+                          document.forEach((element) async {
+                            await _pt.add(element.documentID);
+                          });
+                          return DropdownButton<String>(
+                            underline: SizedBox(),
+                            items: _pt.map((String val) {
+                              return new DropdownMenuItem<String>(
+                                value: val,
+                                child: new Text(val),
+                              );
+                            }).toList(),
+                            hint: Text("PT"),
+                            onChanged: (String newVal) {
+                              setState(() {
+                                this._selectedPT = newVal;
+                                this._selectedBatch = null;
+                              });
+                            },
+                            value: _selectedPT,
+                            isExpanded: true,
+                          );
+                        } else {
+                          return DropdownButton<String>(
+                            underline: Container(),
+                            hint: Text("PT"),
+                            isExpanded: true,
+                          );
+                        }
+                      }),
+                ),
+              ],
+            )
                 : Center(),
             _selectedPT != null
                 ? Column(
-                    children: <Widget>[
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: new BoxDecoration(
-                          border:
-                              Border.all(style: BorderStyle.solid, width: 0.80),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: StreamBuilder(
-                            stream: Firestore.instance
-                                .collection("semwise_batches")
-                                .document(_selectedPT)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              List<String> _batch = new List<String>();
-                              if (snapshot != null && snapshot.hasData) {
-                                DocumentSnapshot document = snapshot.data;
-                                _batch =
-                                    document.data.keys.toList(growable: false);
-                                return DropdownButton<String>(
-                                  underline: SizedBox(),
-                                  items: _batch.map((String key) {
-                                    return new DropdownMenuItem<String>(
-                                      value: key,
-                                      child: new Text(key),
-                                    );
-                                  }).toList(),
-                                  hint: Text("Batches"),
-                                  onChanged: (String newVal) {
-                                    setState(() {
-                                      this._selectedBatch = newVal;
-                                    });
-                                  },
-                                  value: _selectedBatch,
-                                  isExpanded: true,
-                                );
-                              } else {
-                                return DropdownButton<String>(
-                                  underline: Container(),
-                                  hint: Text("Semester"),
-                                  isExpanded: true,
-                                );
-                              }
-                            }),
-                      )
-                    ],
-                  )
+              children: <Widget>[
+                Container(
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: new BoxDecoration(
+                    border:
+                    Border.all(style: BorderStyle.solid, width: 0.80),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: StreamBuilder(
+                      stream: Firestore.instance
+                          .collection("semwise_batches")
+                          .document(_selectedPT)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        List<String> _batch = new List<String>();
+                        if (snapshot != null && snapshot.hasData) {
+                          DocumentSnapshot document = snapshot.data;
+                          _batch =
+                              document.data.keys.toList(growable: false);
+                          return DropdownButton<String>(
+                            underline: SizedBox(),
+                            items: _batch.map((String key) {
+                              return new DropdownMenuItem<String>(
+                                value: key,
+                                child: new Text(key),
+                              );
+                            }).toList(),
+                            hint: Text("Batches"),
+                            onChanged: (String newVal) {
+                              setState(() {
+                                this._selectedBatch = newVal;
+                              });
+                            },
+                            value: _selectedBatch,
+                            isExpanded: true,
+                          );
+                        } else {
+                          return DropdownButton<String>(
+                            underline: Container(),
+                            hint: Text("Semester"),
+                            isExpanded: true,
+                          );
+                        }
+                      }),
+                )
+              ],
+            )
                 : Center(),
             Center(
               child: Container(
@@ -281,9 +281,9 @@ class _AttendanceState extends State<Attendance> {
                         'students': students,
                         'status': "0",
                         'date':
-                            "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
                         'time':
-                            "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}"
+                        "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}"
                       });
                       Navigator.of(context).pushReplacement(
                           new MaterialPageRoute(
@@ -321,35 +321,36 @@ class QRGenerate extends StatelessWidget {
         body: WillPopScope(
           onWillPop: () async {
             return (await showDialog(
-                  context: context,
-                  builder: (context) => new AlertDialog(
-                    title: new Text('Are you sure?'),
-                    content: new Text('Do you want to finish attendance'),
-                    actions: <Widget>[
-                      new FlatButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: new Text('No'),
-                      ),
-                      new FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                          Firestore.instance
-                              .collection("attendance")
-                              .document(documentID)
-                              .updateData({"status": 1});
-                        },
-                        child: new Text('Yes'),
-                      ),
-                    ],
+              context: context,
+              builder: (context) => new AlertDialog(
+                title: new Text('Are you sure?'),
+                content: new Text('Do you want to finish attendance'),
+                actions: <Widget>[
+                  new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: new Text('No'),
                   ),
-                )) ??
+                  new FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      Firestore.instance
+                          .collection("attendance")
+                          .document(documentID)
+                          .updateData({"status": 1});
+                    },
+                    child: new Text('Yes'),
+                  ),
+                ],
+              ),
+            )) ??
                 false;
           },
-          child: ListView(
-            children: [
-              Container(
-                padding: EdgeInsets.all(15),
-                child: Column(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: ListView(
+              padding: EdgeInsets.all(5),
+              children: <Widget>[
+                Column(
                   children: <Widget>[
                     new Padding(
                       padding: const EdgeInsets.only(bottom: 50),
@@ -392,21 +393,19 @@ class QRGenerate extends StatelessWidget {
                           onPressed: () {
                             Firestore.instance
                                 .collection("student_details")
-                                .where("semester",
-                                    isEqualTo: _semester.toString())
+                                .where("semester", isEqualTo: _semester.toString())
                                 .getDocuments()
                                 .then((document) {
                               var sem_student = document.documents;
                               List documents = new List();
                               sem_student.forEach((element) {
                                 if (_type.compareTo("Theory") == 0) {
-                                  if (_batch.compareTo(element['division']) ==
-                                      0) {
+                                  if (_batch.compareTo(element['division']) == 0) {
                                     documents.add(element.documentID);
                                   }
                                 } else if (_type.compareTo("Practical") == 0) {
-                                  if (_batch.compareTo(element['division'] +
-                                          element['batch']) ==
+                                  if (_batch.compareTo(
+                                      element['division'] + element['batch']) ==
                                       0) {
                                     documents.add(element.documentID);
                                   }
@@ -458,8 +457,8 @@ class QRGenerate extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
+                    Container(
+                      height: 400,
                         child: StreamBuilder<Object>(
                             stream: Firestore.instance
                                 .collection("attendance")
@@ -476,16 +475,15 @@ class QRGenerate extends StatelessWidget {
                                     students.length == 0
                                         ? Text("No Students")
                                         : Expanded(
-                                            child: ListView.builder(
-                                              itemBuilder: (context, index) {
-                                                return ListTile(
-                                                  title: Text(
-                                                      "${students[index]}"),
-                                                );
-                                              },
-                                              itemCount: students.length,
-                                            ),
-                                          )
+                                      child: ListView.builder(
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text("${students[index]}"),
+                                          );
+                                        },
+                                        itemCount: students.length,
+                                      ),
+                                    )
                                   ],
                                 );
                               } else {
@@ -493,7 +491,6 @@ class QRGenerate extends StatelessWidget {
                               }
                             }),
                       ),
-                    )
 
                     /* RaisedButton(
                   shape: RoundedRectangleBorder(
@@ -505,8 +502,8 @@ class QRGenerate extends StatelessWidget {
                 ),*/
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ));
   }

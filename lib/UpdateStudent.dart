@@ -117,7 +117,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar("Update Student Details"),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       body: BodyUpdate(context),
     );
   }
@@ -130,10 +130,6 @@ class _UpdateStudentState extends State<UpdateStudentData> {
           padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: new Form(
             autovalidate: _autoValidate,
-            child: new Card(
-              elevation: 30.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
               child: Container(
                 padding: const EdgeInsets.all(15.0),
                 child: new Column(
@@ -316,7 +312,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                     ),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
-                      padding: const EdgeInsets.only(left: 30.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
@@ -352,14 +348,14 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                         ? Container()
                         : new Align(
                             alignment: Alignment.centerLeft,
-                            child: new Text("    Please select Semester",
+                            child: new Text("Please select Semester",
                                 style: TextStyle(
                                     color: Colors.redAccent,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
-                      padding: const EdgeInsets.only(left: 30.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
 //                      alignment: Alignment.center,
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
@@ -393,14 +389,14 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                         ? Container()
                         : new Align(
                             alignment: Alignment.centerLeft,
-                            child: new Text("    Please select Division",
+                            child: new Text("Please select Division",
                                 style: TextStyle(
                                     color: Colors.redAccent,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400))),
                     new Padding(padding: const EdgeInsets.only(bottom: 15.0)),
                     Container(
-                      padding: const EdgeInsets.only(left: 30.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         border:
@@ -433,7 +429,7 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                         ? Container()
                         : new Align(
                             alignment: Alignment.centerLeft,
-                            child: new Text("    Please select Batch",
+                            child: new Text("Please select Batch",
                                 style: TextStyle(
                                     color: Colors.redAccent,
                                     fontSize: 12,
@@ -557,7 +553,6 @@ class _UpdateStudentState extends State<UpdateStudentData> {
                   ],
                 ),
               ),
-            ),
           ),
         ),
       ],

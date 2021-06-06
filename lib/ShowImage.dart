@@ -14,7 +14,6 @@ class ShowImage extends StatelessWidget {
       body: Stack(
         children: <Widget>[
           new Dismissible(
-
             direction: DismissDirection.down,
             key: Key('key'),
             onDismissed: (_) => Navigator.pop(context),
@@ -29,7 +28,7 @@ class ShowImage extends StatelessWidget {
 //            width: MediaQuery.of(context).size.width,
 //            color: Colors.transparent,
 //            height: MediaQuery.of(context).size.height,
-//            child: CachedNetworkImage(imageUrl: url,fadeInDuration: Duration(seconds: 1),),
+//            child: CachedNetworkImage(imageUrl: url,fit: BoxFit.cover,fadeInDuration: Duration(seconds: 1),),
 //          ),
           Padding(
             padding: const EdgeInsets.only(top: 25, left: 10),

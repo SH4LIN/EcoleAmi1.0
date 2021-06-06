@@ -44,7 +44,6 @@ class _ManageInfoState extends State<ManageInfo> {
     });
 
     return new Scaffold(
-      backgroundColor: Colors.white,
       appBar: CommonAppBar("Manage Faculty Details"),
       body: new Container(
         padding: EdgeInsets.all(5.0),
@@ -373,6 +372,10 @@ class _ManageInfoState extends State<ManageInfo> {
                     try {
                       await Firestore.instance
                           .collection('faculty_details')
+                          .document(_document)
+                          .delete();
+                      await Firestore.instance
+                          .collection('verification_details')
                           .document(_document)
                           .delete();
                       final snapShot = await Firestore.instance

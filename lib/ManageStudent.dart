@@ -71,6 +71,7 @@ class _ManageInformationState extends State<ManageInformation> {
         padding: EdgeInsets.all(5.0),
         child: new Column(
           children: <Widget>[
+
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: TextField(

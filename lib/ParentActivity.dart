@@ -11,7 +11,7 @@ import 'package:ecoleami1_0/Contactus.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:compressimage/compressimage.dart';
+//import 'package:compressimage/compressimage.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,10 +31,10 @@ import 'Contactus.dart';
 Widget buildError(BuildContext context, FlutterErrorDetails error) {
   return Scaffold(
       body: Center(
-    child: Text(
-      "Error appeared.",
-    ),
-  ));
+        child: Text(
+          "Error appeared.",
+        ),
+      ));
 }
 
 class ParentActivity extends StatelessWidget {
@@ -145,16 +145,30 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                   return CircularProgressIndicator();
                 },
               ),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor:
-                    Theme.of(context).platform == TargetPlatform.iOS
-                        ? Colors.blue
-                        : Colors.white,
-                child: Text(
-                  "J",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
+              currentAccountPicture: StreamBuilder<DocumentSnapshot>(
+                  stream: Firestore.instance
+                      .collection("parent_details")
+                      .document(_username)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      var doc = snapshot.data;
+                      var name = doc['full_name'];
+                      return CircleAvatar(
+                        maxRadius: 40,
+                        backgroundColor:
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Colors.blue
+                            : Colors.cyanAccent,
+                        child: Text(
+                          '${name[0]}',
+                          style: TextStyle(fontSize: 40.0),
+                        ),
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  }),
               arrowColor: Colors.red,
             ),
             new ListTile(
@@ -176,10 +190,10 @@ class _ParentActivityPageState extends State<ParentActivityPage>
       backgroundColor: selectedIndex == 0
           ? Colors.grey.shade200
           : selectedIndex == 1
-              ? Colors.white
-              : selectedIndex == 2
-                  ? Colors.greenAccent
-                  : selectedIndex == 3 ? Colors.black : Colors.grey,
+          ? Colors.white
+          : selectedIndex == 2
+          ? Colors.greenAccent
+          : selectedIndex == 3 ? Colors.black : Colors.grey,
     );
   }
 
@@ -239,9 +253,9 @@ class _ParentActivityPageState extends State<ParentActivityPage>
       height: 45,
       decoration: isSelected
           ? BoxDecoration(
-              color: item.color,
-              borderRadius: BorderRadius.circular(16.0),
-            )
+        color: item.color,
+        borderRadius: BorderRadius.circular(16.0),
+      )
           : null,
       child: ListView(scrollDirection: Axis.horizontal, children: <Widget>[
         Row(
@@ -252,8 +266,8 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                   size: 25.0,
                   color: isSelected
                       ? item.title.data.compareTo("Settings") == 0
-                          ? Colors.white
-                          : backgroundColor
+                      ? Colors.white
+                      : backgroundColor
                       : Colors.black),
               child: item.icon,
             ),
@@ -261,12 +275,12 @@ class _ParentActivityPageState extends State<ParentActivityPage>
               padding: const EdgeInsets.only(left: 15.0),
               child: isSelected
                   ? Text(
-                      item.title.data,
-                      style: TextStyle(
-                          color: item.title.data.compareTo("Settings") == 0
-                              ? Colors.white
-                              : backgroundColor),
-                    )
+                item.title.data,
+                style: TextStyle(
+                    color: item.title.data.compareTo("Settings") == 0
+                        ? Colors.white
+                        : backgroundColor),
+              )
                   : Container(),
             )
           ],
@@ -277,7 +291,9 @@ class _ParentActivityPageState extends State<ParentActivityPage>
 
   List<String> _subjectsTheory = new List<String>();
   List<String> _subjectsPractical = new List<String>();
-  void getData() async {}
+  void getData() async{
+
+  }
   Map<String, int> totalTheorySubjects = new HashMap<String, int>();
   Map<String, int> totalPracticalSubjects = new HashMap<String, int>();
   Map<String, int> attendedPracticalSubjects = new HashMap<String, int>();
@@ -291,7 +307,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                 .collection("parent_details")
                 .document(_username)
                 .snapshots(),
-            builder: (context, snapshot) {
+            builder: (context, snapshot)  {
               if (snapshot != null && snapshot.hasData) {
                 var data = snapshot.data;
                 var _currentSem = data["student_semester"];
@@ -334,7 +350,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   _subjectsTheory.isNotEmpty) {
                                 var data = snapshot.data.documents;
                                 List<DocumentSnapshot> myTheoryData =
-                                    new List<DocumentSnapshot>();
+                                new List<DocumentSnapshot>();
                                 data.forEach((element) {
                                   if (element["type"].compareTo("Theory") ==
                                       0) {
@@ -353,7 +369,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   myTheoryData.forEach((element1) {
                                     List<dynamic> i = new List<dynamic>();
                                     if (element1['subject']
-                                            .compareTo(element) ==
+                                        .compareTo(element) ==
                                         0) {
                                       count++;
                                       i = element1['students'];
@@ -380,9 +396,9 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                       Colors.green
                                     ];
                                     Map<String, double> pieData =
-                                        new HashMap<String, double>();
+                                    new HashMap<String, double>();
                                     pieData["Absent"] = (j[index] -
-                                            attendedTheorySubjects[i[index]])
+                                        attendedTheorySubjects[i[index]])
                                         .toDouble();
                                     pieData["Present"] =
                                         attendedTheorySubjects[i[index]]
@@ -395,48 +411,48 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                           children: <Widget>[
                                             Flexible(
                                                 child: Text(
-                                              "${i[index]} (Theory)",
-                                              textAlign: TextAlign.center,
-                                            )),
+                                                  "${i[index]} (Theory)",
+                                                  textAlign: TextAlign.center,
+                                                )),
                                             j[index] != 0
                                                 ? Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 14.0),
-                                                    child: PieChart(
-                                                      dataMap: pieData,
-                                                      colorList: _colors,
-                                                      animationDuration:
-                                                          Duration(
-                                                              milliseconds:
-                                                                  500),
-                                                      chartRadius: 110,
-                                                      chartType: ChartType.disc,
-                                                      showChartValues: true,
-                                                      showLegends: true,
-                                                      showChartValuesInPercentage:
-                                                          true,
-                                                      showChartValuesOutside:
-                                                          true,
-                                                      showChartValueLabel: true,
-                                                      initialAngle: 90,
-                                                    ),
-                                                  )
+                                              padding:
+                                              const EdgeInsets.only(
+                                                  top: 14.0),
+                                              child: PieChart(
+                                                dataMap: pieData,
+                                                colorList: _colors,
+                                                animationDuration:
+                                                Duration(
+                                                    milliseconds:
+                                                    500),
+                                                chartRadius: 110,
+                                                chartType: ChartType.disc,
+                                                showChartValues: true,
+                                                showLegends: true,
+                                                showChartValuesInPercentage:
+                                                true,
+                                                showChartValuesOutside:
+                                                true,
+                                                showChartValueLabel: true,
+                                                initialAngle: 90,
+                                              ),
+                                            )
                                                 : Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            14.0),
-                                                    child: Center(
-                                                      child: Text(
-                                                        "No Lecture Taken Yet!",
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .lightGreen),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ),
+                                              padding:
+                                              const EdgeInsets.all(
+                                                  14.0),
+                                              child: Center(
+                                                child: Text(
+                                                  "No Lecture Taken Yet!",
+                                                  style: TextStyle(
+                                                      color: Colors
+                                                          .lightGreen),
+                                                  textAlign:
+                                                  TextAlign.center,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -467,13 +483,13 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   _subjectsPractical.isNotEmpty) {
                                 var data = snapshot.data.documents;
                                 List<DocumentSnapshot> myPracticalData =
-                                    new List<DocumentSnapshot>();
+                                new List<DocumentSnapshot>();
                                 data.forEach((element) {
                                   if (element["type"].compareTo("Practical") ==
                                       0) {
                                     if (element["batch"]
-                                                .compareTo(_div + _batch) ==
-                                            0 &&
+                                        .compareTo(_div + _batch) ==
+                                        0 &&
                                         element['status'] == 1) {
                                       myPracticalData.add(element);
                                     }
@@ -488,7 +504,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   myPracticalData.forEach((element1) {
                                     List<dynamic> i = new List<dynamic>();
                                     if (element1['subject']
-                                            .compareTo(element) ==
+                                        .compareTo(element) ==
                                         0) {
                                       count++;
                                       i = element1['students'];
@@ -508,15 +524,15 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     var i =
-                                        totalPracticalSubjects.keys.toList();
+                                    totalPracticalSubjects.keys.toList();
                                     var j =
-                                        totalPracticalSubjects.values.toList();
+                                    totalPracticalSubjects.values.toList();
                                     List<Color> _colors = [
                                       Colors.red,
                                       Colors.green
                                     ];
                                     Map<String, double> pieData =
-                                        new HashMap<String, double>();
+                                    new HashMap<String, double>();
                                     pieData["Absent"] = j[index] -
                                         attendedPracticalSubjects[i[index]]
                                             .toDouble();
@@ -533,46 +549,46 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                                                 child: Text(
                                                     "${i[index]} (Practical)",
                                                     textAlign:
-                                                        TextAlign.center)),
+                                                    TextAlign.center)),
                                             j[index] != 0
                                                 ? Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 14.0),
-                                                    child: PieChart(
-                                                      dataMap: pieData,
-                                                      colorList: _colors,
-                                                      animationDuration:
-                                                          Duration(
-                                                              milliseconds:
-                                                                  500),
-                                                      chartRadius: 110,
-                                                      chartType: ChartType.disc,
-                                                      showChartValues: true,
-                                                      showLegends: true,
-                                                      showChartValuesInPercentage:
-                                                          true,
-                                                      showChartValuesOutside:
-                                                          true,
-                                                      showChartValueLabel: true,
-                                                      initialAngle: 90,
-                                                    ),
-                                                  )
+                                              padding:
+                                              const EdgeInsets.only(
+                                                  top: 14.0),
+                                              child: PieChart(
+                                                dataMap: pieData,
+                                                colorList: _colors,
+                                                animationDuration:
+                                                Duration(
+                                                    milliseconds:
+                                                    500),
+                                                chartRadius: 110,
+                                                chartType: ChartType.disc,
+                                                showChartValues: true,
+                                                showLegends: true,
+                                                showChartValuesInPercentage:
+                                                true,
+                                                showChartValuesOutside:
+                                                true,
+                                                showChartValueLabel: true,
+                                                initialAngle: 90,
+                                              ),
+                                            )
                                                 : Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            14.0),
-                                                    child: Center(
-                                                      child: Text(
-                                                        "No Lab Taken Yet!",
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .lightGreen),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  )
+                                              padding:
+                                              const EdgeInsets.all(
+                                                  14.0),
+                                              child: Center(
+                                                child: Text(
+                                                  "No Lab Taken Yet!",
+                                                  style: TextStyle(
+                                                      color: Colors
+                                                          .lightGreen),
+                                                  textAlign:
+                                                  TextAlign.center,
+                                                ),
+                                              ),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -593,7 +609,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                           stream: Firestore.instance
                               .collection("attendance")
                               .where('students',
-                                  arrayContains: _usernameStudent)
+                              arrayContains: _usernameStudent)
                               .snapshots(),
                           builder: (context, snapshot) {
                             if (snapshot != null && snapshot.hasData) {
@@ -601,52 +617,52 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                               List<DocumentSnapshot> data = document.documents;
                               return data.length == 0
                                   ? Align(
-                                      alignment: Alignment.center,
-                                      child: Text("No Attendance Submitted"))
+                                  alignment: Alignment.center,
+                                  child: Text("No Attendance Submitted"))
                                   : Expanded(
-                                      child: ListView.builder(
-                                          itemCount: data.length,
-                                          itemBuilder: (context, index) {
-                                            return Card(
-                                              margin: EdgeInsets.all(14),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(14.0),
-                                                child: Column(
-                                                  children: <Widget>[
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: <Widget>[
-                                                        Flexible(
-                                                          child: Container(
-                                                            child: Center(
-                                                              child: Text(
-                                                                "${data[index]['subject']}(${data[index]["type"]})",
-                                                                softWrap: true,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Container(
-                                                      child: Text(
-                                                          "${data[index]['date']}"),
-                                                    ),
-                                                    Container(
+                                child: ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        margin: EdgeInsets.all(14),
+                                        child: Padding(
+                                          padding:
+                                          const EdgeInsets.all(14.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceAround,
+                                                children: <Widget>[
+                                                  Flexible(
+                                                    child: Container(
+                                                      child: Center(
                                                         child: Text(
-                                                            "${data[index]['time']}")),
-                                                  ],
-                                                ),
+                                                          "${data[index]['subject']}(${data[index]["type"]})",
+                                                          softWrap: true,
+                                                          textAlign:
+                                                          TextAlign
+                                                              .center,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            );
-                                          }),
-                                    );
+                                              Container(
+                                                child: Text(
+                                                    "${data[index]['date']}"),
+                                              ),
+                                              Container(
+                                                  child: Text(
+                                                      "${data[index]['time']}")),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              );
                             } else {
                               return CircularProgressIndicator();
                             }
@@ -734,9 +750,9 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                     return CircleAvatar(
                       maxRadius: 40,
                       backgroundColor:
-                          Theme.of(context).platform == TargetPlatform.iOS
-                              ? Colors.blue
-                              : Colors.cyanAccent,
+                      Theme.of(context).platform == TargetPlatform.iOS
+                          ? Colors.blue
+                          : Colors.cyanAccent,
                       child: Text(
                         '${name[0]}',
                         style: TextStyle(fontSize: 40.0),
@@ -773,7 +789,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? 'Please enter First Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -938,7 +954,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _fValidate ? 'Please enter First Name' : null,
+                              _fValidate ? 'Please enter First Name' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -964,7 +980,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                           _enrCheck = document['student_enrollment'];
                           _enrCheck.compareTo("------------") == 0
                               ? _enr.text =
-                                  "(enrollment number is not registered)"
+                          "(enrollment number is not registered)"
                               : _enr.text = document['student_enrollment'];
                         }
                         return new TextField(
@@ -1085,7 +1101,7 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                           decoration: new InputDecoration(
                               hintText: "Loading ...",
                               errorText:
-                                  _semValidate ? 'Please enter Semester' : null,
+                              _semValidate ? 'Please enter Semester' : null,
                               hintStyle: new TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white70,
@@ -1126,225 +1142,225 @@ class _ParentActivityPageState extends State<ParentActivityPage>
     });
     return _semester != null
         ? ListView(
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.65,
-                    child: StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('QnA')
-                            .document("parents")
-                            .collection(_semester)
-                            .orderBy('timestamp', descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot != null && snapshot.hasData) {
-                            msgItems = snapshot.data.documents;
-                          }
-                          return ListView.builder(
-                            itemBuilder: (context, index) {
-                              String senderUsername = msgItems[index]['userid'];
-                              _fullName = msgItems[index]['full_name'];
-                              int type = msgItems[index]['type'];
-                              return Column(
-                                crossAxisAlignment:
-                                    (senderUsername.compareTo(_username)) == 0
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    alignment:
-                                        (senderUsername.compareTo(_username)) ==
-                                                0
-                                            ? Alignment.topRight
-                                            : Alignment.topLeft,
-                                    child: Wrap(children: <Widget>[
-                                      Bubble(
-                                        padding: BubbleEdges.only(left: 8),
-                                        elevation: 10.0,
-                                        shadowColor: Colors.white,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              (senderUsername.compareTo(
-                                                          _username)) ==
-                                                      0
-                                                  ? "You"
-                                                  : _fullName,
-                                              style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                  fontSize: 12),
-                                            ),
-                                            SizedBox(height: 8),
-                                            type == 0
-                                                ? Text(
-                                                    msgItems[index]['message'],
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black),
-                                                  )
-                                                : GestureDetector(
-                                                    onTap: () {
-                                                      print(index);
-                                                      Navigator.of(context).push(
-                                                          new MaterialPageRoute(
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  ShowImage(msgItems[
-                                                                          index]
-                                                                      [
-                                                                      'message'])));
-                                                    },
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: msgItems[index]
-                                                          ['message'],
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Center(
-                                                              child:
-                                                                  CircularProgressIndicator()),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          new Icon(Icons.error),
-                                                    ),
-                                                  ),
-                                            SizedBox(height: 3),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(
-                                                  msgItems[index]['time'],
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 10),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        nip: (senderUsername
-                                                    .compareTo(_username)) ==
-                                                0
-                                            ? BubbleNip.rightTop
-                                            : BubbleNip.leftTop,
-                                      ),
-                                    ]),
-                                    padding:
-                                        EdgeInsets.only(top: 10.0, left: 8),
-                                    margin: EdgeInsets.only(bottom: 8),
-                                  ),
-                                ],
-                              );
-                            },
-                            reverse: true,
-                            itemCount: msgItems != null ? msgItems.length : 0,
-                          );
-                        }),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(top: 15),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(26),
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Row(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.65,
+              child: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('QnA')
+                      .document("parents")
+                      .collection(_semester)
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot != null && snapshot.hasData) {
+                      msgItems = snapshot.data.documents;
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        String senderUsername = msgItems[index]['userid'];
+                        _fullName = msgItems[index]['full_name'];
+                        int type = msgItems[index]['type'];
+                        return Column(
+                          crossAxisAlignment:
+                          (senderUsername.compareTo(_username)) == 0
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              alignment:
+                              (senderUsername.compareTo(_username)) ==
+                                  0
+                                  ? Alignment.topRight
+                                  : Alignment.topLeft,
+                              child: Wrap(children: <Widget>[
+                                Bubble(
+                                  padding: BubbleEdges.only(left: 8),
+                                  elevation: 10.0,
+                                  shadowColor: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      SizedBox(width: 16),
-                                      Expanded(
-                                          child: TextFormField(
-                                        controller: _msg,
-                                        onChanged: (value) {
-                                          if (value.toString().isEmpty) {
-                                            setState(() {
-                                              msgEmpty = true;
-                                            });
-                                          } else {
-                                            if (value
-                                                    .toString()
-                                                    .trim()
-                                                    .length ==
-                                                0) {
-                                              setState(() {
-                                                print("Space");
-                                                msgEmpty = true;
-                                              });
-                                            } else if (value.isNotEmpty) {
-                                              setState(() {
-                                                msgEmpty = false;
-                                              });
-                                            }
-                                          }
+                                      Text(
+                                        (senderUsername.compareTo(
+                                            _username)) ==
+                                            0
+                                            ? "You"
+                                            : _fullName,
+                                        style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      type == 0
+                                          ? Text(
+                                        msgItems[index]['message'],
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      )
+                                          : GestureDetector(
+                                        onTap: () {
+                                          print(index);
+                                          Navigator.of(context).push(
+                                              new MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                  context) =>
+                                                      ShowImage(msgItems[
+                                                      index]
+                                                      [
+                                                      'message'])));
                                         },
-                                        keyboardType: TextInputType.multiline,
-                                        minLines: 1,
-                                        maxLines: 100,
-                                        decoration: InputDecoration(
-                                          hintText: 'Type a message',
-                                          border: InputBorder.none,
-                                          alignLabelWithHint: true,
+                                        child: CachedNetworkImage(
+                                          imageUrl: msgItems[index]
+                                          ['message'],
+                                          placeholder: (context,
+                                              url) =>
+                                              Center(
+                                                  child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context,
+                                              url, error) =>
+                                          new Icon(Icons.error),
                                         ),
-                                      )),
-                                      GestureDetector(
-                                        onTap: () => sendCameraImage(),
-                                        child: Icon(Icons.camera_alt,
-                                            color: Theme.of(context).hintColor),
                                       ),
-                                      SizedBox(width: 8.0),
-                                      GestureDetector(
-                                        onTap: () => sendImage(),
-                                        child: Icon(Icons.image,
-                                            color: Theme.of(context).hintColor),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            msgItems[index]['time'],
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 10),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(width: 8.0),
-                                      SizedBox(width: 8.0),
                                     ],
                                   ),
+                                  nip: (senderUsername
+                                      .compareTo(_username)) ==
+                                      0
+                                      ? BubbleNip.rightTop
+                                      : BubbleNip.leftTop,
                                 ),
-                              ),
+                              ]),
+                              padding:
+                              EdgeInsets.only(top: 10.0, left: 8),
+                              margin: EdgeInsets.only(bottom: 8),
+                            ),
+                          ],
+                        );
+                      },
+                      reverse: true,
+                      itemCount: msgItems != null ? msgItems.length : 0,
+                    );
+                  }),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(26),
+                          child: Container(
+                            color: Colors.white,
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(width: 16),
+                                Expanded(
+                                    child: TextFormField(
+                                      controller: _msg,
+                                      onChanged: (value) {
+                                        if (value.toString().isEmpty) {
+                                          setState(() {
+                                            msgEmpty = true;
+                                          });
+                                        } else {
+                                          if (value
+                                              .toString()
+                                              .trim()
+                                              .length ==
+                                              0) {
+                                            setState(() {
+                                              print("Space");
+                                              msgEmpty = true;
+                                            });
+                                          } else if (value.isNotEmpty) {
+                                            setState(() {
+                                              msgEmpty = false;
+                                            });
+                                          }
+                                        }
+                                      },
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 100,
+                                      decoration: InputDecoration(
+                                        hintText: 'Type a message',
+                                        border: InputBorder.none,
+                                        alignLabelWithHint: true,
+                                      ),
+                                    )),
+                                GestureDetector(
+                                  onTap: () => sendCameraImage(),
+                                  child: Icon(Icons.camera_alt,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                GestureDetector(
+                                  onTap: () => sendImage(),
+                                  child: Icon(Icons.image,
+                                      color: Theme.of(context).hintColor),
+                                ),
+                                SizedBox(width: 8.0),
+                                SizedBox(width: 8.0),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          AnimatedContainer(
-                            duration: Duration(seconds: 1),
-                            curve: Curves.fastOutSlowIn,
-                            margin: EdgeInsets.only(top: 15),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _type = 0;
-                                  sendMessage(_msg.text);
-                                  _msg.clear();
-                                });
-                              },
-                              child: msgEmpty
-                                  ? Container()
-                                  : CircleAvatar(
-                                      child: Icon(Icons.send),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
-            ],
-          )
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    AnimatedContainer(
+                      duration: Duration(seconds: 1),
+                      curve: Curves.fastOutSlowIn,
+                      margin: EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _type = 0;
+                            sendMessage(_msg.text);
+                            _msg.clear();
+                          });
+                        },
+                        child: msgEmpty
+                            ? Container()
+                            : CircleAvatar(
+                          child: Icon(Icons.send),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      ],
+    )
         : Center(child: CircularProgressIndicator());
   }
 
@@ -1358,12 +1374,12 @@ class _ParentActivityPageState extends State<ParentActivityPage>
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+ /*     print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1415,12 +1431,12 @@ class _ParentActivityPageState extends State<ParentActivityPage>
       _type = 1;
     });
     if (_image != null) {
-      print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
+     /* print("FILE SIZE BEFORE: " + _image.lengthSync().toString());
       await CompressImage.compress(
           imageSrc: _image.path,
           desiredQuality: 50); //desiredQuality ranges from 0 to 100
       print("FILE SIZE  AFTER: " + _image.lengthSync().toString());
-      print(_image.path);
+      print(_image.path);*/
       StorageReference storageReference = FirebaseStorage.instance
           .ref()
           .child('QnA Images/${Path.basename(_image.path)}}');
@@ -1515,17 +1531,6 @@ class _ParentActivityPageState extends State<ParentActivityPage>
               }),
           ListTile(
             leading: Icon(
-              Icons.info_outline,
-              color: Colors.white,
-            ),
-            title: Text(
-              "About Us",
-              style: TextStyle(color: Colors.white),
-            ),
-            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-          ),
-          ListTile(
-            leading: Icon(
               Icons.call,
               color: Colors.white,
             ),
@@ -1583,13 +1588,13 @@ class _ParentActivityPageState extends State<ParentActivityPage>
                               new FlatButton(
                                   onPressed: () async {
                                     SharedPreferences prf =
-                                        await SharedPreferences.getInstance();
+                                    await SharedPreferences.getInstance();
                                     prf.setBool("isLoggedIn", false);
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pushReplacement(
                                         new MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                new MainScreen()));
+                                            new MainScreen()));
                                   },
                                   child: new Text(
                                     "Logout",
